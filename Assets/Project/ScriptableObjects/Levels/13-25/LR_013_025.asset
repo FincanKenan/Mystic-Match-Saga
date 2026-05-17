@@ -17,8 +17,8 @@ MonoBehaviour:
   tileBag: {fileID: 11400000, guid: d256eaf7b67feb547a26d43454db8a4b, type: 2}
   backgroundLayerBottom: {fileID: 3229507492666951288, guid: 9872d30bcc8badb4f8031c854c366476, type: 3}
   backgroundLayerTop: {fileID: -8985808423211435256, guid: 40370233a2d8ef34eacfcd5aca86c3e3, type: 3}
-  minTotalTiles: 24
-  maxTotalTiles: 45
+  minTotalTiles: 27
+  maxTotalTiles: 54
   allowedNormalLayouts:
   - layout: {fileID: 11400000, guid: b3bbced42f24eb346b20672fb9f72ca5, type: 2}
     weight: 1
@@ -28,6 +28,18 @@ MonoBehaviour:
     weight: 1
   - layout: {fileID: 11400000, guid: 4f11006cad163044dbc06aeefa64c77e, type: 2}
     weight: 1
+  - layout: {fileID: 11400000, guid: 25567d591a97ada45841ef3165ba2d5c, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: 7689ac603554d6448a9f6ec098d961e1, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: b1033b247cd5a12408df69ad4107ebb2, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: 26974daba6edb2844b285fd1fea98d42, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: 7154d5d08e004c34b8c14edbf661a551, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: eff0a4ecdf48e164db8bedc1e0c4145f, type: 2}
+    weight: 100
   allowedSpecialLayouts:
   - layout: {fileID: 11400000, guid: a38e1e5572a6a3347ad728185239a2b4, type: 2}
     weight: 2

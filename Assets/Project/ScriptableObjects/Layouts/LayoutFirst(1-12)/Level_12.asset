@@ -61,7 +61,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - T12-N1-Point_3
+      - T12-N1-Point_2
       minStackHeight: 9
       maxStackHeight: 9
       note: 

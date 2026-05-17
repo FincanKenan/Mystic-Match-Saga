@@ -25,6 +25,7 @@ MonoBehaviour:
       visibilityMode: 0
       stackOpenDirection: 2
       startsLocked: 0
+      unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds: []
       minStackHeight: 12
       maxStackHeight: 12
@@ -35,6 +36,7 @@ MonoBehaviour:
       visibilityMode: 0
       stackOpenDirection: 0
       startsLocked: 1
+      unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - T11-N1-Point_1
       - T11-N1-Point_5
@@ -47,6 +49,7 @@ MonoBehaviour:
       visibilityMode: 0
       stackOpenDirection: 1
       startsLocked: 0
+      unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds: []
       minStackHeight: 12
       maxStackHeight: 12
@@ -57,6 +60,7 @@ MonoBehaviour:
       visibilityMode: 0
       stackOpenDirection: 4
       startsLocked: 1
+      unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - T11-N1-Point_3
       - T11-N1-Point_6
@@ -69,6 +73,7 @@ MonoBehaviour:
       visibilityMode: 0
       stackOpenDirection: 2
       startsLocked: 0
+      unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds: []
       minStackHeight: 12
       maxStackHeight: 12
@@ -79,6 +84,7 @@ MonoBehaviour:
       visibilityMode: 0
       stackOpenDirection: 1
       startsLocked: 0
+      unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds: []
       minStackHeight: 12
       maxStackHeight: 12

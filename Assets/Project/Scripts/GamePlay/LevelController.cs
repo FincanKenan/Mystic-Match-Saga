@@ -26,6 +26,7 @@ namespace ZenMatch.Gameplay
             public List<TileTypeSO> TrayBeforeSlots;
             public Sprite TileSprite;
             public bool IsValid;
+            public bool UnlockedTraySlot;
         }
 
         [SerializeField] private BoardSpawner boardSpawner;
@@ -38,6 +39,12 @@ namespace ZenMatch.Gameplay
         [Header("Debug")]
         [SerializeField] private bool logTrayStateAfterEachMove = true;
         [SerializeField] private bool logBoardStateAfterEachMove = true;
+
+       
+
+
+
+
 
         private LevelGameState _gameState = LevelGameState.Playing;
         private bool _isMoveInProgress = false;
@@ -170,9 +177,17 @@ namespace ZenMatch.Gameplay
             if (boardSpawner != null && boardSpawner.TryGetPointWorldPosition(move.PointId, out worldPos))
                 boardWorldPos = worldPos;
 
+            trayController.RestoreSlots(move.TrayBeforeSlots);
+
+            yield return null;
+
             if (tileFlyBackAnimator != null && move.TileSprite != null)
             {
-                tileFlyBackAnimator.Play(move.TileSprite, trayWorldPos, boardWorldPos);
+                tileFlyBackAnimator.Play(
+                    move.TileSprite,
+                    trayWorldPos,
+                    boardWorldPos);
+
                 yield return new WaitForSeconds(tileFlyBackAnimator.Duration);
             }
 
@@ -181,9 +196,14 @@ namespace ZenMatch.Gameplay
                 move.TileIndex,
                 move.RemovedTile);
 
+            if (restored && move.UnlockedTraySlot)
+            {
+                trayController.RelockOneSlot();
+                boardSpawner.RestoreTraySlotRewardVisual(move.PointId);
+            }
+
             if (restored)
             {
-                trayController.RestoreSlots(move.TrayBeforeSlots);
                 _gameState = LevelGameState.Playing;
 
                 if (logTrayStateAfterEachMove && trayController.State != null)
@@ -220,6 +240,12 @@ namespace ZenMatch.Gameplay
             if (_isMoveInProgress)
                 return false;
 
+            if (trayController != null &&
+    trayController.View != null &&
+    trayController.View.IsAnimating)
+                return false;
+
+
             if (boardSpawner == null || trayController == null)
                 return false;
 
@@ -233,6 +259,7 @@ namespace ZenMatch.Gameplay
             if (!boardSpawner.TryTakeTile(pointId, tileIndex, out BoardTileInstance removedTile, out int removedIndex))
                 return false;
 
+           
             if (removedTile == null || removedTile.TileType == null)
                 return false;
 
@@ -334,9 +361,13 @@ namespace ZenMatch.Gameplay
                     TileIndex = sourceTileIndex,
                     RemovedTile = removedTile,
                     TrayBeforeSlots = trayBeforeSlots != null
-                        ? new List<TileTypeSO>(trayBeforeSlots)
-                        : new List<TileTypeSO>(),
+         ? new List<TileTypeSO>(trayBeforeSlots)
+         : new List<TileTypeSO>(),
                     TileSprite = removedTile.TileType != null ? removedTile.TileType.Icon : null,
+                    UnlockedTraySlot =
+         boardSpawner != null &&
+         boardSpawner.IsTraySlotUnlockPoint(sourcePointId) &&
+         boardSpawner.IsPointCompleted(sourcePointId),
                     IsValid = true
                 };
             }

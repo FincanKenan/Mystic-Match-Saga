@@ -102,6 +102,41 @@ namespace ZenMatch.Gameplay
             _slots.Add(tileType);
         }
 
+        public void GroupSameTiles()
+        {
+            if (_slots.Count <= 1)
+                return;
+
+            List<TileTypeSO> orderedTypes = new();
+            Dictionary<TileTypeSO, int> counts = new();
+
+            for (int i = 0; i < _slots.Count; i++)
+            {
+                TileTypeSO tile = _slots[i];
+                if (tile == null)
+                    continue;
+
+                if (!counts.ContainsKey(tile))
+                {
+                    counts.Add(tile, 0);
+                    orderedTypes.Add(tile);
+                }
+
+                counts[tile]++;
+            }
+
+            _slots.Clear();
+
+            for (int i = 0; i < orderedTypes.Count; i++)
+            {
+                TileTypeSO type = orderedTypes[i];
+                int count = counts[type];
+
+                for (int c = 0; c < count; c++)
+                    _slots.Add(type);
+            }
+        }
+
         public bool CanAdd()
         {
             return _slots.Count < CurrentCapacity;
@@ -228,6 +263,19 @@ namespace ZenMatch.Gameplay
             sb.Append(" | Locked: ").Append(LockedSlots);
 
             return sb.ToString();
+        }
+        public bool TryRemoveLast(out TileTypeSO removedTile)
+        {
+            removedTile = null;
+
+            if (_slots.Count <= 0)
+                return false;
+
+            int lastIndex = _slots.Count - 1;
+            removedTile = _slots[lastIndex];
+            _slots.RemoveAt(lastIndex);
+
+            return removedTile != null;
         }
     }
 }

@@ -1,0 +1,113 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6a23a505127a8a4f8ba459b786c93ef, type: 3}
+  m_Name: Level_18
+  m_EditorClassIdentifier: 
+  layoutId: Normal_1
+  category: 0
+  groups:
+  - groupId: Group_01
+    role: 0
+    startLocked: 0
+    points:
+    - pointId: L18-N1-Point_1
+      stackDirection: 0
+      stackLayoutMode: 0
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 4
+      maxStackHeight: 4
+      note: 
+    - pointId: L18-N1-Point_2
+      stackDirection: 1
+      stackLayoutMode: 0
+      visibilityMode: 0
+      stackOpenDirection: 1
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - L18-N1-Point_1
+      minStackHeight: 4
+      maxStackHeight: 4
+      note: 
+    - pointId: L18-N1-Point_3
+      stackDirection: 0
+      stackLayoutMode: 0
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - L18-N1-Point_2
+      minStackHeight: 4
+      maxStackHeight: 4
+      note: 
+    - pointId: L18-N1-Point_4
+      stackDirection: 0
+      stackLayoutMode: 0
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 4
+      maxStackHeight: 4
+      note: 
+    - pointId: L18-N1-Point_5
+      stackDirection: 1
+      stackLayoutMode: 0
+      visibilityMode: 0
+      stackOpenDirection: 4
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - L18-N1-Point_4
+      minStackHeight: 4
+      maxStackHeight: 4
+      note: 
+    - pointId: L18-N1-Point_6
+      stackDirection: 0
+      stackLayoutMode: 0
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - L18-N1-Point_5
+      minStackHeight: 4
+      maxStackHeight: 4
+      note: 
+    - pointId: L18-N1-Point_7
+      stackDirection: 1
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 4
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 6
+      maxStackHeight: 6
+      note: 
+    - pointId: L18-N1-Point_8
+      stackDirection: 1
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 4
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 3
+      maxStackHeight: 3
+      note: 

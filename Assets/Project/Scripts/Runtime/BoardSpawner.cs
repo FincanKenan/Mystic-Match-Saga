@@ -62,8 +62,8 @@ namespace ZenMatch.Runtime
         [SerializeField] private BackgroundPresenter backgroundPresenter;
 
         [Header("Stack View")]
-        [SerializeField] private Vector3 verticalStackOffsetStep = new Vector3(0f, 0.18f, 0f);
-        [SerializeField] private Vector3 horizontalStackOffsetStep = new Vector3(0.18f, 0f, 0f);
+        [SerializeField] private Vector3 verticalStackOffsetStep = new Vector3(0f, 0.20f, 0f);
+        [SerializeField] private Vector3 horizontalStackOffsetStep = new Vector3(0.20f, 0f, 0f);
         [SerializeField] private Sprite hiddenBackSprite;
         [SerializeField] private string sortingLayerName = "Default";
         [SerializeField] private int baseSortingOrder = 10;
@@ -112,8 +112,6 @@ namespace ZenMatch.Runtime
 
         [Header("Debug")]
         [SerializeField] private bool logTileDistribution = true;
-
-  
 
         private readonly List<BoardStack> _runtimeStacks = new();
         private readonly List<BoardStackView> _runtimeViews = new();
@@ -181,7 +179,7 @@ namespace ZenMatch.Runtime
                     else
                         Destroy(pair.Value);
 #else
-        Destroy(pair.Value);
+                    Destroy(pair.Value);
 #endif
                 }
             }
@@ -262,7 +260,9 @@ namespace ZenMatch.Runtime
             stack.InsertAt(clampedIndex, tile);
 
             _completedPointIds.Remove(pointId);
+
             RefreshStackView(pointId);
+            RefreshAllLockStates();
 
             return true;
         }
@@ -853,17 +853,25 @@ namespace ZenMatch.Runtime
                 if (!stack.StartsLocked)
                     continue;
 
-                if (!stack.IsLocked)
-                    continue;
+                bool shouldBeUnlocked = CanUnlock(stack);
 
-                if (CanUnlock(stack))
-                {
+                if (shouldBeUnlocked)
                     stack.Unlock();
-                    RefreshStackView(stack.PointId);
-                }
+                else
+                    stack.Lock();
+
+                RefreshStackView(stack.PointId);
             }
 
             RefreshAllStackDims();
+        }
+
+        public bool IsPointCompleted(string pointId)
+        {
+            if (string.IsNullOrWhiteSpace(pointId))
+                return false;
+
+            return _completedPointIds.Contains(pointId);
         }
 
         private bool CanUnlock(BoardStack stack)
@@ -1191,7 +1199,6 @@ namespace ZenMatch.Runtime
                     $"AssignedCursor: {tileCursor}, GeneratedCount: {generatedTiles.Count}",
                     this);
             }
-
         }
 
         private bool AreAllTileCountsMultipleOfThree(List<TileTypeSO> generatedTiles)
@@ -1298,7 +1305,7 @@ namespace ZenMatch.Runtime
                 else
                     Destroy(go);
 #else
-        Destroy(go);
+                Destroy(go);
 #endif
             }
 
@@ -1314,25 +1321,23 @@ namespace ZenMatch.Runtime
             BoardStackView view = stackGo.AddComponent<BoardStackView>();
             view.Bind(stack);
 
-
-
             float dimFactor = CalculateStackDimFactor(stack);
 
             view.Configure(
-    verticalStackOffsetStep,
-    horizontalStackOffsetStep,
-    hiddenBackSprite,
-    sortingLayerName,
-    baseSortingOrder + (renderPriority * sortingOrderStepPerRenderPriority),
-    1,
-    dimFactor);
+                verticalStackOffsetStep,
+                horizontalStackOffsetStep,
+                hiddenBackSprite,
+                sortingLayerName,
+                baseSortingOrder + (renderPriority * sortingOrderStepPerRenderPriority),
+                1,
+                dimFactor);
 
             view.ConfigureSelectableGlow(
-    selectableGlowSprite,
-    selectableGlowColor,
-    selectableGlowScale,
-    selectableGlowSortingOffset,
-    showGlowOnExposedLine);
+                selectableGlowSprite,
+                selectableGlowColor,
+                selectableGlowScale,
+                selectableGlowSortingOffset,
+                showGlowOnExposedLine);
 
             view.Rebuild();
 
@@ -1341,8 +1346,6 @@ namespace ZenMatch.Runtime
 
             return view;
         }
-
-
 
         private float CalculateStackDimFactor(BoardStack targetStack)
         {
@@ -1355,7 +1358,11 @@ namespace ZenMatch.Runtime
             if (targetStack.VisibilityMode == StackVisibilityMode.Hidden)
                 return 0f;
 
-            List<BoardStack> lockedStacks = new();
+            int targetPriority = targetStack.Anchor != null
+                ? targetStack.Anchor.RenderPriority
+                : 0;
+
+            List<int> lockedPriorities = new();
 
             for (int i = 0; i < _runtimeStacks.Count; i++)
             {
@@ -1370,18 +1377,17 @@ namespace ZenMatch.Runtime
                 if (stack.VisibilityMode == StackVisibilityMode.Hidden)
                     continue;
 
-                lockedStacks.Add(stack);
+                int priority = stack.Anchor != null
+                    ? stack.Anchor.RenderPriority
+                    : 0;
+
+                if (!lockedPriorities.Contains(priority))
+                    lockedPriorities.Add(priority);
             }
 
-            lockedStacks.Sort((a, b) =>
-            {
-                int aPriority = a.Anchor != null ? a.Anchor.RenderPriority : 0;
-                int bPriority = b.Anchor != null ? b.Anchor.RenderPriority : 0;
+            lockedPriorities.Sort((a, b) => b.CompareTo(a));
 
-                return bPriority.CompareTo(aPriority);
-            });
-
-            int rank = lockedStacks.IndexOf(targetStack);
+            int rank = lockedPriorities.IndexOf(targetPriority);
 
             if (rank < 0)
                 return 0f;
@@ -1397,18 +1403,16 @@ namespace ZenMatch.Runtime
             };
         }
 
-        
-
         private void RefreshAllStackDims()
         {
             for (int i = 0; i < _runtimeStacks.Count; i++)
             {
-                var stack = _runtimeStacks[i];
+                BoardStack stack = _runtimeStacks[i];
 
                 if (stack == null)
                     continue;
 
-                if (!_viewByPointId.TryGetValue(stack.PointId, out var view))
+                if (!_viewByPointId.TryGetValue(stack.PointId, out BoardStackView view))
                     continue;
 
                 float dim = CalculateStackDimFactor(stack);
@@ -1677,5 +1681,33 @@ namespace ZenMatch.Runtime
                 }
             }
         }
+
+        public bool IsTraySlotUnlockPoint(string pointId)
+        {
+            if (string.IsNullOrWhiteSpace(pointId))
+                return false;
+
+            return _traySlotUnlockPointIds.Contains(pointId);
+        }
+
+        public void RestoreTraySlotRewardVisual(string pointId)
+        {
+            if (string.IsNullOrWhiteSpace(pointId))
+                return;
+
+            if (!_traySlotUnlockPointIds.Contains(pointId))
+                return;
+
+            if (_traySlotRewardVisualByPointId.ContainsKey(pointId))
+                return;
+
+            if (!_stackByPointId.TryGetValue(pointId, out BoardStack stack) || stack == null)
+                return;
+
+            int renderPriority = stack.Anchor != null ? stack.Anchor.RenderPriority : 0;
+            CreateTraySlotRewardVisual(stack, renderPriority);
+        }
     }
+
+
 }

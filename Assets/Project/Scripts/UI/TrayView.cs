@@ -27,9 +27,9 @@ namespace ZenMatch.UI
         [SerializeField] private float slotSpacing = 1.1f;
 
         [Header("Animation")]
-        [SerializeField] private float matchHoldDuration = 0.18f;
-        [SerializeField] private float matchedFadeDuration = 0.12f;
-        [SerializeField] private float collapseDuration = 0.18f;
+        [SerializeField] private float matchHoldDuration = 0.12f;
+        [SerializeField] private float matchedFadeDuration = 0.8f;
+        [SerializeField] private float collapseDuration = 0.12f;
 
         [Header("Rendering")]
         [SerializeField] private string sortingLayerName = "Default";
@@ -243,6 +243,120 @@ namespace ZenMatch.UI
                 _tileVisuals.Add(go);
             }
         }
+
+        public void PlayReorderSequence(
+    List<TileTypeSO> startSlots,
+    List<TileTypeSO> targetSlots,
+    int currentCapacity,
+    int maxVisualCapacity,
+    int lockedSlots)
+        {
+            if (_activeAnimation != null)
+                StopCoroutine(_activeAnimation);
+
+            _currentCapacity = currentCapacity;
+            _maxVisualCapacity = maxVisualCapacity;
+            _lockedSlots = lockedSlots;
+
+            EnsureBaseSlots(_maxVisualCapacity);
+            RefreshLockedSlotVisuals(_currentCapacity, _maxVisualCapacity);
+
+            _activeAnimation = StartCoroutine(PlayReorderSequenceRoutine(startSlots, targetSlots));
+        }
+
+       
+
+        private IEnumerator PlayReorderSequenceRoutine(
+    List<TileTypeSO> startSlots,
+    List<TileTypeSO> targetSlots)
+        {
+            ClearTileVisuals();
+
+            List<TraySlotVisual> visuals = BuildFilledSlotVisuals(startSlots);
+
+            if (visuals.Count == 0)
+            {
+                RebuildTileVisualsFromSnapshot(targetSlots);
+                _activeAnimation = null;
+                yield break;
+            }
+
+            Dictionary<TileTypeSO, Queue<int>> targetIndexQueues = BuildTargetIndexQueues(targetSlots);
+
+            Vector3[] startPositions = new Vector3[visuals.Count];
+            Vector3[] targetPositions = new Vector3[visuals.Count];
+
+            for (int i = 0; i < visuals.Count; i++)
+            {
+                TraySlotVisual visual = visuals[i];
+
+                startPositions[i] = visual.Transform.localPosition;
+
+                int targetIndex = i;
+
+                if (visual.TileType != null &&
+                    targetIndexQueues.TryGetValue(visual.TileType, out Queue<int> queue) &&
+                    queue.Count > 0)
+                {
+                    targetIndex = queue.Dequeue();
+                }
+
+                targetPositions[i] = GetSlotLocalPosition(targetIndex);
+            }
+
+            float duration = 0.20f;
+            float time = 0f;
+
+            while (time < duration)
+            {
+                time += Time.deltaTime;
+
+                float t = Mathf.Clamp01(time / duration);
+                t = t * t * (3f - 2f * t);
+
+                for (int i = 0; i < visuals.Count; i++)
+                {
+                    if (visuals[i] == null || visuals[i].Transform == null)
+                        continue;
+
+                    visuals[i].Transform.localPosition = Vector3.Lerp(
+                        startPositions[i],
+                        targetPositions[i],
+                        t);
+                }
+
+                yield return null;
+            }
+
+            ClearTempVisuals(visuals);
+            RebuildTileVisualsFromSnapshot(targetSlots);
+
+            _activeAnimation = null;
+        }
+
+        private Dictionary<TileTypeSO, Queue<int>> BuildTargetIndexQueues(List<TileTypeSO> targetSlots)
+        {
+            Dictionary<TileTypeSO, Queue<int>> result = new();
+
+            if (targetSlots == null)
+                return result;
+
+            for (int i = 0; i < targetSlots.Count; i++)
+            {
+                TileTypeSO tile = targetSlots[i];
+                if (tile == null)
+                    continue;
+
+                if (!result.ContainsKey(tile))
+                    result[tile] = new Queue<int>();
+
+                result[tile].Enqueue(i);
+            }
+
+            return result;
+        }
+
+        
 
         private IEnumerator PlayMatchResolveSequenceRoutine(
             List<TileTypeSO> beforeSlots,

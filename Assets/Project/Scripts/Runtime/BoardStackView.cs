@@ -27,15 +27,25 @@ namespace ZenMatch.Runtime
         [SerializeField] private float zigzagHorizontalStep = 0.18f;
         [SerializeField] private float zigzagHorizontalVerticalOffset = 0.09f;
 
+        [Header("Diagonal Layout")]
+        [SerializeField] private Vector2 diagonalStep = new Vector2(0.14f, 0.14f);
+
+        [Header("Stairs Layout")]
+        [SerializeField] private float stairsHorizontalStep = 0.22f;
+        [SerializeField] private float stairsVerticalStep = 0.12f;
+        [SerializeField] private int stairsTilesPerStep = 2;
+
         [Header("Exposed Line Layout")]
-        [SerializeField] private float exposedVerticalSpacing = 0.5f;
-        [SerializeField] private float exposedHorizontalSpacing = 0.5f;
-        [SerializeField] private float exposedVerticalStartOffset = 0.35f;
-        [SerializeField] private float exposedHorizontalStartOffset = 0.35f;
+        [SerializeField] private float exposedVerticalSpacing = 0.50f;
+        [SerializeField] private float exposedHorizontalSpacing = 0.50f;
+        [SerializeField] private float exposedVerticalStartOffset = 0.20f;
+        [SerializeField] private float exposedHorizontalStartOffset = 0.20f;
+        [SerializeField] private float exposedAutoSpacingMultiplier = 1f;
+        [SerializeField] private bool useAutoExposedSpacing = true;
 
         [Header("Exposed Grid Layout")]
-        [SerializeField] private float exposedGridHorizontalSpacing = 0.5f;
-        [SerializeField] private float exposedGridVerticalSpacing = 0.5f;
+        [SerializeField] private float exposedGridHorizontalSpacing = 0.72f;
+        [SerializeField] private float exposedGridVerticalSpacing = 0.72f;
         [SerializeField] private Vector2 exposedGridStartOffset = new Vector2(0.2f, 0.2f);
 
         [Header("Hidden View")]
@@ -58,7 +68,7 @@ namespace ZenMatch.Runtime
         [SerializeField] private Color selectableGlowColor = new Color(1f, 1f, 1f, 0.18f);
         [SerializeField] private float selectableGlowScale = 1.05f;
         [SerializeField] private int selectableGlowSortingOffset = 1;
-        [SerializeField] private bool showGlowOnExposedLine = false;
+        [SerializeField] private bool showGlowOnExposedLine = true;
 
         [Header("Glow Pulse")]
         [SerializeField] private bool enableGlowPulse = true;
@@ -83,29 +93,29 @@ namespace ZenMatch.Runtime
         }
 
         public void Configure(
-    Vector3 verticalOffsetStep,
-    Vector3 horizontalOffsetStep,
-    Sprite hiddenSprite,
-    string layerName,
-    int startSortingOrder,
-    int perTileSortingStep,
-    float stackDimFactor)
+            Vector3 verticalOffsetStep,
+            Vector3 horizontalOffsetStep,
+            Sprite hiddenBackSprite,
+            string sortingLayerName,
+            int baseSortingOrder,
+            int sortingOrderStep,
+            float stackDimFactor)
         {
-            verticalStackOffsetStep = verticalOffsetStep;
-            horizontalStackOffsetStep = horizontalOffsetStep;
-            hiddenBackSprite = hiddenSprite;
-            sortingLayerName = layerName;
-            baseSortingOrder = startSortingOrder;
-            sortingStepPerTile = perTileSortingStep;
-            _stackDimFactor = Mathf.Clamp01(stackDimFactor);
+            this.verticalStackOffsetStep = verticalOffsetStep;
+            this.horizontalStackOffsetStep = horizontalOffsetStep;
+            this.hiddenBackSprite = hiddenBackSprite;
+            this.sortingLayerName = sortingLayerName;
+            this.baseSortingOrder = baseSortingOrder;
+            this.sortingStepPerTile = sortingOrderStep;
+            _stackDimFactor = stackDimFactor;
         }
 
         public void ConfigureSelectableGlow(
-    Sprite glowSprite,
-    Color glowColor,
-    float glowScale,
-    int glowSortingOffset,
-    bool glowOnExposed)
+            Sprite glowSprite,
+            Color glowColor,
+            float glowScale,
+            int glowSortingOffset,
+            bool glowOnExposed)
         {
             selectableGlowSprite = glowSprite;
             selectableGlowColor = glowColor;
@@ -232,10 +242,11 @@ namespace ZenMatch.Runtime
             if (_stack.IsLocked)
                 return false;
 
-            
-
             if (_stack.LayoutMode == StackLayoutMode.ExposedLine)
-                return showGlowOnExposedLine;
+                return true;
+
+            if (_stack.Count == 1)
+                return true;
 
             return index == topIndex;
         }
@@ -270,7 +281,7 @@ namespace ZenMatch.Runtime
                 return slotIndex;
 
             return ShouldReverseVisualOrder()
-                ? (initialLastIndex - slotIndex)
+                ? initialLastIndex - slotIndex
                 : slotIndex;
         }
 
@@ -283,10 +294,19 @@ namespace ZenMatch.Runtime
             {
                 StackDirection.Horizontal => _stack.OpenDirection == StackOpenDirection.Left,
                 StackDirection.Vertical => _stack.OpenDirection == StackOpenDirection.Down,
+
                 StackDirection.ZigzagHorizontal => _stack.OpenDirection == StackOpenDirection.Left,
                 StackDirection.ZigzagVertical => _stack.OpenDirection == StackOpenDirection.Down,
+
                 StackDirection.Grid2 => _stack.OpenDirection == StackOpenDirection.Left || _stack.OpenDirection == StackOpenDirection.Down,
                 StackDirection.Grid3 => _stack.OpenDirection == StackOpenDirection.Left || _stack.OpenDirection == StackOpenDirection.Down,
+
+                StackDirection.DiagonalRight => _stack.OpenDirection == StackOpenDirection.Left || _stack.OpenDirection == StackOpenDirection.Down,
+                StackDirection.DiagonalLeft => _stack.OpenDirection == StackOpenDirection.Right || _stack.OpenDirection == StackOpenDirection.Down,
+
+                StackDirection.StairsRight => _stack.OpenDirection == StackOpenDirection.Left || _stack.OpenDirection == StackOpenDirection.Down,
+                StackDirection.StairsLeft => _stack.OpenDirection == StackOpenDirection.Right || _stack.OpenDirection == StackOpenDirection.Down,
+
                 _ => false
             };
         }
@@ -296,10 +316,41 @@ namespace ZenMatch.Runtime
             if (_stack == null)
                 return Vector3.zero;
 
-            if (_stack.LayoutMode == StackLayoutMode.ExposedLine)
-                return ResolveExposedOffset(index);
+            return BoardStackLayoutUtility.ResolveOffset(
+                _stack.Direction,
+                _stack.LayoutMode,
+                index,
 
-            return ResolveOverlappedOffset(index);
+                verticalStackOffsetStep,
+                horizontalStackOffsetStep,
+
+                overlappedGridHorizontalSpacing,
+                overlappedGridVerticalSpacing,
+                overlappedGridDepthOffsetY,
+
+                zigzagVerticalHorizontalOffset,
+                zigzagVerticalStep,
+
+                zigzagHorizontalStep,
+                zigzagHorizontalVerticalOffset,
+
+                diagonalStep,
+
+                stairsHorizontalStep,
+                stairsVerticalStep,
+                stairsTilesPerStep,
+
+                exposedVerticalSpacing,
+                exposedHorizontalSpacing,
+
+                exposedVerticalStartOffset,
+                exposedHorizontalStartOffset,
+
+                GetAutoHorizontalSpacing(GetTopSprite()),
+                GetAutoVerticalSpacing(GetTopSprite()),
+
+                exposedGridStartOffset
+            );
         }
 
         private Vector3 ResolveOverlappedOffset(int index)
@@ -310,10 +361,19 @@ namespace ZenMatch.Runtime
             return _stack.Direction switch
             {
                 StackDirection.Horizontal => horizontalStackOffsetStep * index,
+
                 StackDirection.ZigzagVertical => ResolveZigzagVerticalOffset(index),
                 StackDirection.ZigzagHorizontal => ResolveZigzagHorizontalOffset(index),
+
                 StackDirection.Grid2 => ResolveOverlappedGridOffset(index, 2),
                 StackDirection.Grid3 => ResolveOverlappedGridOffset(index, 3),
+
+                StackDirection.DiagonalRight => ResolveDiagonalOffset(index, 1),
+                StackDirection.DiagonalLeft => ResolveDiagonalOffset(index, -1),
+
+                StackDirection.StairsRight => ResolveStairsOffset(index, 1),
+                StackDirection.StairsLeft => ResolveStairsOffset(index, -1),
+
                 _ => verticalStackOffsetStep * index
             };
         }
@@ -323,24 +383,82 @@ namespace ZenMatch.Runtime
             if (_stack == null)
                 return Vector3.zero;
 
-            return _stack.Direction switch
+            switch (_stack.Direction)
             {
-                StackDirection.Horizontal => new Vector3(
-                    exposedHorizontalStartOffset + (index * exposedHorizontalSpacing),
-                    0f,
-                    0f),
+                case StackDirection.Horizontal:
+                    {
+                        float spacing = GetAutoHorizontalSpacing(GetTopSprite());
 
-                StackDirection.ZigzagVertical => ResolveExposedZigzagVerticalOffset(index),
-                StackDirection.ZigzagHorizontal => ResolveExposedZigzagHorizontalOffset(index),
+                        return new Vector3(
+                            exposedHorizontalStartOffset + index * spacing,
+                            0f,
+                            0f);
+                    }
 
-                StackDirection.Grid2 => ResolveExposedGridOffset(index, 2),
-                StackDirection.Grid3 => ResolveExposedGridOffset(index, 3),
+                case StackDirection.ZigzagVertical:
+                    return ResolveExposedZigzagVerticalOffset(index);
 
-                _ => new Vector3(
-                    0f,
-                    exposedVerticalStartOffset + (index * exposedVerticalSpacing),
-                    0f)
-            };
+                case StackDirection.ZigzagHorizontal:
+                    return ResolveExposedZigzagHorizontalOffset(index);
+
+                case StackDirection.Grid2:
+                    return ResolveExposedGridOffset(index, 2);
+
+                case StackDirection.Grid3:
+                    return ResolveExposedGridOffset(index, 3);
+
+                case StackDirection.DiagonalRight:
+                    return ResolveExposedDiagonalOffset(index, 1);
+
+                case StackDirection.DiagonalLeft:
+                    return ResolveExposedDiagonalOffset(index, -1);
+
+                case StackDirection.StairsRight:
+                    return ResolveExposedStairsOffset(index, 1);
+
+                case StackDirection.StairsLeft:
+                    return ResolveExposedStairsOffset(index, -1);
+
+                case StackDirection.Vertical:
+                default:
+                    {
+                        float spacing = GetAutoVerticalSpacing(GetTopSprite());
+
+                        return new Vector3(
+                            0f,
+                            exposedVerticalStartOffset + index * spacing,
+                            0f);
+                    }
+            }
+        }
+
+        private float GetAutoHorizontalSpacing(Sprite sprite)
+        {
+            if (!useAutoExposedSpacing || sprite == null)
+                return exposedHorizontalSpacing;
+
+            return Mathf.Max(exposedHorizontalSpacing, sprite.bounds.size.x * exposedAutoSpacingMultiplier);
+        }
+
+        private float GetAutoVerticalSpacing(Sprite sprite)
+        {
+            if (!useAutoExposedSpacing || sprite == null)
+                return exposedVerticalSpacing;
+
+            return Mathf.Max(exposedVerticalSpacing, sprite.bounds.size.y * exposedAutoSpacingMultiplier);
+        }
+
+        private Sprite GetTopSprite()
+        {
+            if (_stack == null || _stack.Count == 0)
+                return null;
+
+            BoardTileInstance tile = _stack.PeekTop();
+
+            if (tile == null || tile.TileType == null)
+                return null;
+
+            return tile.TileType.Icon;
         }
 
         private Vector3 ResolveOverlappedGridOffset(int index, int columns)
@@ -348,8 +466,12 @@ namespace ZenMatch.Runtime
             int row = index / columns;
             int column = index % columns;
 
+            bool reverseRow = row % 2 == 1;
+            if (reverseRow)
+                column = columns - 1 - column;
+
             float x = column * overlappedGridHorizontalSpacing;
-            float y = -(row * overlappedGridVerticalSpacing) + (index * overlappedGridDepthOffsetY);
+            float y = -(row * overlappedGridVerticalSpacing) + index * overlappedGridDepthOffsetY;
 
             return new Vector3(x, y, 0f);
         }
@@ -359,8 +481,11 @@ namespace ZenMatch.Runtime
             int row = index / columns;
             int column = index % columns;
 
-            float x = exposedGridStartOffset.x + (column * exposedGridHorizontalSpacing);
-            float y = exposedGridStartOffset.y - (row * exposedGridVerticalSpacing);
+            float horizontalSpacing = GetAutoHorizontalSpacing(GetTopSprite());
+            float verticalSpacing = GetAutoVerticalSpacing(GetTopSprite());
+
+            float x = exposedGridStartOffset.x + column * horizontalSpacing;
+            float y = exposedGridStartOffset.y - row * verticalSpacing;
 
             return new Vector3(x, y, 0f);
         }
@@ -370,7 +495,7 @@ namespace ZenMatch.Runtime
             if (index == 0)
                 return Vector3.zero;
 
-            float x = (index % 2 == 0)
+            float x = index % 2 == 0
                 ? -zigzagVerticalHorizontalOffset
                 : zigzagVerticalHorizontalOffset;
 
@@ -386,25 +511,79 @@ namespace ZenMatch.Runtime
 
             float x = zigzagHorizontalStep * index;
 
-            float y = (index % 2 == 0)
+            float y = index % 2 == 0
                 ? -zigzagHorizontalVerticalOffset
                 : zigzagHorizontalVerticalOffset;
 
             return new Vector3(x, y, 0f);
         }
 
+        private Vector3 ResolveDiagonalOffset(int index, int direction)
+        {
+            float x = diagonalStep.x * index * direction;
+            float y = diagonalStep.y * index;
+
+            return new Vector3(x, y, 0f);
+        }
+
+        private Vector3 ResolveStairsOffset(int index, int direction)
+        {
+            int safeTilesPerStep = Mathf.Max(1, stairsTilesPerStep);
+
+            int stepIndex = index / safeTilesPerStep;
+            int localIndex = index % safeTilesPerStep;
+
+            float x = stepIndex * stairsHorizontalStep * direction;
+            float y = stepIndex * stairsVerticalStep + localIndex * overlappedGridDepthOffsetY;
+
+            return new Vector3(x, y, 0f);
+        }
+
+        private Vector3 ResolveExposedDiagonalOffset(int index, int direction)
+        {
+            float horizontalSpacing = GetAutoHorizontalSpacing(GetTopSprite()) * 0.7f;
+            float verticalSpacing = GetAutoVerticalSpacing(GetTopSprite()) * 0.7f;
+
+            float x = direction * (exposedHorizontalStartOffset + index * horizontalSpacing);
+            float y = exposedVerticalStartOffset + index * verticalSpacing;
+
+            return new Vector3(x, y, 0f);
+        }
+
+        private Vector3 ResolveExposedStairsOffset(int index, int direction)
+        {
+            int safeTilesPerStep = Mathf.Max(1, stairsTilesPerStep);
+
+            int stepIndex = index / safeTilesPerStep;
+            int localIndex = index % safeTilesPerStep;
+
+            float horizontalSpacing = GetAutoHorizontalSpacing(GetTopSprite());
+            float verticalSpacing = GetAutoVerticalSpacing(GetTopSprite());
+
+            float x = direction * (stepIndex * horizontalSpacing);
+            float y = exposedVerticalStartOffset + stepIndex * verticalSpacing + localIndex * (verticalSpacing * 0.18f);
+
+            return new Vector3(x, y, 0f);
+        }
+
         private Vector3 ResolveExposedZigzagVerticalOffset(int index)
         {
-            float x = (index % 2 == 0) ? 0f : zigzagVerticalHorizontalOffset;
-            float y = exposedVerticalStartOffset + (index * exposedVerticalSpacing);
+            float horizontalSpacing = GetAutoHorizontalSpacing(GetTopSprite());
+            float verticalSpacing = GetAutoVerticalSpacing(GetTopSprite());
+
+            float x = index % 2 == 0 ? 0f : horizontalSpacing * 0.35f;
+            float y = exposedVerticalStartOffset + index * verticalSpacing;
 
             return new Vector3(x, y, 0f);
         }
 
         private Vector3 ResolveExposedZigzagHorizontalOffset(int index)
         {
-            float x = exposedHorizontalStartOffset + (index * exposedHorizontalSpacing);
-            float y = (index % 2 == 0) ? 0f : zigzagHorizontalVerticalOffset;
+            float horizontalSpacing = GetAutoHorizontalSpacing(GetTopSprite());
+            float verticalSpacing = GetAutoVerticalSpacing(GetTopSprite());
+
+            float x = exposedHorizontalStartOffset + index * horizontalSpacing;
+            float y = index % 2 == 0 ? 0f : verticalSpacing * 0.35f;
 
             return new Vector3(x, y, 0f);
         }
@@ -430,14 +609,17 @@ namespace ZenMatch.Runtime
 
             Color baseColor = ApplyStackDim(tileColor);
 
+            if (_stack.LayoutMode == StackLayoutMode.ExposedLine)
+                return baseColor;
+
             if (index == topIndex)
                 return baseColor;
 
             int depth = topIndex - index;
+
             if (depth == 1)
                 return baseColor;
 
-            // Kararma 2. alttaki taştan başlasın.
             float innerDim = Mathf.Min((depth - 1) * innerDimStep, innerMaxDim);
             float final = 1f - innerDim;
 
@@ -450,6 +632,9 @@ namespace ZenMatch.Runtime
 
         private Color ApplyStackDim(Color baseColor)
         {
+            if (_stackDimFactor <= 0f)
+                return baseColor;
+
             float value = 1f - _stackDimFactor;
 
             return new Color(

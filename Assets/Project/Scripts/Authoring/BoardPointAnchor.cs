@@ -11,6 +11,16 @@ namespace ZenMatch.Authoring
         [Header("Render")]
         [SerializeField] private int renderPriority = 0;
 
+       
+
+        [SerializeField]
+        [Range(0f, 1f)]
+        private float normalizedX = 0.5f;
+
+        [SerializeField]
+        [Range(0f, 1f)]
+        private float normalizedY = 0.5f;
+
         [Header("Debug")]
         [SerializeField] private bool showGizmo = true;
         [SerializeField] private Color gizmoColor = Color.cyan;
@@ -21,8 +31,14 @@ namespace ZenMatch.Authoring
         public int RenderPriority => renderPriority;
         public Vector3 WorldPosition => transform.position;
 
+
+
+
+
         private void OnValidate()
         {
+            pointId = gameObject.name;
+
             if (pointId == null)
                 pointId = string.Empty;
 
