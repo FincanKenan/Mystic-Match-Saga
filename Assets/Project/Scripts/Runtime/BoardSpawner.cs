@@ -95,8 +95,8 @@ namespace ZenMatch.Runtime
         [Header("Locked Stack Dim Steps")]
         [SerializeField, Range(0f, 0.95f)] private float lockedStackDimRank1 = 0.10f;
         [SerializeField, Range(0f, 0.95f)] private float lockedStackDimRank2 = 0.22f;
-        [SerializeField, Range(0f, 0.95f)] private float lockedStackDimRank3 = 0.35f;
-        [SerializeField, Range(0f, 0.95f)] private float lockedStackDimRank4 = 0.48f;
+        [SerializeField, Range(0f, 0.95f)] private float lockedStackDimRank3 = 0.30f;
+        [SerializeField, Range(0f, 0.95f)] private float lockedStackDimRank4 = 0.35f;
 
         [Header("Selectable Glow Settings")]
         [SerializeField] private Sprite selectableGlowSprite;

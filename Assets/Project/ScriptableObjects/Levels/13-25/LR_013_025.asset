@@ -39,7 +39,15 @@ MonoBehaviour:
   - layout: {fileID: 11400000, guid: 7154d5d08e004c34b8c14edbf661a551, type: 2}
     weight: 1
   - layout: {fileID: 11400000, guid: eff0a4ecdf48e164db8bedc1e0c4145f, type: 2}
-    weight: 100
+    weight: 1
+  - layout: {fileID: 11400000, guid: d7c9945fd73922442a73ffacef69e762, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: 4dd640405f4b14e4b922a269a4cd4bba, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: c6bf5e7b790b6a94e91e8f893b5ee8e7, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: 71c4c792efa4cbd4d9a3fe0b61191b48, type: 2}
+    weight: 1
   allowedSpecialLayouts:
   - layout: {fileID: 11400000, guid: a38e1e5572a6a3347ad728185239a2b4, type: 2}
-    weight: 2
+    weight: 1
