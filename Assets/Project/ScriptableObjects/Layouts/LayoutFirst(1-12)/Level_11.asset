@@ -23,7 +23,7 @@ MonoBehaviour:
       stackDirection: 3
       stackLayoutMode: 0
       visibilityMode: 0
-      stackOpenDirection: 2
+      stackOpenDirection: 1
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds: []
@@ -34,7 +34,7 @@ MonoBehaviour:
       stackDirection: 2
       stackLayoutMode: 1
       visibilityMode: 0
-      stackOpenDirection: 0
+      stackOpenDirection: 2
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
@@ -47,7 +47,7 @@ MonoBehaviour:
       stackDirection: 3
       stackLayoutMode: 0
       visibilityMode: 0
-      stackOpenDirection: 1
+      stackOpenDirection: 4
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds: []
@@ -71,7 +71,7 @@ MonoBehaviour:
       stackDirection: 3
       stackLayoutMode: 0
       visibilityMode: 0
-      stackOpenDirection: 2
+      stackOpenDirection: 3
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds: []
@@ -82,7 +82,7 @@ MonoBehaviour:
       stackDirection: 3
       stackLayoutMode: 0
       visibilityMode: 0
-      stackOpenDirection: 1
+      stackOpenDirection: 2
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds: []

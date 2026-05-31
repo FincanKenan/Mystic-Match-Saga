@@ -74,7 +74,7 @@ namespace ZenMatch.UI
             }
 
             _currentCapacity = trayState.CurrentCapacity;
-            _maxVisualCapacity = trayState.MaxVisualCapacity;
+            _maxVisualCapacity = Mathf.Max(trayState.MaxVisualCapacity, trayState.CurrentCapacity);
             _lockedSlots = trayState.LockedSlots;
 
             EnsureBaseSlots(_maxVisualCapacity);
@@ -122,7 +122,7 @@ namespace ZenMatch.UI
                 StopCoroutine(_activeAnimation);
 
             _currentCapacity = currentCapacity;
-            _maxVisualCapacity = maxVisualCapacity;
+            _maxVisualCapacity = Mathf.Max(maxVisualCapacity, currentCapacity);
             _lockedSlots = lockedSlots;
 
             EnsureBaseSlots(_maxVisualCapacity);

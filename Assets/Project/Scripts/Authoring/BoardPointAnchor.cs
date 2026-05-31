@@ -11,8 +11,6 @@ namespace ZenMatch.Authoring
         [Header("Render")]
         [SerializeField] private int renderPriority = 0;
 
-       
-
         [SerializeField]
         [Range(0f, 1f)]
         private float normalizedX = 0.5f;
@@ -31,9 +29,15 @@ namespace ZenMatch.Authoring
         public int RenderPriority => renderPriority;
         public Vector3 WorldPosition => transform.position;
 
+#if UNITY_EDITOR
+        public void EditorSyncPointIdWithObjectName()
+        {
+            pointId = gameObject.name;
 
-
-
+            if (pointId == null)
+                pointId = string.Empty;
+        }
+#endif
 
         private void OnValidate()
         {

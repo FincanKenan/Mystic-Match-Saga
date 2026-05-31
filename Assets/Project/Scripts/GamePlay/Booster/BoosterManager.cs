@@ -324,8 +324,11 @@ namespace ZenMatch.Gameplay.Boosters
 
         private void RefreshTrayView()
         {
-            if (trayView != null)
-                trayView.Refresh();
+            if (levelController == null)
+                return;
+
+            if (levelController.TrayController != null)
+                levelController.TrayController.RefreshView();
         }
     }
 }

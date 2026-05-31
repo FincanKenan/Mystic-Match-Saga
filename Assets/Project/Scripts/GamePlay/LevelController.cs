@@ -40,8 +40,8 @@ namespace ZenMatch.Gameplay
         [SerializeField] private bool logTrayStateAfterEachMove = true;
         [SerializeField] private bool logBoardStateAfterEachMove = true;
 
-       
 
+        public TrayController TrayController => trayController;
 
 
 
