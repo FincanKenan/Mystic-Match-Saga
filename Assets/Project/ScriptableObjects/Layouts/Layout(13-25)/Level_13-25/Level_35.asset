@@ -100,7 +100,6 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L35-N1-Point_17
       - L35-N1-Point_23
       minStackHeight: 3
       maxStackHeight: 3
@@ -137,7 +136,6 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L35-N1-Point_13
       - L35-N1-Point_23
       minStackHeight: 3
       maxStackHeight: 3

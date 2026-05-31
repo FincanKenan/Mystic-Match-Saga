@@ -31,7 +31,7 @@ MonoBehaviour:
   - layout: {fileID: 11400000, guid: da45352d5e4d05b48bf6e411bf53688e, type: 2}
     weight: 1
   - layout: {fileID: 11400000, guid: 80dafd12a6a43b3468dc68a53ff089f5, type: 2}
-    weight: 1
+    weight: 100
   - layout: {fileID: 11400000, guid: 8f028fc092843f14fb8754f65236e501, type: 2}
     weight: 1
   - layout: {fileID: 11400000, guid: 269bee86c2707ee43bc032a3e325a445, type: 2}
@@ -39,5 +39,5 @@ MonoBehaviour:
   - layout: {fileID: 11400000, guid: 355d1547ee6b48947b7b06e9c75f8e2f, type: 2}
     weight: 1
   - layout: {fileID: 11400000, guid: 094d53c44394f0f499ac8cd9f3712c8a, type: 2}
-    weight: 100
+    weight: 1
   allowedSpecialLayouts: []

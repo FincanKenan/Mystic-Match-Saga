@@ -120,8 +120,6 @@ MonoBehaviour:
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - L34-N1-Point_10
-      - L34-N1-Point_1
-      - L34-N1-Point_2
       minStackHeight: 3
       maxStackHeight: 3
       note: 
@@ -144,18 +142,8 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L34-N1-Point_1
-      - L34-N1-Point_2
-      - L34-N1-Point_3
-      - L34-N1-Point_4
-      - L34-N1-Point_5
-      - L34-N1-Point_6
       - L34-N1-Point_7
-      - L34-N1-Point_8
-      - L34-N1-Point_9
-      - L34-N1-Point_10
-      - L34-N1-Point_21
-      - L34-N1-Point_22
+      - L34-N1-Point_5
       minStackHeight: 3
       maxStackHeight: 3
       note: 
@@ -167,18 +155,8 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L34-N1-Point_1
-      - L34-N1-Point_2
-      - L34-N1-Point_3
-      - L34-N1-Point_4
-      - L34-N1-Point_5
-      - L34-N1-Point_6
-      - L34-N1-Point_7
       - L34-N1-Point_8
-      - L34-N1-Point_9
-      - L34-N1-Point_10
-      - L34-N1-Point_21
-      - L34-N1-Point_22
+      - L34-N1-Point_6
       minStackHeight: 3
       maxStackHeight: 3
       note: 
@@ -190,18 +168,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L34-N1-Point_1
-      - L34-N1-Point_2
-      - L34-N1-Point_3
-      - L34-N1-Point_4
-      - L34-N1-Point_5
-      - L34-N1-Point_6
-      - L34-N1-Point_7
-      - L34-N1-Point_8
-      - L34-N1-Point_9
-      - L34-N1-Point_10
-      - L34-N1-Point_21
-      - L34-N1-Point_22
+      - L34-N1-Point_14
       minStackHeight: 3
       maxStackHeight: 3
       note: 
@@ -213,18 +180,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L34-N1-Point_1
-      - L34-N1-Point_2
-      - L34-N1-Point_3
-      - L34-N1-Point_4
-      - L34-N1-Point_5
-      - L34-N1-Point_6
-      - L34-N1-Point_7
-      - L34-N1-Point_8
-      - L34-N1-Point_9
-      - L34-N1-Point_10
-      - L34-N1-Point_21
-      - L34-N1-Point_22
+      - L34-N1-Point_16
       minStackHeight: 3
       maxStackHeight: 3
       note: 
@@ -237,17 +193,7 @@ MonoBehaviour:
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - L34-N1-Point_1
-      - L34-N1-Point_2
       - L34-N1-Point_3
-      - L34-N1-Point_4
-      - L34-N1-Point_5
-      - L34-N1-Point_6
-      - L34-N1-Point_7
-      - L34-N1-Point_8
-      - L34-N1-Point_9
-      - L34-N1-Point_10
-      - L34-N1-Point_21
-      - L34-N1-Point_22
       minStackHeight: 3
       maxStackHeight: 3
       note: 
@@ -259,18 +205,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L34-N1-Point_1
-      - L34-N1-Point_2
-      - L34-N1-Point_3
-      - L34-N1-Point_4
-      - L34-N1-Point_5
-      - L34-N1-Point_6
-      - L34-N1-Point_7
       - L34-N1-Point_8
-      - L34-N1-Point_9
-      - L34-N1-Point_10
-      - L34-N1-Point_21
-      - L34-N1-Point_22
       minStackHeight: 3
       maxStackHeight: 3
       note: 
@@ -282,18 +217,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L34-N1-Point_1
-      - L34-N1-Point_2
-      - L34-N1-Point_3
-      - L34-N1-Point_4
-      - L34-N1-Point_5
-      - L34-N1-Point_6
-      - L34-N1-Point_7
-      - L34-N1-Point_8
-      - L34-N1-Point_9
-      - L34-N1-Point_10
-      - L34-N1-Point_21
-      - L34-N1-Point_22
+      - L34-N1-Point_19
       minStackHeight: 3
       maxStackHeight: 3
       note: 
@@ -305,18 +229,8 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L34-N1-Point_1
       - L34-N1-Point_2
-      - L34-N1-Point_3
       - L34-N1-Point_4
-      - L34-N1-Point_5
-      - L34-N1-Point_6
-      - L34-N1-Point_7
-      - L34-N1-Point_8
-      - L34-N1-Point_9
-      - L34-N1-Point_10
-      - L34-N1-Point_21
-      - L34-N1-Point_22
       minStackHeight: 3
       maxStackHeight: 3
       note: 
@@ -328,18 +242,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L34-N1-Point_1
-      - L34-N1-Point_2
-      - L34-N1-Point_3
-      - L34-N1-Point_4
-      - L34-N1-Point_5
-      - L34-N1-Point_6
-      - L34-N1-Point_7
-      - L34-N1-Point_8
-      - L34-N1-Point_9
-      - L34-N1-Point_10
-      - L34-N1-Point_21
-      - L34-N1-Point_22
+      - L34-N1-Point_20
       minStackHeight: 3
       maxStackHeight: 3
       note: 
@@ -351,18 +254,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L34-N1-Point_1
-      - L34-N1-Point_2
-      - L34-N1-Point_3
-      - L34-N1-Point_4
-      - L34-N1-Point_5
-      - L34-N1-Point_6
       - L34-N1-Point_7
-      - L34-N1-Point_8
-      - L34-N1-Point_9
-      - L34-N1-Point_10
-      - L34-N1-Point_21
-      - L34-N1-Point_22
       minStackHeight: 3
       maxStackHeight: 3
       note: 
@@ -394,21 +286,9 @@ MonoBehaviour:
       stackLayoutMode: 0
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L34-N1-Point_1
-      - L34-N1-Point_2
-      - L34-N1-Point_3
-      - L34-N1-Point_4
-      - L34-N1-Point_5
-      - L34-N1-Point_6
-      - L34-N1-Point_7
-      - L34-N1-Point_8
-      - L34-N1-Point_9
-      - L34-N1-Point_10
-      - L34-N1-Point_21
-      - L34-N1-Point_22
+      requiredCompletedPointIds: []
       minStackHeight: 3
       maxStackHeight: 3
       note: 

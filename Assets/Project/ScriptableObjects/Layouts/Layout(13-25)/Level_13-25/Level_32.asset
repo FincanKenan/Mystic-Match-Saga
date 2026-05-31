@@ -203,7 +203,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_9
+      - L32-N1-Point_1_9
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -215,8 +215,8 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_9
-      - L20-N1-Point_1_10
+      - L32-N1-Point_1_9
+      - L32-N1-Point_1_10
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -228,7 +228,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_10
+      - L32-N1-Point_1_10
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -240,8 +240,8 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_9
-      - L20-N1-Point_1_7
+      - L32-N1-Point_1_9
+      - L32-N1-Point_1_7
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -253,10 +253,10 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_9
-      - L20-N1-Point_1_10
-      - L20-N1-Point_1_7
-      - L20-N1-Point_1_8
+      - L32-N1-Point_1_9
+      - L32-N1-Point_1_10
+      - L32-N1-Point_1_7
+      - L32-N1-Point_1_8
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -268,8 +268,8 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_8
-      - L20-N1-Point_1_10
+      - L32-N1-Point_1_8
+      - L32-N1-Point_1_10
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -281,7 +281,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_16
+      - L32-N1-Point_1_16
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -293,8 +293,8 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_16
-      - L20-N1-Point_1_15
+      - L32-N1-Point_1_16
+      - L32-N1-Point_1_15
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -306,8 +306,8 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_15
-      - L20-N1-Point_1_5
+      - L32-N1-Point_1_15
+      - L32-N1-Point_1_5
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -319,10 +319,10 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_5
-      - L20-N1-Point_1_6
-      - L20-N1-Point_1_7
-      - L20-N1-Point_1_8
+      - L32-N1-Point_1_5
+      - L32-N1-Point_1_6
+      - L32-N1-Point_1_7
+      - L32-N1-Point_1_8
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -334,9 +334,9 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_8
-      - L20-N1-Point_1_6
-      - L20-N1-Point_1_12
+      - L32-N1-Point_1_8
+      - L32-N1-Point_1_6
+      - L32-N1-Point_1_12
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -348,8 +348,8 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_12
-      - L20-N1-Point_1_13
+      - L32-N1-Point_1_12
+      - L32-N1-Point_1_13
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -361,7 +361,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_13
+      - L32-N1-Point_1_13
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -373,7 +373,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_16
+      - L32-N1-Point_1_16
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -385,9 +385,9 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_16
-      - L20-N1-Point_1_15
-      - L20-N1-Point_1_14
+      - L32-N1-Point_1_16
+      - L32-N1-Point_1_15
+      - L32-N1-Point_1_14
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -399,10 +399,10 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_15
-      - L20-N1-Point_1_14
-      - L20-N1-Point_1_5
-      - L20-N1-Point_1_3
+      - L32-N1-Point_1_15
+      - L32-N1-Point_1_14
+      - L32-N1-Point_1_5
+      - L32-N1-Point_1_3
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -414,10 +414,10 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_5
-      - L20-N1-Point_1_6
-      - L20-N1-Point_1_3
-      - L20-N1-Point_1_4
+      - L32-N1-Point_1_5
+      - L32-N1-Point_1_6
+      - L32-N1-Point_1_3
+      - L32-N1-Point_1_4
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -429,10 +429,10 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_12
-      - L20-N1-Point_1_11
-      - L20-N1-Point_1_6
-      - L20-N1-Point_1_4
+      - L32-N1-Point_1_12
+      - L32-N1-Point_1_11
+      - L32-N1-Point_1_6
+      - L32-N1-Point_1_4
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -444,9 +444,9 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_12
-      - L20-N1-Point_1_13
-      - L20-N1-Point_1_11
+      - L32-N1-Point_1_12
+      - L32-N1-Point_1_13
+      - L32-N1-Point_1_11
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -458,7 +458,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_13
+      - L32-N1-Point_1_13
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -470,9 +470,9 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_1
-      - L20-N1-Point_1_3
-      - L20-N1-Point_1_14
+      - L32-N1-Point_1_1
+      - L32-N1-Point_1_3
+      - L32-N1-Point_1_14
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -484,10 +484,10 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_4
-      - L20-N1-Point_1_3
-      - L20-N1-Point_1_2
-      - L20-N1-Point_1_1
+      - L32-N1-Point_1_4
+      - L32-N1-Point_1_3
+      - L32-N1-Point_1_2
+      - L32-N1-Point_1_1
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -499,9 +499,9 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_2
-      - L20-N1-Point_1_4
-      - L20-N1-Point_1_11
+      - L32-N1-Point_1_2
+      - L32-N1-Point_1_4
+      - L32-N1-Point_1_11
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -513,7 +513,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_1
+      - L32-N1-Point_1_1
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -525,8 +525,8 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_1
-      - L20-N1-Point_1_2
+      - L32-N1-Point_1_1
+      - L32-N1-Point_1_2
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -538,7 +538,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - L20-N1-Point_1_2
+      - L32-N1-Point_1_2
       minStackHeight: 1
       maxStackHeight: 1
       note: 
