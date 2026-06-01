@@ -37,11 +37,11 @@ MonoBehaviour:
   - layout: {fileID: 11400000, guid: b1033b247cd5a12408df69ad4107ebb2, type: 2}
     weight: 1
   - layout: {fileID: 11400000, guid: 26974daba6edb2844b285fd1fea98d42, type: 2}
-    weight: 1
+    weight: 100
   - layout: {fileID: 11400000, guid: 7154d5d08e004c34b8c14edbf661a551, type: 2}
     weight: 1
   - layout: {fileID: 11400000, guid: eff0a4ecdf48e164db8bedc1e0c4145f, type: 2}
-    weight: 100
+    weight: 1
   - layout: {fileID: 11400000, guid: d7c9945fd73922442a73ffacef69e762, type: 2}
     weight: 1
   - layout: {fileID: 11400000, guid: 4dd640405f4b14e4b922a269a4cd4bba, type: 2}

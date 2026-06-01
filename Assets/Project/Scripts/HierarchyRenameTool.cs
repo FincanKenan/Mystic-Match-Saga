@@ -8,7 +8,7 @@ public class HierarchyRenameTool
     {
         foreach (GameObject obj in Selection.gameObjects)
         {
-            obj.name = obj.name.Replace("L34", "L35");
+            obj.name = obj.name.Replace("L21", "L36");
         }
     }
 }
