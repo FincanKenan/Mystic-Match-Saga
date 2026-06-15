@@ -388,8 +388,9 @@ public class BoardLayoutPreviewController : MonoBehaviour
             GetAutoHorizontalSpacing(GetPreviewSprite()),
             GetAutoVerticalSpacing(GetPreviewSprite()),
 
-            exposedGridStartOffset
-        );
+           exposedGridStartOffset,
+                pointRef.stackOpenDirection
+);
 
         return result;
     }

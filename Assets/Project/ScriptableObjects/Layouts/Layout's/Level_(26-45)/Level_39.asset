@@ -1,0 +1,457 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6a23a505127a8a4f8ba459b786c93ef, type: 3}
+  m_Name: Level_39
+  m_EditorClassIdentifier: 
+  layoutId: Normal_1
+  category: 0
+  groups:
+  - groupId: Group_01
+    role: 0
+    startLocked: 0
+    points:
+    - pointId: Triple_Up-Back_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triple_Up-Front_1
+      - Triple_Up-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Up-Back_1-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Up-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triple_Up-Back_1-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triple_Up-Front_1-2.
+      - Triple_Up-Front_1-3.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Up-Back_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Up-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triple_Up-Back_1-3.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triple_Up-Front_1-3.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Back_1-4.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Down-Front_1-4.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triple_Down-Back_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triple_Down-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Back_1-3.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Down-Front_1-3.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Back_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Down-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Back_1-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Down-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Up-Back_2-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Up-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Up-Back_2
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Up-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Back_2-4.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Down-Front_1-4.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Back_2-3.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Down-Front_1-3.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Back_2-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Down-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triple_Up-Back_2-3.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triple_Up-Front_1-3.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Back_2
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Down-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triple_Up-Back_2
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triple_Up-Front_1
+      - Triple_Up-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triple_Down-Back_2
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triple_Down-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triple_Up-Back_2-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triple_Up-Front_1-2.
+      - Triple_Up-Front_1-3.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Up-Back_3-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Up-Front_1-2.
+      - Triple_Up-Back_2-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Back_3-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Down-Front_1-2.
+      - Triple_Up-Back_2-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triple_Down-Front_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Back_3-3.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Down-Front_1-3.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triple_Up-Front_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triple_Up-Front_1-3.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Back_3
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Down-Front_1
+      - Triple_Up-Back_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Back_3-4.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Down-Front_1-4.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triple_Up-Front_1-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Up-Back_3
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triangle_Up-Front_1
+      - Triple_Up-Back_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Up-Front_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triple_Up-Back_1-3.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Front_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triple_Up-Back_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Front_1-3.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triple_Down-Back_2
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Front_1-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triple_Up-Back_2
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Down-Front_1-4.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triple_Down-Back_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: Triangle_Up-Front_1-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - Triple_Up-Back_2-3.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 

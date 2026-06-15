@@ -1,0 +1,133 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6a23a505127a8a4f8ba459b786c93ef, type: 3}
+  m_Name: Level_79
+  m_EditorClassIdentifier: 
+  layoutId: Normal_1
+  category: 0
+  groups:
+  - groupId: Group_01
+    role: 0
+    startLocked: 0
+    points:
+    - pointId: StonePoint_Stack_1
+      stackDirection: 14
+      stackLayoutMode: 0
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 11
+      maxStackHeight: 11
+      note: 
+    - pointId: StonePoint_Stack_2
+      stackDirection: 15
+      stackLayoutMode: 0
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - StonePoint_Stack_4
+      minStackHeight: 11
+      maxStackHeight: 11
+      note: 
+    - pointId: StonePoint_Stack_3
+      stackDirection: 17
+      stackLayoutMode: 0
+      visibilityMode: 0
+      stackOpenDirection: 2
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - StonePoint_Stack_1
+      minStackHeight: 11
+      maxStackHeight: 11
+      note: 
+    - pointId: StonePoint_Stack_4
+      stackDirection: 16
+      stackLayoutMode: 0
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 11
+      maxStackHeight: 11
+      note: 
+    - pointId: StonePoint_Stack_5
+      stackDirection: 2
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 4
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 4
+      maxStackHeight: 4
+      note: 
+    - pointId: StonePoint_Stack_6
+      stackDirection: 3
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 6
+      maxStackHeight: 6
+      note: 
+    - pointId: StonePoint_Stack_7
+      stackDirection: 3
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 6
+      maxStackHeight: 6
+      note: 
+    - pointId: StonePoint_Stack_8
+      stackDirection: 2
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 4
+      maxStackHeight: 4
+      note: 
+    - pointId: StonePoint_Stack_9
+      stackDirection: 2
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 4
+      maxStackHeight: 4
+      note: 
+    - pointId: StonePoint_Stack_10
+      stackDirection: 2
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 4
+      maxStackHeight: 4
+      note: 

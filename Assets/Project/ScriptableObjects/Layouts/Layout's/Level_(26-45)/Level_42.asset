@@ -1,0 +1,773 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6a23a505127a8a4f8ba459b786c93ef, type: 3}
+  m_Name: Level_42
+  m_EditorClassIdentifier: 
+  layoutId: Normal_1
+  category: 0
+  groups:
+  - groupId: Group_01
+    role: 0
+    startLocked: 0
+    points:
+    - pointId: StonePoint_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_1-10.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-10.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_1-7.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-7.
+      - St_D-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_1-11.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-11.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_1-6.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-6.
+      - St_Up-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_1-12.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-12.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_1-5.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-5.
+      - St_Up-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_1-13.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-13.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_1-4.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-4.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_1-14.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-14.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_1-8.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-8.
+      - St_D-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_V-Back_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_V-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_1-3.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-3.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Up-Back_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Up-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_D-Back_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_D-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_V-Back_1-4.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_V-Front_1-4.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_D-Back_1-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_D-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_1-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_V-Back_1-3.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_V-Front_1-3.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_1-9.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-9.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_V-Back_1-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_V-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Up-Back_1-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Up-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_2-12.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-12.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_V-Back_2-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_V-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_2-13.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-13.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_2-11.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-11.
+      - St_Up-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_V-Back_2-3.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_V-Front_1-3.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_2-10.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-10.
+      - St_D-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_2-14.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-14.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_2-9.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-9.
+      - St_D-Back_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_V-Back_2
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_V-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_2-8.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-8.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_V-Back_2-4.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_V-Front_1-4.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_2-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_2-4.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-4.
+      - St_Up-Front_1
+      - St_Up-Back_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_2
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_2-5.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-5.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_2-3.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-3.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Up-Front_1-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Up-Front_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_D-Front_1-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_2-7.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-7.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_D-Front_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Back_2-6.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Line_H-Front_1-6.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_V-Front_1-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_V-Front_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_V-Front_1-3.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Front_1
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Front_1-14.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Front_1-13.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Front_1-8.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_D-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Front_1-3.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Front_1-12.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Front_1-4.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Up-Front_1
+      - St_Up-Back_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Front_1-11.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Up-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Front_1-5.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Up-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Front_1-10.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_D-Front_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Front_1-6.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_Up-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Front_1-9.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_D-Front_1
+      - St_D-Back_1
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Front_1-7.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds:
+      - St_D-Front_1-2.
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_H-Front_1-2.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 
+    - pointId: St_Line_V-Front_1-4.
+      stackDirection: 0
+      stackLayoutMode: 1
+      visibilityMode: 0
+      stackOpenDirection: 0
+      startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      requiredCompletedPointIds: []
+      minStackHeight: 1
+      maxStackHeight: 1
+      note: 

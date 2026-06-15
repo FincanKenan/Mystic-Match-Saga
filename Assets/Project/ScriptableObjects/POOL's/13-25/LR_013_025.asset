@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e877c6b3610eaad4a8f0f6b7ca66e300, type: 3}
+  m_Name: LR_013_025
+  m_EditorClassIdentifier: 
+  minLevel: 13
+  maxLevel: 25
+  tileBag: {fileID: 11400000, guid: d256eaf7b67feb547a26d43454db8a4b, type: 2}
+  backgroundLayerBottom: {fileID: 3229507492666951288, guid: 9872d30bcc8badb4f8031c854c366476, type: 3}
+  backgroundLayerTop: {fileID: -8985808423211435256, guid: 40370233a2d8ef34eacfcd5aca86c3e3, type: 3}
+  minTotalTiles: 27
+  maxTotalTiles: 54
+  allowedNormalLayouts:
+  - layout: {fileID: 11400000, guid: b3bbced42f24eb346b20672fb9f72ca5, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: a94b17f490eaa664d93482e3dc97f73c, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: a38e1e5572a6a3347ad728185239a2b4, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: fb96fb9cdde9b1a4ebc4c87dd4803953, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: 4f11006cad163044dbc06aeefa64c77e, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: 25567d591a97ada45841ef3165ba2d5c, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: 7689ac603554d6448a9f6ec098d961e1, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: b1033b247cd5a12408df69ad4107ebb2, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: 26974daba6edb2844b285fd1fea98d42, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: 7154d5d08e004c34b8c14edbf661a551, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: eff0a4ecdf48e164db8bedc1e0c4145f, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: d7c9945fd73922442a73ffacef69e762, type: 2}
+    weight: 1
+  - layout: {fileID: 11400000, guid: 4dd640405f4b14e4b922a269a4cd4bba, type: 2}
+    weight: 1
+  allowedSpecialLayouts: []

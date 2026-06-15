@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e877c6b3610eaad4a8f0f6b7ca66e300, type: 3}
+  m_Name: Ebru_Pool(1-50)
+  m_EditorClassIdentifier: 
+  minLevel: 200
+  maxLevel: 250
+  tileBag: {fileID: 11400000, guid: e9d07aeef155af14a90d17ca9b0c3bb2, type: 2}
+  backgroundLayerBottom: {fileID: 3229507492666951288, guid: 9872d30bcc8badb4f8031c854c366476, type: 3}
+  backgroundLayerTop: {fileID: -8985808423211435256, guid: 40370233a2d8ef34eacfcd5aca86c3e3, type: 3}
+  minTotalTiles: 30
+  maxTotalTiles: 81
+  allowedNormalLayouts:
+  - layout: {fileID: 11400000, guid: 711ac4ddf3b879b41b29df183a6bc9e5, type: 2}
+    weight: 100
+  allowedSpecialLayouts: []

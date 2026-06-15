@@ -60,6 +60,7 @@ namespace ZenMatch.Runtime
         [Header("Scene References")]
         [SerializeField] private Transform stacksRoot;
         [SerializeField] private BackgroundPresenter backgroundPresenter;
+        [SerializeField] private Transform scenePointsSearchRoot;
 
         [Header("Stack View")]
         [SerializeField] private Vector3 verticalStackOffsetStep = new Vector3(0f, 0.20f, 0f);
@@ -68,6 +69,11 @@ namespace ZenMatch.Runtime
         [SerializeField] private string sortingLayerName = "Default";
         [SerializeField] private int baseSortingOrder = 10;
         [SerializeField] private int sortingOrderStepPerRenderPriority = 100;
+
+        [Header("Fixed Level Behaviour")]
+        [SerializeField] private bool useFixedLevelsOnlyInRange = true;
+        [SerializeField] private int fixedLevelMin = 1;
+        [SerializeField] private int fixedLevelMax = 12;
 
         [Header("Tray Slot Reward Visual")]
         [SerializeField] private Sprite traySlotRewardSprite;
@@ -145,8 +151,15 @@ namespace ZenMatch.Runtime
                 ? new System.Random()
                 : new System.Random(fixedSeed);
 
-            if (TrySpawnFixedLevel(rng))
-                return;
+            bool shouldTryFixedLevel =
+                !useFixedLevelsOnlyInRange ||
+                (currentLevel >= fixedLevelMin && currentLevel <= fixedLevelMax);
+
+            if (shouldTryFixedLevel)
+            {
+                if (TrySpawnFixedLevel(rng))
+                    return;
+            }
 
             SpawnProceduralFromRange(rng);
         }
@@ -581,7 +594,7 @@ namespace ZenMatch.Runtime
             EnsureStacksRoot();
 
             Dictionary<string, BoardPointAnchor> anchorMap = BuildAnchorMap(
-                FindObjectsByType<BoardPointAnchor>(FindObjectsSortMode.None));
+    FindAnchorsForLayout(layout, fixedLevel));
 
             List<ResolvedSpawnPoint> resolvedPoints = ResolveLayoutSpawnPoints(layout, anchorMap);
             LogResolvedPoints(layout, resolvedPoints);
@@ -641,6 +654,10 @@ namespace ZenMatch.Runtime
             BuildRuntimeStacksFromPlan(resolvedPoints, stackHeights, generatedTiles);
             RefreshAllLockStates();
 
+            BoardSpawnIntroAnimator introAnimator = GetComponent<BoardSpawnIntroAnimator>();
+            if (introAnimator != null)
+                introAnimator.PlayIntro(stacksRoot);
+
             Debug.Log(
                 $"[BoardSpawner] Fixed level spawn tamamlandı. " +
                 $"Level: {currentLevel}, Layout: {layout.LayoutId}, FinalTiles: {totalTiles}, StackCount: {_runtimeStacks.Count}",
@@ -695,7 +712,7 @@ namespace ZenMatch.Runtime
             EnsureStacksRoot();
 
             Dictionary<string, BoardPointAnchor> anchorMap = BuildAnchorMap(
-                FindObjectsByType<BoardPointAnchor>(FindObjectsSortMode.None));
+    FindAnchorsForLayout(selectedLayout, null));
 
             List<ResolvedSpawnPoint> resolvedPoints = ResolveLayoutSpawnPoints(selectedLayout, anchorMap);
             LogResolvedPoints(selectedLayout, resolvedPoints);
@@ -787,11 +804,17 @@ namespace ZenMatch.Runtime
             BuildRuntimeStacksFromPlan(resolvedPoints, stackHeights, generatedTiles);
             RefreshAllLockStates();
 
+            BoardSpawnIntroAnimator introAnimator = GetComponent<BoardSpawnIntroAnimator>();
+            if (introAnimator != null)
+                introAnimator.PlayIntro(stacksRoot);
+
             Debug.Log(
-                $"[BoardSpawner] Spawn tamamlandı. " +
-                $"Level: {currentLevel}, Layout: {selectedLayout.LayoutId}, " +
-                $"RequestedTiles: {requestedTotalTiles}, FinalTiles: {generatedTiles.Count}, StackCount: {_runtimeStacks.Count}",
-                this);
+    $"[BoardSpawner] HAVUZ spawn tamamlandı. " +
+    $"CurrentLevel: {currentLevel}, " +
+    $"SelectedLayoutAsset: {selectedLayout.name}, " +
+    $"SelectedLayoutId: {selectedLayout.LayoutId}, " +
+    $"RequestedTiles: {requestedTotalTiles}, FinalTiles: {generatedTiles.Count}, StackCount: {_runtimeStacks.Count}",
+    this);
         }
 
         private void ApplyBackgroundFromFixedLevel(FixedLevelSO fixedLevel)
@@ -941,6 +964,89 @@ namespace ZenMatch.Runtime
                 cumulative += entry.Weight;
                 if (roll < cumulative)
                     return entry.Layout;
+            }
+
+            return null;
+        }
+
+        private BoardPointAnchor[] FindAnchorsForLayout(BoardLayoutSO layout, FixedLevelSO fixedLevel)
+        {
+            Transform levelRoot = ResolveSceneRootForLayout(layout, fixedLevel);
+
+            if (levelRoot == null)
+            {
+                Debug.LogError(
+                    $"[BoardSpawner] Aktif layout için scene root bulunamadı. " +
+                    $"LayoutAsset: {(layout != null ? layout.name : "NULL")}, " +
+                    $"LayoutId: {(layout != null ? layout.LayoutId : "NULL")}, " +
+                    $"Level: {(fixedLevel != null ? fixedLevel.LevelNumber.ToString() : currentLevel.ToString())}",
+                    this);
+
+                return new BoardPointAnchor[0];
+            }
+
+            BoardPointAnchor[] anchors =
+                levelRoot.GetComponentsInChildren<BoardPointAnchor>(true);
+
+            Debug.Log(
+                $"[BoardSpawner] Anchor root seçildi: {levelRoot.name} | AnchorCount: {anchors.Length}",
+                levelRoot);
+
+            return anchors;
+        }
+
+        private Transform ResolveSceneRootForLayout(BoardLayoutSO layout, FixedLevelSO fixedLevel)
+        {
+            if (layout == null)
+                return null;
+
+            List<string> candidateNames = new List<string>();
+
+            if (fixedLevel != null)
+                candidateNames.Add($"Level_{fixedLevel.LevelNumber}");
+
+            if (!string.IsNullOrWhiteSpace(layout.name))
+                candidateNames.Add(layout.name);
+
+            if (!string.IsNullOrWhiteSpace(layout.LayoutId))
+                candidateNames.Add(layout.LayoutId);
+
+            Transform searchRoot = scenePointsSearchRoot != null
+                ? scenePointsSearchRoot
+                : transform.root;
+
+            for (int i = 0; i < candidateNames.Count; i++)
+            {
+                string candidateName = candidateNames[i];
+
+                if (string.IsNullOrWhiteSpace(candidateName))
+                    continue;
+
+                Transform found = FindChildRecursive(searchRoot, candidateName);
+
+                if (found != null)
+                    return found;
+            }
+
+            return null;
+        }
+
+        private Transform FindChildRecursive(Transform root, string targetName)
+        {
+            if (root == null || string.IsNullOrWhiteSpace(targetName))
+                return null;
+
+            if (root.name == targetName)
+                return root;
+
+            for (int i = 0; i < root.childCount; i++)
+            {
+                Transform child = root.GetChild(i);
+
+                Transform found = FindChildRecursive(child, targetName);
+
+                if (found != null)
+                    return found;
             }
 
             return null;

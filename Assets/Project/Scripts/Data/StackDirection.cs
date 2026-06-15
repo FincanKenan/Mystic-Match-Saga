@@ -11,7 +11,19 @@ namespace ZenMatch.Data
 
         DiagonalRight = 6,
         DiagonalLeft = 7,
+
+
         StairsRight = 8,
-        StairsLeft = 9
+        StairsLeft = 9,
+
+        StairsRight3,
+        StairsLeft3,
+        StairsRight4,
+        StairsLeft4,
+
+        ArcRight,
+        ArcLeft,
+        ArcUp,
+        ArcDown
     }
 }

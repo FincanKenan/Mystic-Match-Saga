@@ -38,7 +38,8 @@ namespace ZenMatch.Runtime
             float autoHorizontalSpacing,
             float autoVerticalSpacing,
 
-            Vector2 exposedGridStartOffset
+            Vector2 exposedGridStartOffset,
+            StackOpenDirection openDirection
         )
         {
             if (layoutMode == StackLayoutMode.ExposedLine)
@@ -51,7 +52,8 @@ namespace ZenMatch.Runtime
                     autoHorizontalSpacing,
                     autoVerticalSpacing,
                     exposedGridStartOffset,
-                    stairsTilesPerStep);
+                    stairsTilesPerStep,
+                    openDirection);
             }
 
             return ResolveOverlappedOffset(
@@ -69,7 +71,8 @@ namespace ZenMatch.Runtime
                 diagonalStep,
                 stairsHorizontalStep,
                 stairsVerticalStep,
-                stairsTilesPerStep);
+                stairsTilesPerStep,
+                openDirection);
         }
 
         private static Vector3 ResolveOverlappedOffset(
@@ -87,7 +90,8 @@ namespace ZenMatch.Runtime
             Vector2 diagonalStep,
             float stairsHorizontalStep,
             float stairsVerticalStep,
-            int stairsTilesPerStep)
+            int stairsTilesPerStep,
+            StackOpenDirection openDirection)
         {
             switch (direction)
             {
@@ -118,6 +122,24 @@ namespace ZenMatch.Runtime
                 case StackDirection.StairsLeft:
                     return ResolveStairsOffset(index, stairsHorizontalStep, stairsVerticalStep, gridDepthOffsetY, stairsTilesPerStep, -1);
 
+                case StackDirection.StairsRight3:
+                    return ResolveStairsOffset(index, stairsHorizontalStep, stairsVerticalStep, gridDepthOffsetY, 3, 1);
+
+                case StackDirection.StairsLeft3:
+                    return ResolveStairsOffset(index, stairsHorizontalStep, stairsVerticalStep, gridDepthOffsetY, 3, -1);
+
+                case StackDirection.StairsRight4:
+                    return ResolveStairsOffset(index, stairsHorizontalStep, stairsVerticalStep, gridDepthOffsetY, 4, 1);
+
+                case StackDirection.StairsLeft4:
+                    return ResolveStairsOffset(index, stairsHorizontalStep, stairsVerticalStep, gridDepthOffsetY, 4, -1);
+
+                case StackDirection.ArcRight:
+                case StackDirection.ArcLeft:
+                case StackDirection.ArcUp:
+                case StackDirection.ArcDown:
+                    return ResolveArcOffset(index, 0.45f, 0.90f, -90f, 90f, direction, openDirection);
+
                 case StackDirection.Vertical:
                 default:
                     return verticalStep * index;
@@ -132,15 +154,13 @@ namespace ZenMatch.Runtime
             float autoHorizontalSpacing,
             float autoVerticalSpacing,
             Vector2 exposedGridStartOffset,
-            int stairsTilesPerStep)
+            int stairsTilesPerStep,
+            StackOpenDirection openDirection)
         {
             switch (direction)
             {
                 case StackDirection.Horizontal:
-                    return new Vector3(
-                        exposedHorizontalStartOffset + index * autoHorizontalSpacing,
-                        0f,
-                        0f);
+                    return new Vector3(exposedHorizontalStartOffset + index * autoHorizontalSpacing, 0f, 0f);
 
                 case StackDirection.Grid2:
                     return ResolveExposedGridOffset(index, 2, autoHorizontalSpacing, autoVerticalSpacing, exposedGridStartOffset);
@@ -166,21 +186,31 @@ namespace ZenMatch.Runtime
                 case StackDirection.StairsLeft:
                     return ResolveExposedStairsOffset(index, exposedVerticalStartOffset, autoHorizontalSpacing, autoVerticalSpacing, stairsTilesPerStep, -1);
 
+                case StackDirection.StairsRight3:
+                    return ResolveExposedStairsOffset(index, exposedVerticalStartOffset, autoHorizontalSpacing, autoVerticalSpacing, 3, 1);
+
+                case StackDirection.StairsLeft3:
+                    return ResolveExposedStairsOffset(index, exposedVerticalStartOffset, autoHorizontalSpacing, autoVerticalSpacing, 3, -1);
+
+                case StackDirection.StairsRight4:
+                    return ResolveExposedStairsOffset(index, exposedVerticalStartOffset, autoHorizontalSpacing, autoVerticalSpacing, 4, 1);
+
+                case StackDirection.StairsLeft4:
+                    return ResolveExposedStairsOffset(index, exposedVerticalStartOffset, autoHorizontalSpacing, autoVerticalSpacing, 4, -1);
+
+                case StackDirection.ArcRight:
+                case StackDirection.ArcLeft:
+                case StackDirection.ArcUp:
+                case StackDirection.ArcDown:
+                    return ResolveArcOffset(index, 0.45f, 0.90f, -90f, 90f, direction, openDirection);
+
                 case StackDirection.Vertical:
                 default:
-                    return new Vector3(
-                        0f,
-                        exposedVerticalStartOffset + index * autoVerticalSpacing,
-                        0f);
+                    return new Vector3(0f, exposedVerticalStartOffset + index * autoVerticalSpacing, 0f);
             }
         }
 
-        private static Vector3 ResolveOverlappedGridOffset(
-            int index,
-            int columns,
-            float horizontalSpacing,
-            float verticalSpacing,
-            float depthOffsetY)
+        private static Vector3 ResolveOverlappedGridOffset(int index, int columns, float horizontalSpacing, float verticalSpacing, float depthOffsetY)
         {
             int row = index / columns;
             int column = index % columns;
@@ -195,12 +225,7 @@ namespace ZenMatch.Runtime
             return new Vector3(x, y, 0f);
         }
 
-        private static Vector3 ResolveExposedGridOffset(
-            int index,
-            int columns,
-            float horizontalSpacing,
-            float verticalSpacing,
-            Vector2 startOffset)
+        private static Vector3 ResolveExposedGridOffset(int index, int columns, float horizontalSpacing, float verticalSpacing, Vector2 startOffset)
         {
             int row = index / columns;
             int column = index % columns;
@@ -211,10 +236,7 @@ namespace ZenMatch.Runtime
             return new Vector3(x, y, 0f);
         }
 
-        private static Vector3 ResolveZigzagVerticalOffset(
-            int index,
-            float horizontalOffset,
-            float verticalStep)
+        private static Vector3 ResolveZigzagVerticalOffset(int index, float horizontalOffset, float verticalStep)
         {
             if (index == 0)
                 return Vector3.zero;
@@ -225,10 +247,7 @@ namespace ZenMatch.Runtime
             return new Vector3(x, y, 0f);
         }
 
-        private static Vector3 ResolveZigzagHorizontalOffset(
-            int index,
-            float horizontalStep,
-            float verticalOffset)
+        private static Vector3 ResolveZigzagHorizontalOffset(int index, float horizontalStep, float verticalOffset)
         {
             if (index == 0)
                 return Vector3.zero;
@@ -239,10 +258,7 @@ namespace ZenMatch.Runtime
             return new Vector3(x, y, 0f);
         }
 
-        private static Vector3 ResolveDiagonalOffset(
-            int index,
-            Vector2 diagonalStep,
-            int direction)
+        private static Vector3 ResolveDiagonalOffset(int index, Vector2 diagonalStep, int direction)
         {
             float x = diagonalStep.x * index * direction;
             float y = diagonalStep.y * index;
@@ -250,13 +266,7 @@ namespace ZenMatch.Runtime
             return new Vector3(x, y, 0f);
         }
 
-        private static Vector3 ResolveStairsOffset(
-            int index,
-            float horizontalStep,
-            float verticalStep,
-            float depthOffsetY,
-            int tilesPerStep,
-            int direction)
+        private static Vector3 ResolveStairsOffset(int index, float horizontalStep, float verticalStep, float depthOffsetY, int tilesPerStep, int direction)
         {
             int safeTilesPerStep = Mathf.Max(1, tilesPerStep);
 
@@ -269,13 +279,7 @@ namespace ZenMatch.Runtime
             return new Vector3(x, y, 0f);
         }
 
-        private static Vector3 ResolveExposedDiagonalOffset(
-            int index,
-            float horizontalStartOffset,
-            float verticalStartOffset,
-            float horizontalSpacing,
-            float verticalSpacing,
-            int direction)
+        private static Vector3 ResolveExposedDiagonalOffset(int index, float horizontalStartOffset, float verticalStartOffset, float horizontalSpacing, float verticalSpacing, int direction)
         {
             float x = direction * (horizontalStartOffset + index * horizontalSpacing * 0.7f);
             float y = verticalStartOffset + index * verticalSpacing * 0.7f;
@@ -283,13 +287,7 @@ namespace ZenMatch.Runtime
             return new Vector3(x, y, 0f);
         }
 
-        private static Vector3 ResolveExposedStairsOffset(
-            int index,
-            float verticalStartOffset,
-            float horizontalSpacing,
-            float verticalSpacing,
-            int tilesPerStep,
-            int direction)
+        private static Vector3 ResolveExposedStairsOffset(int index, float verticalStartOffset, float horizontalSpacing, float verticalSpacing, int tilesPerStep, int direction)
         {
             int safeTilesPerStep = Mathf.Max(1, tilesPerStep);
 
@@ -302,11 +300,7 @@ namespace ZenMatch.Runtime
             return new Vector3(x, y, 0f);
         }
 
-        private static Vector3 ResolveExposedZigzagVerticalOffset(
-            int index,
-            float verticalStartOffset,
-            float horizontalSpacing,
-            float verticalSpacing)
+        private static Vector3 ResolveExposedZigzagVerticalOffset(int index, float verticalStartOffset, float horizontalSpacing, float verticalSpacing)
         {
             float x = index % 2 == 0 ? 0f : horizontalSpacing * 0.35f;
             float y = verticalStartOffset + index * verticalSpacing;
@@ -314,16 +308,64 @@ namespace ZenMatch.Runtime
             return new Vector3(x, y, 0f);
         }
 
-        private static Vector3 ResolveExposedZigzagHorizontalOffset(
-            int index,
-            float horizontalStartOffset,
-            float horizontalSpacing,
-            float verticalSpacing)
+        private static Vector3 ResolveExposedZigzagHorizontalOffset(int index, float horizontalStartOffset, float horizontalSpacing, float verticalSpacing)
         {
             float x = horizontalStartOffset + index * horizontalSpacing;
             float y = index % 2 == 0 ? 0f : verticalSpacing * 0.35f;
 
             return new Vector3(x, y, 0f);
+        }
+
+        private static Vector3 ResolveArcOffset(
+            int index,
+            float radiusX,
+            float radiusY,
+            float startAngle,
+            float endAngle,
+            StackDirection direction,
+            StackOpenDirection openDirection)
+        {
+            const int previewCount = 12;
+
+            int resolvedIndex = ShouldReverseArcOrder(direction, openDirection)
+                ? previewCount - 1 - index
+                : index;
+
+            float t = previewCount <= 1 ? 0.5f : resolvedIndex / (float)(previewCount - 1);
+            float angle = Mathf.Lerp(startAngle, endAngle, t) * Mathf.Deg2Rad;
+
+            float x = Mathf.Cos(angle);
+            float y = Mathf.Sin(angle);
+
+            switch (direction)
+            {
+                case StackDirection.ArcRight:
+                    return new Vector3(x * radiusX, y * radiusY, 0f);
+
+                case StackDirection.ArcLeft:
+                    return new Vector3(-x * radiusX, y * radiusY, 0f);
+
+                case StackDirection.ArcUp:
+                    return new Vector3(y * radiusY, x * radiusX, 0f);
+
+                case StackDirection.ArcDown:
+                    return new Vector3(y * radiusY, -x * radiusX, 0f);
+
+                default:
+                    return Vector3.zero;
+            }
+        }
+
+        private static bool ShouldReverseArcOrder(StackDirection direction, StackOpenDirection openDirection)
+        {
+            return direction switch
+            {
+                StackDirection.ArcRight => openDirection == StackOpenDirection.Left || openDirection == StackOpenDirection.Down,
+                StackDirection.ArcLeft => openDirection == StackOpenDirection.Right || openDirection == StackOpenDirection.Down,
+                StackDirection.ArcUp => openDirection == StackOpenDirection.Down || openDirection == StackOpenDirection.Left,
+                StackDirection.ArcDown => openDirection == StackOpenDirection.Up || openDirection == StackOpenDirection.Left,
+                _ => false
+            };
         }
     }
 }
