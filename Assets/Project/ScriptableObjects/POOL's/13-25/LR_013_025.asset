@@ -21,7 +21,7 @@ MonoBehaviour:
   maxTotalTiles: 54
   allowedNormalLayouts:
   - layout: {fileID: 11400000, guid: b3bbced42f24eb346b20672fb9f72ca5, type: 2}
-    weight: 1
+    weight: 1000
   - layout: {fileID: 11400000, guid: a94b17f490eaa664d93482e3dc97f73c, type: 2}
     weight: 1
   - layout: {fileID: 11400000, guid: a38e1e5572a6a3347ad728185239a2b4, type: 2}
