@@ -309,7 +309,7 @@ public class BoardLayoutPreviewController : MonoBehaviour
             int tileCount = GetTileCount(data.point, data.pointReference);
             data.visualIndex = GetVisualIndex(data.pointReference, data.tileIndex, tileCount);
 
-            Vector2 offset = ResolveOffsetForIndex(data.pointReference, data.visualIndex);
+            Vector2 offset = ResolveOffsetForIndex(data.pointReference, data.visualIndex, tileCount);
 
             data.tileTransform.position = data.point.transform.position + (Vector3)offset;
             data.tileTransform.localScale = Vector3.one * tileScale;
@@ -350,7 +350,7 @@ public class BoardLayoutPreviewController : MonoBehaviour
         }
     }
 
-    private Vector2 ResolveOffsetForIndex(SpawnPointReference pointRef, int index)
+    private Vector2 ResolveOffsetForIndex(SpawnPointReference pointRef, int index, int tileCount)
     {
         if (pointRef == null)
             return Vector2.zero;
@@ -388,9 +388,10 @@ public class BoardLayoutPreviewController : MonoBehaviour
             GetAutoHorizontalSpacing(GetPreviewSprite()),
             GetAutoVerticalSpacing(GetPreviewSprite()),
 
-           exposedGridStartOffset,
-                pointRef.stackOpenDirection
-);
+            exposedGridStartOffset,
+            pointRef.stackOpenDirection,
+            tileCount
+        );
 
         return result;
     }

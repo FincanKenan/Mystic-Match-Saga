@@ -5,6 +5,7 @@ using ZenMatch.Runtime;
 using ZenMatch.UI;
 using ZenMatch.Gameplay.Boosters;
 using ZenMatch.Data;
+using ZenMatch.Runtime.RewardMissions;
 
 namespace ZenMatch.Gameplay
 {
@@ -27,6 +28,8 @@ namespace ZenMatch.Gameplay
             public Sprite TileSprite;
             public bool IsValid;
             public bool UnlockedTraySlot;
+
+            public RewardGiftControllerSnapshot RewardGiftSnapshotBefore;
         }
 
         [SerializeField] private BoardSpawner boardSpawner;
@@ -35,6 +38,7 @@ namespace ZenMatch.Gameplay
         [SerializeField] private TileFlyToTrayAnimator tileFlyAnimator;
         [SerializeField] private TileFlyBackAnimator tileFlyBackAnimator;
         [SerializeField] private BoosterManager boosterManager;
+        [SerializeField] private RewardGiftController rewardGiftController;
 
         [Header("Debug")]
         [SerializeField] private bool logTrayStateAfterEachMove = true;
@@ -72,6 +76,9 @@ namespace ZenMatch.Gameplay
 
             if (boosterManager == null)
                 boosterManager = FindFirstObjectByType<BoosterManager>();
+
+            if (rewardGiftController == null)
+                rewardGiftController = FindFirstObjectByType<RewardGiftController>();
         }
 
         private IEnumerator Start()
@@ -101,6 +108,32 @@ namespace ZenMatch.Gameplay
             {
                 trayController.Initialize();
             }
+
+            InitializeRewardGiftsForCurrentLayout();
+        }
+
+        private void InitializeRewardGiftsForCurrentLayout()
+        {
+            if (rewardGiftController == null)
+                return;
+
+            if (boardSpawner == null)
+            {
+                rewardGiftController.ClearGifts();
+                return;
+            }
+
+            BoardLayoutSO layout = boardSpawner.LastSpawnedLayout;
+
+            if (layout == null)
+            {
+                rewardGiftController.ClearGifts();
+                return;
+            }
+
+            rewardGiftController.Initialize(
+                layout.RewardGifts,
+                boardSpawner.CurrentLevel);
         }
 
         public void SetInputEnabled(bool enabled)
@@ -202,6 +235,11 @@ namespace ZenMatch.Gameplay
                 boardSpawner.RestoreTraySlotRewardVisual(move.PointId);
             }
 
+            if (restored && rewardGiftController != null && move.RewardGiftSnapshotBefore != null)
+            {
+                rewardGiftController.RestoreSnapshot(move.RewardGiftSnapshotBefore);
+            }
+
             if (restored)
             {
                 _gameState = LevelGameState.Playing;
@@ -253,14 +291,14 @@ namespace ZenMatch.Gameplay
                 trayController.Initialize();
 
             List<TileTypeSO> trayBeforeSnapshot = trayController.State != null
-                ? trayController.State.CreateSnapshot()
-                : new List<TileTypeSO>();
+     ? trayController.State.CreateSnapshot()
+     : new List<TileTypeSO>();
+
+            RewardGiftControllerSnapshot rewardGiftSnapshotBefore = rewardGiftController != null
+                ? rewardGiftController.CaptureSnapshot()
+                : null;
 
             if (!boardSpawner.TryTakeTile(pointId, tileIndex, out BoardTileInstance removedTile, out int removedIndex))
-                return false;
-
-           
-            if (removedTile == null || removedTile.TileType == null)
                 return false;
 
             int targetSlotIndex = trayController.State != null ? trayController.State.Count : 0;
@@ -275,13 +313,14 @@ namespace ZenMatch.Gameplay
                 startWorldPosition = targetWorldPosition;
 
             StartCoroutine(HandleMoveRoutine(
-                removedTile,
-                startWorldPosition,
-                targetWorldPosition,
-                true,
-                pointId,
-                removedIndex,
-                trayBeforeSnapshot));
+    removedTile,
+    startWorldPosition,
+    targetWorldPosition,
+    true,
+    pointId,
+    removedIndex,
+    trayBeforeSnapshot,
+    rewardGiftSnapshotBefore));
 
             return true;
         }
@@ -310,23 +349,25 @@ namespace ZenMatch.Gameplay
                 targetWorldPosition = trayController.View.GetSlotWorldPosition(targetSlotIndex);
 
             StartCoroutine(HandleMoveRoutine(
-                removedTile,
-                startWorldPosition,
-                targetWorldPosition,
-                false,
-                null,
-                -1,
-                null));
+    removedTile,
+    startWorldPosition,
+    targetWorldPosition,
+    false,
+    null,
+    -1,
+    null,
+    null));
         }
 
         private IEnumerator HandleMoveRoutine(
-            BoardTileInstance removedTile,
-            Vector3 startWorldPosition,
-            Vector3 targetWorldPosition,
-            bool recordUndo,
-            string sourcePointId,
-            int sourceTileIndex,
-            List<TileTypeSO> trayBeforeSlots)
+    BoardTileInstance removedTile,
+    Vector3 startWorldPosition,
+    Vector3 targetWorldPosition,
+    bool recordUndo,
+    string sourcePointId,
+    int sourceTileIndex,
+    List<TileTypeSO> trayBeforeSlots,
+    RewardGiftControllerSnapshot rewardGiftSnapshotBefore)
         {
             _isMoveInProgress = true;
 
@@ -353,6 +394,9 @@ namespace ZenMatch.Gameplay
             if (addedSuccessfully && boosterManager != null)
                 boosterManager.NotifyTileAddedToTray();
 
+            if (addedSuccessfully && recordUndo && rewardGiftController != null)
+                rewardGiftController.NotifySuccessfulTileSelection(sourcePointId, removedTile);
+
             if (addedSuccessfully && recordUndo)
             {
                 _lastMove = new LastMoveRecord
@@ -361,13 +405,14 @@ namespace ZenMatch.Gameplay
                     TileIndex = sourceTileIndex,
                     RemovedTile = removedTile,
                     TrayBeforeSlots = trayBeforeSlots != null
-         ? new List<TileTypeSO>(trayBeforeSlots)
-         : new List<TileTypeSO>(),
+        ? new List<TileTypeSO>(trayBeforeSlots)
+        : new List<TileTypeSO>(),
                     TileSprite = removedTile.TileType != null ? removedTile.TileType.Icon : null,
                     UnlockedTraySlot =
-         boardSpawner != null &&
-         boardSpawner.IsTraySlotUnlockPoint(sourcePointId) &&
-         boardSpawner.IsPointCompleted(sourcePointId),
+        boardSpawner != null &&
+        boardSpawner.IsTraySlotUnlockPoint(sourcePointId) &&
+        boardSpawner.IsPointCompleted(sourcePointId),
+                    RewardGiftSnapshotBefore = rewardGiftSnapshotBefore,
                     IsValid = true
                 };
             }

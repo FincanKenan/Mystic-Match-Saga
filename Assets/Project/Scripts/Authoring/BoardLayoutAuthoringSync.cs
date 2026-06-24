@@ -79,6 +79,8 @@ namespace ZenMatch.Authoring
                 return;
             }
 
+            ValidateSpecialTiles(pointRefs);
+
             Undo.RecordObject(targetLayout, "Sync Scene Points To BoardLayoutSO");
 
             SpawnGroupDefinition group = new SpawnGroupDefinition();
@@ -103,6 +105,55 @@ namespace ZenMatch.Authoring
             Debug.Log(
                 $"[BoardLayoutAuthoringSync] Sync tamamlandý. Layout: {targetLayout.name}, Point Count: {pointRefs.Count}",
                 targetLayout);
+        }
+
+        private void ValidateSpecialTiles(List<SpawnPointReference> pointRefs)
+        {
+            int totalSpecialCount = 0;
+            Dictionary<string, int> groupCounts = new();
+
+            for (int i = 0; i < pointRefs.Count; i++)
+            {
+                SpawnPointReference point = pointRefs[i];
+
+                if (point == null || !point.isSpecialTile)
+                    continue;
+
+                totalSpecialCount++;
+
+                if (point.specialTile == null)
+                {
+                    Debug.LogWarning(
+                        $"[BoardLayoutAuthoringSync] Special Tile boþ. PointId: {point.pointId}",
+                        targetLayout);
+                }
+
+                string groupKey = string.IsNullOrWhiteSpace(point.specialTileGroupId)
+                    ? point.specialTile != null ? point.specialTile.TileId : "UngroupedSpecialTile"
+                    : point.specialTileGroupId;
+
+                if (!groupCounts.ContainsKey(groupKey))
+                    groupCounts[groupKey] = 0;
+
+                groupCounts[groupKey]++;
+            }
+
+            if (totalSpecialCount > 0 && totalSpecialCount % 3 != 0)
+            {
+                Debug.LogWarning(
+                    $"[BoardLayoutAuthoringSync] Toplam özel taþ sayýsý 3'ün katý deðil. Count: {totalSpecialCount}",
+                    targetLayout);
+            }
+
+            foreach (KeyValuePair<string, int> pair in groupCounts)
+            {
+                if (pair.Value % 3 != 0)
+                {
+                    Debug.LogWarning(
+                        $"[BoardLayoutAuthoringSync] Special group 3'ün katý deðil. Group: {pair.Key}, Count: {pair.Value}",
+                        targetLayout);
+                }
+            }
         }
 #endif
 

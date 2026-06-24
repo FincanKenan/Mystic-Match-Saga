@@ -107,6 +107,21 @@ namespace ZenMatch.Runtime
                 _slotIndexByTile.Add(tile, index);
         }
 
+        public void RebuildStableSlotIndices()
+        {
+            _slotIndexByTile.Clear();
+
+            for (int i = 0; i < _tiles.Count; i++)
+            {
+                BoardTileInstance tile = _tiles[i];
+
+                if (tile == null)
+                    continue;
+
+                _slotIndexByTile[tile] = i;
+            }
+        }
+
         public int GetStableSlotIndex(BoardTileInstance tile)
         {
             if (tile == null)

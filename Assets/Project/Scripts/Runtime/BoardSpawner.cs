@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine;
 using ZenMatch.Authoring;
 using ZenMatch.Data;
+using ZenMatch.UI;
 
 namespace ZenMatch.Runtime
 {
@@ -24,6 +25,11 @@ namespace ZenMatch.Runtime
             public readonly int MinStackHeight;
             public readonly int MaxStackHeight;
             public readonly int RenderPriority;
+            public readonly bool IsSpecialTile;
+            public readonly TileTypeSO SpecialTile;
+            public readonly SpecialTileBehaviorType SpecialBehaviorType;
+            public readonly string SpecialTileGroupId;
+            public readonly int SpecialRewardTurnLimit;
 
             public ResolvedSpawnPoint(
                 BoardPointAnchor anchor,
@@ -36,7 +42,12 @@ namespace ZenMatch.Runtime
                 List<string> requiredCompletedPointIds,
                 int minStackHeight,
                 int maxStackHeight,
-                int renderPriority)
+                int renderPriority,
+                bool isSpecialTile,
+                TileTypeSO specialTile,
+                SpecialTileBehaviorType specialBehaviorType,
+                string specialTileGroupId,
+                int specialRewardTurnLimit)
             {
                 Anchor = anchor;
                 Direction = direction;
@@ -49,7 +60,29 @@ namespace ZenMatch.Runtime
                 MinStackHeight = minStackHeight;
                 MaxStackHeight = maxStackHeight;
                 RenderPriority = renderPriority;
+                IsSpecialTile = isSpecialTile;
+                SpecialTile = specialTile;
+                SpecialBehaviorType = specialBehaviorType;
+                SpecialTileGroupId = specialTileGroupId;
+                SpecialRewardTurnLimit = specialRewardTurnLimit;
             }
+        }
+
+        private sealed class SpecialRewardTileState
+        {
+            public BoardTileInstance Tile;
+            public bool IsRewardActive;
+            public bool WasRewardCollected;
+            public int TurnsRemaining;
+            public int LastCollectedTurnsRemaining;
+        }
+
+        private sealed class SpecialRewardMoveSnapshot
+        {
+            public BoardTileInstance RemovedTile;
+            public SpecialRewardTileState RemovedTileBefore;
+            public readonly List<SpecialRewardTileState> AffectedTilesBefore = new();
+            public bool CollectedRemovedTileReward;
         }
 
         [Header("Generation Source")]
@@ -111,6 +144,14 @@ namespace ZenMatch.Runtime
         [SerializeField] private int selectableGlowSortingOffset = -1;
         [SerializeField] private bool showGlowOnExposedLine = false;
 
+        [Header("Special Reward Tile Visuals")]
+        [SerializeField] private Sprite specialCornerSparkSprite;
+        [SerializeField] private Sprite specialRuneSprite;
+        [SerializeField] private int specialRewardVisualSortingOffset = 3;
+
+        [Header("Special Reward Tray")]
+        [SerializeField] private SpecialRewardTrayView specialRewardTrayView;
+
         [Header("Generation")]
         [SerializeField] private bool spawnOnStart = true;
         [SerializeField] private bool useRandomSeed = true;
@@ -126,10 +167,15 @@ namespace ZenMatch.Runtime
         private readonly HashSet<string> _completedPointIds = new();
         private readonly HashSet<string> _traySlotUnlockPointIds = new();
         private readonly Dictionary<string, GameObject> _traySlotRewardVisualByPointId = new();
+        private readonly Dictionary<BoardTileInstance, SpecialRewardMoveSnapshot> _specialRewardUndoSnapshots = new();
 
         public IReadOnlyList<BoardStack> RuntimeStacks => _runtimeStacks;
 
+        public int CurrentLevel => currentLevel;
+
         public FixedLevelSO LastSpawnedFixedLevel { get; private set; }
+        public BoardLayoutSO LastSpawnedLayout { get; private set; }
+
         public bool LastSpawnWasFixedLevel => LastSpawnedFixedLevel != null;
 
         public event Action<string> PointCompleted;
@@ -182,6 +228,9 @@ namespace ZenMatch.Runtime
                 }
             }
 
+            if (specialRewardTrayView != null)
+                specialRewardTrayView.ClearAndHide();
+
             foreach (var pair in _traySlotRewardVisualByPointId)
             {
                 if (pair.Value != null)
@@ -205,6 +254,9 @@ namespace ZenMatch.Runtime
             _viewByPointId.Clear();
             _completedPointIds.Clear();
             _traySlotUnlockPointIds.Clear();
+            _specialRewardUndoSnapshots.Clear();
+
+            LastSpawnedLayout = null;
         }
 
         public bool TryTakeTopTile(string pointId, out BoardTileInstance removedTile)
@@ -250,6 +302,8 @@ namespace ZenMatch.Runtime
             if (removedTile == null)
                 return false;
 
+            HandleSpecialRewardAfterTileTaken(pointId, removedTile);
+
             RefreshStackView(pointId);
 
             if (stack.Count == 0)
@@ -272,12 +326,47 @@ namespace ZenMatch.Runtime
             int clampedIndex = Mathf.Clamp(tileIndex, 0, stack.Count);
             stack.InsertAt(clampedIndex, tile);
 
+            RestoreSpecialRewardUndoForTile(tile);
+
             _completedPointIds.Remove(pointId);
 
             RefreshStackView(pointId);
+            RefreshAllSpecialRewardViews();
             RefreshAllLockStates();
 
             return true;
+        }
+
+        private void RestoreSpecialRewardUndoForTile(BoardTileInstance restoredTile)
+        {
+            if (restoredTile == null)
+                return;
+
+            if (!_specialRewardUndoSnapshots.TryGetValue(restoredTile, out SpecialRewardMoveSnapshot snapshot))
+                return;
+
+            if (snapshot.CollectedRemovedTileReward && specialRewardTrayView != null)
+                specialRewardTrayView.UnmarkCollected(restoredTile.TileType);
+
+            RestoreSpecialRewardState(snapshot.RemovedTileBefore);
+
+            for (int i = 0; i < snapshot.AffectedTilesBefore.Count; i++)
+                RestoreSpecialRewardState(snapshot.AffectedTilesBefore[i]);
+
+            _specialRewardUndoSnapshots.Remove(restoredTile);
+        }
+
+        private void RefreshAllSpecialRewardViews()
+        {
+            for (int i = 0; i < _runtimeStacks.Count; i++)
+            {
+                BoardStack stack = _runtimeStacks[i];
+
+                if (stack == null)
+                    continue;
+
+                RefreshStackView(stack.PointId);
+            }
         }
 
         public bool TryTakeAnyNonHiddenTileOfType(
@@ -317,6 +406,8 @@ namespace ZenMatch.Runtime
 
                     pointId = stack.PointId;
                     sourceWorldPosition = stack.GetWorldBasePosition();
+
+                    HandleSpecialRewardAfterTileTaken(pointId, removedTile);
 
                     RefreshStackView(pointId);
 
@@ -362,6 +453,8 @@ namespace ZenMatch.Runtime
 
                     pointId = stack.PointId;
 
+                    HandleSpecialRewardAfterTileTaken(pointId, removedTile);
+
                     RefreshStackView(pointId);
 
                     if (stack.Count == 0)
@@ -381,43 +474,57 @@ namespace ZenMatch.Runtime
 
             List<BoardStack> stacks = new();
             List<int> indices = new();
-            List<TileTypeSO> tileTypes = new();
+            List<BoardTileInstance> tiles = new();
 
             for (int i = 0; i < _runtimeStacks.Count; i++)
             {
                 BoardStack stack = _runtimeStacks[i];
+
                 if (stack == null || stack.Count <= 0)
                     continue;
 
                 for (int t = 0; t < stack.Count; t++)
                 {
                     BoardTileInstance tile = stack.GetTileAt(t);
+
                     if (tile == null || tile.TileType == null)
                         continue;
 
                     stacks.Add(stack);
                     indices.Add(t);
-                    tileTypes.Add(tile.TileType);
+                    tiles.Add(tile);
                 }
             }
 
-            if (tileTypes.Count <= 1)
+            if (tiles.Count <= 1)
                 return false;
 
-            for (int i = tileTypes.Count - 1; i > 0; i--)
+            for (int i = tiles.Count - 1; i > 0; i--)
             {
                 int j = rng.Next(0, i + 1);
-                (tileTypes[i], tileTypes[j]) = (tileTypes[j], tileTypes[i]);
+                (tiles[i], tiles[j]) = (tiles[j], tiles[i]);
             }
 
-            for (int i = 0; i < tileTypes.Count; i++)
-                stacks[i].SetTileAt(indices[i], new BoardTileInstance(tileTypes[i]));
+            HashSet<BoardStack> affectedStacks = new();
 
-            for (int i = 0; i < _runtimeStacks.Count; i++)
+            for (int i = 0; i < tiles.Count; i++)
             {
-                BoardStack stack = _runtimeStacks[i];
-                if (stack != null)
-                    RefreshStackView(stack.PointId);
+                BoardStack stack = stacks[i];
+
+                if (stack == null)
+                    continue;
+
+                stack.SetTileAt(indices[i], tiles[i]);
+                affectedStacks.Add(stack);
+            }
+
+            foreach (BoardStack stack in affectedStacks)
+            {
+                if (stack == null)
+                    continue;
+
+                stack.RebuildStableSlotIndices();
+                RefreshStackView(stack.PointId);
             }
 
             return true;
@@ -627,21 +734,36 @@ namespace ZenMatch.Runtime
                 return true;
             }
 
-            List<TileTypeSO> generatedTiles = TileTripleDistributionBuilder.BuildTripleDistributedTiles(
-                tileBag,
-                totalTiles,
-                rng);
+            int normalTileCount = ComputeNormalTileCountForTileBag(resolvedPoints, stackHeights);
+            if (normalTileCount < 0)
+            {
+                Debug.LogError($"[BoardSpawner] Fixed level {currentLevel} normal tile sayısı hesaplanamadı.", this);
+                return true;
+            }
 
-            if (generatedTiles == null || generatedTiles.Count != totalTiles)
+            if (normalTileCount % 3 != 0)
             {
                 Debug.LogError(
-                    $"[BoardSpawner] Fixed level {currentLevel} için tile distribution oluşturulamadı. " +
-                    $"Expected: {totalTiles}, Actual: {(generatedTiles == null ? 0 : generatedTiles.Count)}",
+                    $"[BoardSpawner] Fixed level {currentLevel} normal tile sayısı 3'ün katı olmalı. " +
+                    $"NormalTileCount: {normalTileCount}. Special tile sayısını 3'ün katı yap.",
                     this);
                 return true;
             }
 
-            if (!AreAllTileCountsMultipleOfThree(generatedTiles))
+            List<TileTypeSO> generatedTiles = normalTileCount > 0
+                ? TileTripleDistributionBuilder.BuildTripleDistributedTiles(tileBag, normalTileCount, rng)
+                : new List<TileTypeSO>();
+
+            if (generatedTiles == null || generatedTiles.Count != normalTileCount)
+            {
+                Debug.LogError(
+                    $"[BoardSpawner] Fixed level {currentLevel} için tile distribution oluşturulamadı. " +
+                    $"Expected: {normalTileCount}, Actual: {(generatedTiles == null ? 0 : generatedTiles.Count)}",
+                    this);
+                return true;
+            }
+
+            if (generatedTiles.Count > 0 && !AreAllTileCountsMultipleOfThree(generatedTiles))
             {
                 LogInvalidTileCounts(generatedTiles);
                 Debug.LogError($"[BoardSpawner] Fixed level {currentLevel} tile dağılımında 3'ün katı olmayan type bulundu.", this);
@@ -652,6 +774,10 @@ namespace ZenMatch.Runtime
                 LogTileDistribution(generatedTiles);
 
             BuildRuntimeStacksFromPlan(resolvedPoints, stackHeights, generatedTiles);
+
+            LastSpawnedLayout = layout;
+
+            InitializeSpecialRewardTray();
             RefreshAllLockStates();
 
             BoardSpawnIntroAnimator introAnimator = GetComponent<BoardSpawnIntroAnimator>();
@@ -777,21 +903,36 @@ namespace ZenMatch.Runtime
                 return;
             }
 
-            List<TileTypeSO> generatedTiles = TileTripleDistributionBuilder.BuildTripleDistributedTiles(
-                tileBag,
-                normalizedTotalTiles,
-                rng);
+            int normalTileCount = ComputeNormalTileCountForTileBag(resolvedPoints, stackHeights);
+            if (normalTileCount < 0)
+            {
+                Debug.LogError("[BoardSpawner] Normal tile sayısı hesaplanamadı.", this);
+                return;
+            }
 
-            if (generatedTiles == null || generatedTiles.Count != normalizedTotalTiles)
+            if (normalTileCount % 3 != 0)
             {
                 Debug.LogError(
-                    $"[BoardSpawner] Triple tile distribution oluşturulamadı veya yanlış sayıda tile üretti. " +
-                    $"Expected: {normalizedTotalTiles}, Actual: {(generatedTiles == null ? 0 : generatedTiles.Count)}",
+                    $"[BoardSpawner] Normal tile sayısı 3'ün katı olmalı. " +
+                    $"NormalTileCount: {normalTileCount}. Special tile sayısını 3'ün katı yap.",
                     this);
                 return;
             }
 
-            if (!AreAllTileCountsMultipleOfThree(generatedTiles))
+            List<TileTypeSO> generatedTiles = normalTileCount > 0
+                ? TileTripleDistributionBuilder.BuildTripleDistributedTiles(tileBag, normalTileCount, rng)
+                : new List<TileTypeSO>();
+
+            if (generatedTiles == null || generatedTiles.Count != normalTileCount)
+            {
+                Debug.LogError(
+                    $"[BoardSpawner] Triple tile distribution oluşturulamadı veya yanlış sayıda tile üretti. " +
+                    $"Expected: {normalTileCount}, Actual: {(generatedTiles == null ? 0 : generatedTiles.Count)}",
+                    this);
+                return;
+            }
+
+            if (generatedTiles.Count > 0 && !AreAllTileCountsMultipleOfThree(generatedTiles))
             {
                 LogInvalidTileCounts(generatedTiles);
                 Debug.LogError("[BoardSpawner] Üretilen tile dağılımında 3'ün katı olmayan type bulundu.", this);
@@ -802,6 +943,10 @@ namespace ZenMatch.Runtime
                 LogTileDistribution(generatedTiles);
 
             BuildRuntimeStacksFromPlan(resolvedPoints, stackHeights, generatedTiles);
+
+            LastSpawnedLayout = selectedLayout;
+
+            InitializeSpecialRewardTray();
             RefreshAllLockStates();
 
             BoardSpawnIntroAnimator introAnimator = GetComponent<BoardSpawnIntroAnimator>();
@@ -931,6 +1076,176 @@ namespace ZenMatch.Runtime
 
             if (_viewByPointId.TryGetValue(pointId, out BoardStackView view) && view != null)
                 view.Rebuild();
+        }
+
+        private void HandleSpecialRewardAfterTileTaken(string takenPointId, BoardTileInstance removedTile)
+        {
+            if (removedTile == null)
+                return;
+
+            SpecialRewardMoveSnapshot snapshot = new SpecialRewardMoveSnapshot
+            {
+                RemovedTile = removedTile,
+                RemovedTileBefore = CaptureSpecialRewardState(removedTile)
+            };
+
+            if (removedTile.IsSpecialTile && removedTile.IsSpecialRewardActive)
+            {
+                removedTile.MarkSpecialRewardCollected();
+                snapshot.CollectedRemovedTileReward = true;
+
+                if (specialRewardTrayView != null)
+                    specialRewardTrayView.MarkCollected(removedTile.TileType);
+
+                DecreaseVisibleSpecialRewardTurnsExcept(takenPointId, snapshot);
+
+                _specialRewardUndoSnapshots[removedTile] = snapshot;
+
+                RefreshAllSpecialRewardViewsExcept(takenPointId);
+                return;
+            }
+
+            DecreaseVisibleSpecialRewardTurnsExcept(takenPointId, snapshot);
+
+            if (snapshot.AffectedTilesBefore.Count > 0)
+                _specialRewardUndoSnapshots[removedTile] = snapshot;
+        }
+
+        private SpecialRewardTileState CaptureSpecialRewardState(BoardTileInstance tile)
+        {
+            if (tile == null)
+                return null;
+
+            return new SpecialRewardTileState
+            {
+                Tile = tile,
+                IsRewardActive = tile.IsSpecialRewardActive,
+                WasRewardCollected = tile.WasSpecialRewardCollected,
+                TurnsRemaining = tile.SpecialRewardTurnsRemaining,
+                LastCollectedTurnsRemaining = tile.LastCollectedSpecialRewardTurnsRemaining
+            };
+        }
+
+        private void RestoreSpecialRewardState(SpecialRewardTileState state)
+        {
+            if (state == null || state.Tile == null)
+                return;
+
+            state.Tile.RestoreSpecialRewardState(
+                state.IsRewardActive,
+                state.WasRewardCollected,
+                state.TurnsRemaining,
+                state.LastCollectedTurnsRemaining);
+        }
+
+        private void InitializeSpecialRewardTray()
+        {
+            if (specialRewardTrayView == null)
+                return;
+
+            List<TileTypeSO> rewardTiles = new();
+
+            for (int i = 0; i < _runtimeStacks.Count; i++)
+            {
+                BoardStack stack = _runtimeStacks[i];
+                if (stack == null)
+                    continue;
+
+                for (int t = 0; t < stack.Count; t++)
+                {
+                    BoardTileInstance tile = stack.GetTileAt(t);
+
+                    if (tile == null)
+                        continue;
+
+                    if (!tile.IsSpecialTile)
+                        continue;
+
+                    if (tile.TileType == null)
+                        continue;
+
+                    rewardTiles.Add(tile.TileType);
+                }
+            }
+
+            specialRewardTrayView.Initialize(rewardTiles);
+        }
+
+        private void DecreaseVisibleSpecialRewardTurnsExcept(string ignoredPointId, SpecialRewardMoveSnapshot snapshot)
+        {
+            for (int i = 0; i < _runtimeStacks.Count; i++)
+            {
+                BoardStack stack = _runtimeStacks[i];
+
+                if (stack == null)
+                    continue;
+
+                if (stack.IsLocked)
+                    continue;
+
+                if (stack.Count <= 0)
+                    continue;
+
+                if (string.Equals(stack.PointId, ignoredPointId, StringComparison.Ordinal))
+                    continue;
+
+                bool changed = false;
+
+                if (stack.LayoutMode == StackLayoutMode.ExposedLine)
+                {
+                    for (int t = 0; t < stack.Count; t++)
+                    {
+                        BoardTileInstance tile = stack.GetTileAt(t);
+
+                        if (TryDecreaseSpecialReward(tile, snapshot))
+                            changed = true;
+                    }
+                }
+                else
+                {
+                    BoardTileInstance topTile = stack.PeekTop();
+
+                    if (TryDecreaseSpecialReward(topTile, snapshot))
+                        changed = true;
+                }
+
+                if (changed)
+                    RefreshStackView(stack.PointId);
+            }
+        }
+
+        private bool TryDecreaseSpecialReward(BoardTileInstance tile, SpecialRewardMoveSnapshot snapshot)
+        {
+            if (tile == null)
+                return false;
+
+            if (!tile.IsSpecialTile)
+                return false;
+
+            if (!tile.IsSpecialRewardActive)
+                return false;
+
+            if (snapshot != null)
+                snapshot.AffectedTilesBefore.Add(CaptureSpecialRewardState(tile));
+
+            tile.DecreaseSpecialRewardTurn();
+            return true;
+        }
+
+        private void RefreshAllSpecialRewardViewsExcept(string ignoredPointId)
+        {
+            for (int i = 0; i < _runtimeStacks.Count; i++)
+            {
+                BoardStack stack = _runtimeStacks[i];
+
+                if (stack == null)
+                    continue;
+
+                if (string.Equals(stack.PointId, ignoredPointId, StringComparison.Ordinal))
+                    continue;
+
+                RefreshStackView(stack.PointId);
+            }
         }
 
         private BoardLayoutSO PickWeightedLayout(List<WeightedLayoutReference> weightedLayouts, System.Random rng)
@@ -1125,7 +1440,12 @@ namespace ZenMatch.Runtime
                             requiredIds,
                             minHeight,
                             maxHeight,
-                            anchor.RenderPriority));
+                            anchor.RenderPriority,
+                            pointRef.isSpecialTile,
+                            pointRef.specialTile,
+                            pointRef.specialBehaviorType,
+                            pointRef.specialTileGroupId,
+                            pointRef.specialRewardTurnLimit));
                     }
                 }
             }
@@ -1189,6 +1509,32 @@ namespace ZenMatch.Runtime
 
             for (int i = 0; i < points.Count; i++)
                 total += points[i].MaxStackHeight;
+
+            return total;
+        }
+
+        private int ComputeNormalTileCountForTileBag(
+            List<ResolvedSpawnPoint> points,
+            List<int> stackHeights)
+        {
+            if (points == null || stackHeights == null)
+                return -1;
+
+            if (points.Count != stackHeights.Count)
+                return -1;
+
+            int total = 0;
+
+            for (int i = 0; i < points.Count; i++)
+            {
+                if (stackHeights[i] < 0)
+                    return -1;
+
+                if (points[i].IsSpecialTile)
+                    continue;
+
+                total += stackHeights[i];
+            }
 
             return total;
         }
@@ -1270,16 +1616,49 @@ namespace ZenMatch.Runtime
 
                 for (int t = 0; t < stackHeight; t++)
                 {
-                    if (tileCursor >= generatedTiles.Count)
-                        break;
+                    if (point.IsSpecialTile)
+                    {
+                        TileTypeSO tileType = point.SpecialTile;
 
-                    TileTypeSO tileType = generatedTiles[tileCursor];
-                    tileCursor++;
+                        if (tileType == null)
+                        {
+                            Debug.LogWarning(
+                                $"[BoardSpawner] Special point için SpecialTile boş. PointId: {point.Anchor.PointId}",
+                                this);
 
-                    if (tileType == null)
-                        continue;
+                            continue;
+                        }
 
-                    stack.Add(new BoardTileInstance(tileType));
+                        SpecialTileBehaviorType behavior = point.SpecialBehaviorType;
+
+                        if (behavior == SpecialTileBehaviorType.None)
+                            behavior = SpecialTileBehaviorType.Reward;
+
+                        int rewardTurnLimit = point.SpecialRewardTurnLimit;
+
+                        if (rewardTurnLimit <= 0)
+                            rewardTurnLimit = 3;
+
+                        stack.Add(new BoardTileInstance(
+                            tileType,
+                            true,
+                            behavior,
+                            point.SpecialTileGroupId,
+                            rewardTurnLimit));
+                    }
+                    else
+                    {
+                        if (tileCursor >= generatedTiles.Count)
+                            break;
+
+                        TileTypeSO tileType = generatedTiles[tileCursor];
+                        tileCursor++;
+
+                        if (tileType == null)
+                            continue;
+
+                        stack.Add(new BoardTileInstance(tileType));
+                    }
                 }
 
                 if (stack.Count == 0)
@@ -1445,6 +1824,11 @@ namespace ZenMatch.Runtime
                 selectableGlowSortingOffset,
                 showGlowOnExposedLine);
 
+            view.ConfigureSpecialRewardVisuals(
+                specialCornerSparkSprite,
+                specialRuneSprite,
+                specialRewardVisualSortingOffset);
+
             view.Rebuild();
 
             _runtimeViews.Add(view);
@@ -1607,7 +1991,7 @@ namespace ZenMatch.Runtime
                 Vector3 pos = point.Anchor != null ? point.Anchor.WorldPosition : Vector3.zero;
 
                 sb.AppendLine(
-                    $" - Index: {i} | PointId: {pointId} | Pos: {pos} | RenderPriority: {point.RenderPriority}");
+                    $" - Index: {i} | PointId: {pointId} | Pos: {pos} | RenderPriority: {point.RenderPriority} | IsSpecial: {point.IsSpecialTile}");
             }
 
             Debug.Log(sb.ToString(), this);

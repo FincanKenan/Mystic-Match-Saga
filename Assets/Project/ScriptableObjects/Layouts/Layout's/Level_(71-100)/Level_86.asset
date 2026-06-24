@@ -126,6 +126,7 @@ MonoBehaviour:
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - St_D-Front_1
+      - St_Line_H-Back_1
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -224,6 +225,7 @@ MonoBehaviour:
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - St_Line_V-Front_1
+      - StonePoint_Stack_5
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -395,9 +397,10 @@ MonoBehaviour:
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 0
+      startsLocked: 1
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds: []
+      requiredCompletedPointIds:
+      - StonePoint_Stack_5
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -474,10 +477,9 @@ MonoBehaviour:
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - StonePoint_Stack_2
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
       note: 
@@ -508,9 +510,10 @@ MonoBehaviour:
       stackLayoutMode: 0
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 0
+      startsLocked: 1
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds: []
+      requiredCompletedPointIds:
+      - StonePoint_Stack_6
       minStackHeight: 4
       maxStackHeight: 4
       note: 

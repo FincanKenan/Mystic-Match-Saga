@@ -26,6 +26,13 @@ namespace ZenMatch.Authoring
         [Min(1)] public int minStackHeight = 1;
         [Min(1)] public int maxStackHeight = 3;
 
+        [Header("Special Tile")]
+        public bool isSpecialTile = false;
+        public TileTypeSO specialTile;
+        public SpecialTileBehaviorType specialBehaviorType = SpecialTileBehaviorType.None;
+        public string specialTileGroupId;
+        [Min(0)] public int specialRewardTurnLimit = 3;
+
         [Header("Note")]
         public string note;
 
@@ -58,6 +65,28 @@ namespace ZenMatch.Authoring
 
             if (note == null)
                 note = string.Empty;
+
+            if (specialTileGroupId == null)
+                specialTileGroupId = string.Empty;
+
+            if (!isSpecialTile)
+            {
+                specialTile = null;
+                specialBehaviorType = SpecialTileBehaviorType.None;
+                specialTileGroupId = string.Empty;
+                specialRewardTurnLimit = 0;
+            }
+            else
+            {
+                minStackHeight = 1;
+                maxStackHeight = 1;
+
+                if (specialBehaviorType == SpecialTileBehaviorType.None)
+                    specialBehaviorType = SpecialTileBehaviorType.Reward;
+
+                if (specialRewardTurnLimit < 0)
+                    specialRewardTurnLimit = 0;
+            }
         }
 
         public SpawnPointReference ToSpawnPointReference()
@@ -73,6 +102,13 @@ namespace ZenMatch.Authoring
                 unlocksTraySlotOnComplete = unlocksTraySlotOnComplete,
                 minStackHeight = minStackHeight,
                 maxStackHeight = maxStackHeight,
+
+                isSpecialTile = isSpecialTile,
+                specialTile = isSpecialTile ? specialTile : null,
+                specialBehaviorType = isSpecialTile ? specialBehaviorType : SpecialTileBehaviorType.None,
+                specialTileGroupId = isSpecialTile ? specialTileGroupId : string.Empty,
+                specialRewardTurnLimit = isSpecialTile ? specialRewardTurnLimit : 0,
+
                 note = note,
                 requiredCompletedPointIds = new List<string>()
             };

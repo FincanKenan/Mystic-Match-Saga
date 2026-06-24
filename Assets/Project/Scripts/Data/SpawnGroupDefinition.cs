@@ -25,6 +25,12 @@ namespace ZenMatch.Data
         Down = 4
     }
 
+    public enum SpecialTileBehaviorType
+    {
+        None = 0,
+        Reward = 1
+    }
+
     [Serializable]
     public sealed class SpawnPointReference
     {
@@ -55,6 +61,22 @@ namespace ZenMatch.Data
         [Header("Point Stack Height")]
         [Min(1)] public int minStackHeight = 1;
         [Min(1)] public int maxStackHeight = 3;
+
+        [Header("Special Tile")]
+        [Tooltip("Açýksa bu point TileBag'den rastgele taþ almaz, verilen specialTile ile oluþturulur.")]
+        public bool isSpecialTile = false;
+
+        [Tooltip("Bu pointte oluþturulacak özel taþ tipi.")]
+        public TileTypeSO specialTile;
+
+        [Tooltip("Özel taþ davranýþý. Þimdilik ödül/parlaklýk sistemi için Reward kullanýlýr.")]
+        public SpecialTileBehaviorType specialBehaviorType = SpecialTileBehaviorType.None;
+
+        [Tooltip("Ayný özel taþ grubunu baðlamak için. Örn: Coin_Group_01")]
+        public string specialTileGroupId;
+
+        [Tooltip("Özel taþ açýða çýktýktan sonra kaç geçerli hamle boyunca ödül/parlaklýk aktif kalsýn? 0 ise hiç sönmez.")]
+        [Min(0)] public int specialRewardTurnLimit = 3;
 
         [Tooltip("Ýleride inspector/debug için açýklama.")]
         public string note;
@@ -105,6 +127,28 @@ namespace ZenMatch.Data
 
                 if (points[i].maxStackHeight < points[i].minStackHeight)
                     points[i].maxStackHeight = points[i].minStackHeight;
+
+                if (points[i].specialTileGroupId == null)
+                    points[i].specialTileGroupId = string.Empty;
+
+                if (points[i].specialRewardTurnLimit < 0)
+                    points[i].specialRewardTurnLimit = 0;
+
+                if (!points[i].isSpecialTile)
+                {
+                    points[i].specialTile = null;
+                    points[i].specialBehaviorType = SpecialTileBehaviorType.None;
+                    points[i].specialTileGroupId = string.Empty;
+                    points[i].specialRewardTurnLimit = 0;
+                }
+                else
+                {
+                    points[i].minStackHeight = 1;
+                    points[i].maxStackHeight = 1;
+
+                    if (points[i].specialBehaviorType == SpecialTileBehaviorType.None)
+                        points[i].specialBehaviorType = SpecialTileBehaviorType.Reward;
+                }
             }
         }
 

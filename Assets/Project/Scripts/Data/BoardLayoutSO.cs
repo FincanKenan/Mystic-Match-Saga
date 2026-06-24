@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using ZenMatch.Runtime.RewardMissions;
 
 namespace ZenMatch.Data
 {
@@ -14,9 +15,14 @@ namespace ZenMatch.Data
         [Header("Groups")]
         [SerializeField] private List<SpawnGroupDefinition> groups = new();
 
+        [Header("Reward Gifts")]
+        [Tooltip("Bu layout içinde yer alan hediyeye ulaþma özel bölüm ödülleri.")]
+        [SerializeField] private List<RewardGiftReference> rewardGifts = new();
+
         public string LayoutId => layoutId;
         public LayoutCategory Category => category;
         public IReadOnlyList<SpawnGroupDefinition> Groups => groups;
+        public IReadOnlyList<RewardGiftReference> RewardGifts => rewardGifts;
 
         private void OnValidate()
         {
@@ -33,6 +39,41 @@ namespace ZenMatch.Data
 
                 groups[i].Validate();
             }
+
+            if (rewardGifts == null)
+                rewardGifts = new List<RewardGiftReference>();
+
+            for (int i = 0; i < rewardGifts.Count; i++)
+            {
+                if (rewardGifts[i] == null)
+                    rewardGifts[i] = new RewardGiftReference();
+
+                rewardGifts[i].Validate();
+            }
+        }
+
+        public bool HasRewardGifts()
+        {
+            if (rewardGifts == null || rewardGifts.Count == 0)
+                return false;
+
+            for (int i = 0; i < rewardGifts.Count; i++)
+            {
+                RewardGiftReference gift = rewardGifts[i];
+
+                if (gift == null)
+                    continue;
+
+                gift.Validate();
+
+                if (!string.IsNullOrWhiteSpace(gift.giftId) &&
+     !string.IsNullOrWhiteSpace(gift.GetSceneAnchorId()))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public bool TryGetGroup(string groupId, out SpawnGroupDefinition group)

@@ -39,7 +39,8 @@ namespace ZenMatch.Runtime
             float autoVerticalSpacing,
 
             Vector2 exposedGridStartOffset,
-            StackOpenDirection openDirection
+            StackOpenDirection openDirection,
+            int stackCount
         )
         {
             if (layoutMode == StackLayoutMode.ExposedLine)
@@ -53,7 +54,8 @@ namespace ZenMatch.Runtime
                     autoVerticalSpacing,
                     exposedGridStartOffset,
                     stairsTilesPerStep,
-                    openDirection);
+                    openDirection,
+                    stackCount);
             }
 
             return ResolveOverlappedOffset(
@@ -72,7 +74,8 @@ namespace ZenMatch.Runtime
                 stairsHorizontalStep,
                 stairsVerticalStep,
                 stairsTilesPerStep,
-                openDirection);
+                openDirection,
+                stackCount);
         }
 
         private static Vector3 ResolveOverlappedOffset(
@@ -91,7 +94,8 @@ namespace ZenMatch.Runtime
             float stairsHorizontalStep,
             float stairsVerticalStep,
             int stairsTilesPerStep,
-            StackOpenDirection openDirection)
+            StackOpenDirection openDirection,
+            int stackCount)
         {
             switch (direction)
             {
@@ -138,7 +142,7 @@ namespace ZenMatch.Runtime
                 case StackDirection.ArcLeft:
                 case StackDirection.ArcUp:
                 case StackDirection.ArcDown:
-                    return ResolveArcOffset(index, 0.45f, 0.90f, -90f, 90f, direction, openDirection);
+                    return ResolveArcOffset(index, stackCount, 0.45f, 0.90f, -90f, 90f, direction, openDirection);
 
                 case StackDirection.Vertical:
                 default:
@@ -155,7 +159,8 @@ namespace ZenMatch.Runtime
             float autoVerticalSpacing,
             Vector2 exposedGridStartOffset,
             int stairsTilesPerStep,
-            StackOpenDirection openDirection)
+            StackOpenDirection openDirection,
+            int stackCount)
         {
             switch (direction)
             {
@@ -202,7 +207,7 @@ namespace ZenMatch.Runtime
                 case StackDirection.ArcLeft:
                 case StackDirection.ArcUp:
                 case StackDirection.ArcDown:
-                    return ResolveArcOffset(index, 0.45f, 0.90f, -90f, 90f, direction, openDirection);
+                    return ResolveArcOffset(index, stackCount, 0.45f, 0.90f, -90f, 90f, direction, openDirection);
 
                 case StackDirection.Vertical:
                 default:
@@ -215,8 +220,7 @@ namespace ZenMatch.Runtime
             int row = index / columns;
             int column = index % columns;
 
-            bool reverseRow = row % 2 == 1;
-            if (reverseRow)
+            if (row % 2 == 1)
                 column = columns - 1 - column;
 
             float x = column * horizontalSpacing;
@@ -260,10 +264,10 @@ namespace ZenMatch.Runtime
 
         private static Vector3 ResolveDiagonalOffset(int index, Vector2 diagonalStep, int direction)
         {
-            float x = diagonalStep.x * index * direction;
-            float y = diagonalStep.y * index;
-
-            return new Vector3(x, y, 0f);
+            return new Vector3(
+                diagonalStep.x * index * direction,
+                diagonalStep.y * index,
+                0f);
         }
 
         private static Vector3 ResolveStairsOffset(int index, float horizontalStep, float verticalStep, float depthOffsetY, int tilesPerStep, int direction)
@@ -317,21 +321,26 @@ namespace ZenMatch.Runtime
         }
 
         private static Vector3 ResolveArcOffset(
-            int index,
-            float radiusX,
-            float radiusY,
-            float startAngle,
-            float endAngle,
-            StackDirection direction,
-            StackOpenDirection openDirection)
+    int index,
+    int stackCount,
+    float radiusX,
+    float radiusY,
+    float startAngle,
+    float endAngle,
+    StackDirection direction,
+    StackOpenDirection openDirection)
         {
-            const int previewCount = 12;
+            int count = Mathf.Max(1, stackCount);
 
-            int resolvedIndex = ShouldReverseArcOrder(direction, openDirection)
-                ? previewCount - 1 - index
+            bool reverse = ShouldReverseArcOrder(direction, openDirection);
+
+            int resolvedIndex = reverse
+                ? count - 1 - index
                 : index;
 
-            float t = previewCount <= 1 ? 0.5f : resolvedIndex / (float)(previewCount - 1);
+            resolvedIndex = Mathf.Clamp(resolvedIndex, 0, count - 1);
+
+            float t = count <= 1 ? 0.5f : resolvedIndex / (float)(count - 1);
             float angle = Mathf.Lerp(startAngle, endAngle, t) * Mathf.Deg2Rad;
 
             float x = Mathf.Cos(angle);

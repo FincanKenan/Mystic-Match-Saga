@@ -31,8 +31,8 @@ namespace ZenMatch.Runtime
         [SerializeField] private Vector2 diagonalStep = new Vector2(0.14f, 0.14f);
 
         [Header("Stairs Layout")]
-        [SerializeField] private float stairsHorizontalStep = 0.70f;
-        [SerializeField] private float stairsVerticalStep = 0.60f;
+        [SerializeField] private float stairsHorizontalStep = 0.22f;
+        [SerializeField] private float stairsVerticalStep = 0.12f;
         [SerializeField] private int stairsTilesPerStep = 2;
 
         [Header("Arc Layout")]
@@ -78,6 +78,18 @@ namespace ZenMatch.Runtime
         [SerializeField] private float selectableGlowScale = 1.05f;
         [SerializeField] private int selectableGlowSortingOffset = 1;
         [SerializeField] private bool showGlowOnExposedLine = true;
+
+        [Header("Special Reward Visuals")]
+        [SerializeField] private Sprite specialCornerSparkSprite;
+        [SerializeField] private Sprite specialRuneSprite;
+        [SerializeField] private float specialCornerSparkScale = 0.18f;
+        [SerializeField] private float specialRuneScale = 0.08f;
+        [SerializeField] private int specialRewardVisualSortingOffset = 3;
+
+        [Header("Special Reward Glow")]
+        [SerializeField] private float specialRewardPulseBaseSpeed = 1.2f;
+        [SerializeField] private float specialRewardPulseLowTurnSpeed = 5.5f;
+        [SerializeField] private float specialRewardPulseAmount = 0.040f;
 
         [Header("Glow Pulse")]
         [SerializeField] private bool enableGlowPulse = true;
@@ -131,6 +143,16 @@ namespace ZenMatch.Runtime
             selectableGlowScale = glowScale;
             selectableGlowSortingOffset = glowSortingOffset;
             showGlowOnExposedLine = glowOnExposed;
+        }
+
+        public void ConfigureSpecialRewardVisuals(
+     Sprite cornerSparkSprite,
+     Sprite runeSprite,
+     int sortingOffset)
+        {
+            specialCornerSparkSprite = cornerSparkSprite;
+            specialRuneSprite = runeSprite;
+            specialRewardVisualSortingOffset = sortingOffset;
         }
 
         public void SetStackDimFactor(float dimFactor)
@@ -193,6 +215,9 @@ namespace ZenMatch.Runtime
 
                 if (CanShowSelectableGlow(i, topIndex, isCovered))
                     CreateSelectableGlow(visual.transform, sr.sortingOrder);
+
+                if (CanShowSpecialRewardVisuals(tile, i, topIndex, isCovered))
+                    CreateSpecialRewardVisuals(tile, visual.transform, sr.sortingOrder);
 
                 bool shouldAddCollider = ShouldAddColliderForIndex(i, topIndex, isCovered);
 
@@ -336,6 +361,152 @@ namespace ZenMatch.Runtime
             }
         }
 
+        private bool CanShowSpecialRewardVisuals(BoardTileInstance tile, int index, int topIndex, bool isCovered)
+        {
+            if (tile == null)
+                return false;
+
+            if (!tile.IsSpecialTile)
+                return false;
+
+            if (!tile.IsSpecialRewardActive)
+                return false;
+
+            if (_stack == null)
+                return false;
+
+            if (_stack.IsLocked)
+                return false;
+
+            if (isCovered)
+                return false;
+
+            if (_stack.LayoutMode == StackLayoutMode.ExposedLine)
+                return true;
+
+            return index == topIndex;
+        }
+
+        private void CreateSpecialRewardVisuals(BoardTileInstance tile, Transform parent, int tileSortingOrder)
+        {
+            if (tile == null)
+                return;
+
+            int remaining = Mathf.Max(0, tile.SpecialRewardTurnsRemaining);
+            int limit = Mathf.Max(1, tile.SpecialRewardTurnLimit);
+
+            if (remaining <= 0)
+                return;
+
+            float normalized = Mathf.Clamp01(remaining / (float)limit);
+
+            float pulseSpeed = Mathf.Lerp(
+                specialRewardPulseLowTurnSpeed,
+                specialRewardPulseBaseSpeed,
+                normalized);
+
+            CreateCornerSparks(parent, tileSortingOrder, pulseSpeed, normalized);
+            CreateRunes(parent, tileSortingOrder, pulseSpeed, remaining);
+        }
+
+        private void CreateCornerSparks(Transform parent, int tileSortingOrder, float pulseSpeed, float normalized)
+        {
+            if (specialCornerSparkSprite == null)
+                return;
+
+            SpriteRenderer tileRenderer = parent.GetComponent<SpriteRenderer>();
+            if (tileRenderer == null || tileRenderer.sprite == null)
+                return;
+
+            Vector2 size = tileRenderer.sprite.bounds.size;
+
+            float cornerX = size.x * 0.32f;
+            float cornerY = size.y * 0.32f;
+            float autoScale = Mathf.Min(size.x, size.y) * 0.13f;
+
+            Vector3[] positions =
+            {
+        new Vector3(-cornerX,  cornerY, 0f),
+        new Vector3( cornerX,  cornerY, 0f),
+        new Vector3( cornerX, -cornerY, 0f),
+        new Vector3(-cornerX, -cornerY, 0f)
+    };
+
+            float[] rotations =
+            {
+        0f,
+        -90f,
+        180f,
+        90f
+    };
+
+            for (int i = 0; i < positions.Length; i++)
+            {
+                GameObject go = new GameObject($"SpecialCornerSpark_{i}");
+                go.transform.SetParent(parent, false);
+                go.transform.localPosition = positions[i];
+                go.transform.localRotation = Quaternion.Euler(0f, 0f, rotations[i]);
+                go.transform.localScale = Vector3.one * autoScale;
+
+                SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+                sr.sprite = specialCornerSparkSprite;
+                sr.sortingLayerName = sortingLayerName;
+                sr.sortingOrder = tileSortingOrder + specialRewardVisualSortingOffset;
+
+                Color c = new Color(1f, 0.95f, 0.2f, 1f);
+                c.a = Mathf.Lerp(0.85f, 1f, normalized);
+                sr.color = c;
+
+                GlowPulse pulse = go.AddComponent<GlowPulse>();
+                pulse.Init(pulseSpeed, specialRewardPulseAmount);
+            }
+        }
+
+        private void CreateRunes(Transform parent, int tileSortingOrder, float pulseSpeed, int remaining)
+        {
+            if (specialRuneSprite == null)
+                return;
+
+            SpriteRenderer tileRenderer = parent.GetComponent<SpriteRenderer>();
+            if (tileRenderer == null || tileRenderer.sprite == null)
+                return;
+
+            Vector2 size = tileRenderer.sprite.bounds.size;
+
+            int runeCount = Mathf.Clamp(remaining, 0, 3);
+
+            float runeY = size.y * 0.26f;
+            float spacing = size.x * 0.24f;
+            float autoScale = Mathf.Min(size.x, size.y) * 0.11f;
+
+            Vector3[] positions =
+            {
+        new Vector3(-spacing, runeY, 0f),
+       new Vector3(0f, runeY, 0f),
+        new Vector3( spacing, runeY, 0f)
+    };
+
+            for (int i = 0; i < runeCount; i++)
+            {
+
+                GameObject go = new GameObject($"SpecialRune_{i}");
+                go.transform.SetParent(parent, false);
+                go.transform.localPosition = positions[i];
+                go.transform.localScale = Vector3.one * autoScale;
+
+                SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+                sr.sprite = specialRuneSprite;
+                sr.sortingLayerName = sortingLayerName;
+                sr.sortingOrder = tileSortingOrder + specialRewardVisualSortingOffset + 1;
+                sr.color = new Color(1f, 0.95f, 0.25f, 1f);
+
+                GlowPulse pulse = go.AddComponent<GlowPulse>();
+                pulse.Init(pulseSpeed, specialRewardPulseAmount);
+            }
+        }
+
+
+
         private int GetVisualIndex(int slotIndex)
         {
             if (_stack == null)
@@ -377,10 +548,10 @@ namespace ZenMatch.Runtime
                 StackDirection.StairsRight4 => _stack.OpenDirection == StackOpenDirection.Left || _stack.OpenDirection == StackOpenDirection.Down,
                 StackDirection.StairsLeft4 => _stack.OpenDirection == StackOpenDirection.Right || _stack.OpenDirection == StackOpenDirection.Down,
 
-                StackDirection.ArcRight => _stack.OpenDirection == StackOpenDirection.Left || _stack.OpenDirection == StackOpenDirection.Down,
-                StackDirection.ArcLeft => _stack.OpenDirection == StackOpenDirection.Right || _stack.OpenDirection == StackOpenDirection.Down,
-                StackDirection.ArcUp => _stack.OpenDirection == StackOpenDirection.Down || _stack.OpenDirection == StackOpenDirection.Left,
-                StackDirection.ArcDown => _stack.OpenDirection == StackOpenDirection.Up || _stack.OpenDirection == StackOpenDirection.Left,
+                StackDirection.ArcRight => false,
+                StackDirection.ArcLeft => false,
+                StackDirection.ArcUp => false,
+                StackDirection.ArcDown => false,
 
                 _ => false
             };
@@ -390,62 +561,6 @@ namespace ZenMatch.Runtime
         {
             if (_stack == null)
                 return Vector3.zero;
-
-            if (_stack.LayoutMode == StackLayoutMode.Overlapped && IsStairsDirection(_stack.Direction))
-            {
-                int safeTilesPerStep = Mathf.Max(1, stairsTilesPerStep);
-                int stepIndex = index / safeTilesPerStep;
-
-                switch (_stack.Direction)
-                {
-                    case StackDirection.StairsRight:
-                    case StackDirection.StairsRight3:
-                    case StackDirection.StairsRight4:
-                        return new Vector3(
-                            stepIndex * stairsHorizontalStep,
-                            stepIndex * stairsVerticalStep,
-                            0f
-                        );
-
-                    case StackDirection.StairsLeft:
-                    case StackDirection.StairsLeft3:
-                    case StackDirection.StairsLeft4:
-                        return new Vector3(
-                            -stepIndex * stairsHorizontalStep,
-                            stepIndex * stairsVerticalStep,
-                            0f
-                        );
-                }
-            }
-
-            if (_stack.Direction == StackDirection.ArcRight ||
-      _stack.Direction == StackDirection.ArcLeft ||
-      _stack.Direction == StackDirection.ArcUp ||
-      _stack.Direction == StackDirection.ArcDown)
-            {
-                int count = Mathf.Max(1, _stack.InitialCount);
-                float t = count <= 1 ? 0.5f : index / (float)(count - 1);
-
-                float angle = Mathf.Lerp(arcStartAngle, arcEndAngle, t) * Mathf.Deg2Rad;
-
-                float x = Mathf.Cos(angle);
-                float y = Mathf.Sin(angle);
-
-                switch (_stack.Direction)
-                {
-                    case StackDirection.ArcRight:
-                        return new Vector3(x * arcRadiusX, y * arcRadiusY, 0f);
-
-                    case StackDirection.ArcLeft:
-                        return new Vector3(-x * arcRadiusX, y * arcRadiusY, 0f);
-
-                    case StackDirection.ArcUp:
-                        return new Vector3(y * arcRadiusY, x * arcRadiusX, 0f);
-
-                    case StackDirection.ArcDown:
-                        return new Vector3(y * arcRadiusY, -x * arcRadiusX, 0f);
-                }
-            }
 
             return BoardStackLayoutUtility.ResolveOffset(
                 _stack.Direction,
@@ -476,11 +591,13 @@ namespace ZenMatch.Runtime
 
                 exposedVerticalStartOffset,
                 exposedHorizontalStartOffset,
-            GetAutoHorizontalSpacing(GetTopSprite()),
-            GetAutoVerticalSpacing(GetTopSprite()),
 
-            exposedGridStartOffset,
-            _stack.OpenDirection
+                GetAutoHorizontalSpacing(GetTopSprite()),
+                GetAutoVerticalSpacing(GetTopSprite()),
+
+                exposedGridStartOffset,
+                _stack.OpenDirection,
+                _stack.InitialCount
             );
         }
 
