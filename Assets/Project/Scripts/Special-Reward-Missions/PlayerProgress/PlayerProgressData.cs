@@ -24,10 +24,12 @@ namespace ZenMatch.Runtime.PlayerProgress
         public List<int> completedLevels = new();
         public List<PlayerBoosterAmount> boosters = new();
 
+        public string lastDailyMissionResetUtc;
+        public List<PlayerMissionProgressData> missionProgresses = new();
+
         public static PlayerProgressData CreateNew()
         {
             string now = DateTime.UtcNow.ToString("O");
-
             return new PlayerProgressData
             {
                 saveVersion = 1,
@@ -43,8 +45,49 @@ namespace ZenMatch.Runtime.PlayerProgress
                 lastPlayedLevel = 1,
 
                 completedLevels = new List<int>(),
-                boosters = new List<PlayerBoosterAmount>()
+                boosters = new List<PlayerBoosterAmount>(),
+
+                lastDailyMissionResetUtc = now,
+                missionProgresses = new List<PlayerMissionProgressData>()
             };
+        }
+
+        public PlayerMissionProgressData GetMissionProgress(string missionId)
+        {
+            if (string.IsNullOrWhiteSpace(missionId))
+                return null;
+
+            if (missionProgresses == null)
+                missionProgresses = new List<PlayerMissionProgressData>();
+
+            for (int i = 0; i < missionProgresses.Count; i++)
+            {
+                PlayerMissionProgressData progress = missionProgresses[i];
+
+                if (progress == null)
+                    continue;
+
+                if (progress.missionId == missionId)
+                    return progress;
+            }
+
+            return null;
+        }
+
+        public PlayerMissionProgressData GetOrCreateMissionProgress(string missionId)
+        {
+            PlayerMissionProgressData progress = GetMissionProgress(missionId);
+
+            if (progress != null)
+                return progress;
+
+            if (missionProgresses == null)
+                missionProgresses = new List<PlayerMissionProgressData>();
+
+            progress = new PlayerMissionProgressData(missionId);
+            missionProgresses.Add(progress);
+
+            return progress;
         }
 
         public void Touch()
