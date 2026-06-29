@@ -6,6 +6,9 @@ public class WorldCameraAnchorFitter : MonoBehaviour
     [Header("References")]
     [SerializeField] private Camera targetCamera;
 
+    [Header("Optional Bounds Renderer")]
+    [SerializeField] private SpriteRenderer boundsRenderer;
+
     [Header("Viewport Anchor")]
     [Range(0f, 1f)]
     [SerializeField] private float viewportX = 0.5f;
@@ -32,7 +35,7 @@ public class WorldCameraAnchorFitter : MonoBehaviour
     [Header("Runtime")]
     [SerializeField] private bool updateContinuously = true;
 
-    private SpriteRenderer _spriteRenderer;
+    private SpriteRenderer _cachedBoundsRenderer;
 
     private void Awake()
     {
@@ -73,8 +76,17 @@ public class WorldCameraAnchorFitter : MonoBehaviour
         if (targetCamera == null)
             targetCamera = Camera.main;
 
-        if (_spriteRenderer == null)
-            _spriteRenderer = GetComponent<SpriteRenderer>();
+        if (boundsRenderer != null)
+        {
+            _cachedBoundsRenderer = boundsRenderer;
+            return;
+        }
+
+        if (_cachedBoundsRenderer == null)
+            _cachedBoundsRenderer = GetComponent<SpriteRenderer>();
+
+        if (_cachedBoundsRenderer == null)
+            _cachedBoundsRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
     private void Apply()
@@ -94,7 +106,7 @@ public class WorldCameraAnchorFitter : MonoBehaviour
             transform.position.z
         );
 
-        if (avoidTrayOverlap && trayRoot != null && _spriteRenderer != null)
+        if (avoidTrayOverlap && trayRoot != null && _cachedBoundsRenderer != null)
         {
             targetPosition = ClampBelowTray(targetPosition);
         }
@@ -119,15 +131,17 @@ public class WorldCameraAnchorFitter : MonoBehaviour
 
     private Vector3 ClampBelowTray(Vector3 targetPosition)
     {
-        Bounds bounds = _spriteRenderer.bounds;
+        Bounds bounds = _cachedBoundsRenderer.bounds;
 
-        float currentTopY = bounds.max.y;
+        float topRelativeToRoot = bounds.max.y - transform.position.y;
+        float targetTopY = targetPosition.y + topRelativeToRoot;
+
         float desiredTopY = trayRoot.position.y - minWorldGapAboveTray;
 
-        if (currentTopY <= desiredTopY)
+        if (targetTopY <= desiredTopY)
             return targetPosition;
 
-        float requiredDownShift = currentTopY - desiredTopY;
+        float requiredDownShift = targetTopY - desiredTopY;
         requiredDownShift = Mathf.Clamp(requiredDownShift, 0f, maxDownShift);
 
         targetPosition.y -= requiredDownShift;

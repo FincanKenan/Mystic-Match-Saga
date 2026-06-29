@@ -82,14 +82,16 @@ namespace ZenMatch.Runtime
         [Header("Special Reward Visuals")]
         [SerializeField] private Sprite specialCornerSparkSprite;
         [SerializeField] private Sprite specialRuneSprite;
-        [SerializeField] private float specialCornerSparkScale = 0.18f;
-        [SerializeField] private float specialRuneScale = 0.08f;
+        [SerializeField] private SpecialRewardVisualDatabaseSO specialRewardVisualDatabase;
         [SerializeField] private int specialRewardVisualSortingOffset = 3;
 
+        [SerializeField] private Color defaultSpecialCornerSparkColor = new Color(1f, 0.95f, 0.2f, 1f);
+        [SerializeField] private Color defaultSpecialRuneColor = new Color(1f, 0.88f, 0.25f, 1f);
+
         [Header("Special Reward Glow")]
-        [SerializeField] private float specialRewardPulseBaseSpeed = 1.2f;
+        [SerializeField] private float specialRewardPulseBaseSpeed = 2f;
         [SerializeField] private float specialRewardPulseLowTurnSpeed = 5.5f;
-        [SerializeField] private float specialRewardPulseAmount = 0.040f;
+        [SerializeField] private float specialRewardPulseAmount = 0.010f;
 
         [Header("Glow Pulse")]
         [SerializeField] private bool enableGlowPulse = true;
@@ -146,12 +148,14 @@ namespace ZenMatch.Runtime
         }
 
         public void ConfigureSpecialRewardVisuals(
-     Sprite cornerSparkSprite,
-     Sprite runeSprite,
-     int sortingOffset)
+    Sprite cornerSparkSprite,
+    Sprite runeSprite,
+    SpecialRewardVisualDatabaseSO visualDatabase,
+    int sortingOffset)
         {
             specialCornerSparkSprite = cornerSparkSprite;
             specialRuneSprite = runeSprite;
+            specialRewardVisualDatabase = visualDatabase;
             specialRewardVisualSortingOffset = sortingOffset;
         }
 
@@ -398,73 +402,88 @@ namespace ZenMatch.Runtime
             if (remaining <= 0)
                 return;
 
-            float normalized = Mathf.Clamp01(remaining / (float)limit);
+            float normalized = CalculateSpecialRewardVisualStrength(remaining, limit);
 
             float pulseSpeed = Mathf.Lerp(
                 specialRewardPulseLowTurnSpeed,
                 specialRewardPulseBaseSpeed,
                 normalized);
 
-            CreateCornerSparks(parent, tileSortingOrder, pulseSpeed, normalized);
-            CreateRunes(parent, tileSortingOrder, pulseSpeed, remaining);
+            CreateSpecialOverlay(tile, parent, tileSortingOrder, pulseSpeed, normalized);
+            CreateRunes(tile, parent, tileSortingOrder, pulseSpeed, remaining);
         }
 
-        private void CreateCornerSparks(Transform parent, int tileSortingOrder, float pulseSpeed, float normalized)
+        private float CalculateSpecialRewardVisualStrength(int remaining, int limit)
         {
-            if (specialCornerSparkSprite == null)
+            if (remaining <= 0)
+                return 0f;
+
+            if (limit <= 1)
+                return 1f;
+
+            return Mathf.Clamp01((remaining - 1) / (float)(limit - 1));
+        }
+
+        private void CreateSpecialOverlay(
+    BoardTileInstance tile,
+    Transform parent,
+    int tileSortingOrder,
+    float pulseSpeed,
+    float normalized)
+        {
+            Sprite overlaySprite = GetCornerSparkSprite(tile);
+            if (overlaySprite == null)
                 return;
 
             SpriteRenderer tileRenderer = parent.GetComponent<SpriteRenderer>();
             if (tileRenderer == null || tileRenderer.sprite == null)
                 return;
 
-            Vector2 size = tileRenderer.sprite.bounds.size;
+            Vector2 tileSize = tileRenderer.sprite.bounds.size;
+            Vector2 overlaySize = overlaySprite.bounds.size;
 
-            float cornerX = size.x * 0.32f;
-            float cornerY = size.y * 0.32f;
-            float autoScale = Mathf.Min(size.x, size.y) * 0.13f;
+            if (overlaySize.x <= 0.0001f || overlaySize.y <= 0.0001f)
+                return;
 
-            Vector3[] positions =
-            {
-        new Vector3(-cornerX,  cornerY, 0f),
-        new Vector3( cornerX,  cornerY, 0f),
-        new Vector3( cornerX, -cornerY, 0f),
-        new Vector3(-cornerX, -cornerY, 0f)
-    };
+            GameObject go = new GameObject("SpecialRewardOverlay");
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = Vector3.zero;
 
-            float[] rotations =
-            {
-        0f,
-        -90f,
-        180f,
-        90f
-    };
+            SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = overlaySprite;
+            sr.sortingLayerName = sortingLayerName;
+            sr.sortingOrder = tileSortingOrder + specialRewardVisualSortingOffset;
 
-            for (int i = 0; i < positions.Length; i++)
-            {
-                GameObject go = new GameObject($"SpecialCornerSpark_{i}");
-                go.transform.SetParent(parent, false);
-                go.transform.localPosition = positions[i];
-                go.transform.localRotation = Quaternion.Euler(0f, 0f, rotations[i]);
-                go.transform.localScale = Vector3.one * autoScale;
+            Color color = GetCornerSparkColor(tile);
+            color.a *= Mathf.Lerp(0.35f, 1f, normalized);
+            sr.color = color;
 
-                SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
-                sr.sprite = specialCornerSparkSprite;
-                sr.sortingLayerName = sortingLayerName;
-                sr.sortingOrder = tileSortingOrder + specialRewardVisualSortingOffset;
+            float scaleMultiplier = GetCornerSparkScaleMultiplier(tile);
 
-                Color c = new Color(1f, 0.95f, 0.2f, 1f);
-                c.a = Mathf.Lerp(0.85f, 1f, normalized);
-                sr.color = c;
+            float scaleX = tileSize.x / overlaySize.x;
+            float scaleY = tileSize.y / overlaySize.y;
 
-                GlowPulse pulse = go.AddComponent<GlowPulse>();
-                pulse.Init(pulseSpeed, specialRewardPulseAmount);
-            }
+            // sprite taşın içine otursun diye biraz küçültüyoruz
+            float insetFactor = 0.92f;
+
+            go.transform.localScale = new Vector3(
+                scaleX * insetFactor * scaleMultiplier,
+                scaleY * insetFactor * scaleMultiplier,
+                1f);
+
+            GlowPulse pulse = go.AddComponent<GlowPulse>();
+            pulse.Init(pulseSpeed, specialRewardPulseAmount);
         }
 
-        private void CreateRunes(Transform parent, int tileSortingOrder, float pulseSpeed, int remaining)
+        private void CreateRunes(
+    BoardTileInstance tile,
+    Transform parent,
+    int tileSortingOrder,
+    float pulseSpeed,
+    int remaining)
         {
-            if (specialRuneSprite == null)
+            Sprite runeSprite = GetRuneSprite(tile);
+            if (runeSprite == null)
                 return;
 
             SpriteRenderer tileRenderer = parent.GetComponent<SpriteRenderer>();
@@ -475,37 +494,126 @@ namespace ZenMatch.Runtime
 
             int runeCount = Mathf.Clamp(remaining, 0, 3);
 
-            float runeY = size.y * 0.26f;
-            float spacing = size.x * 0.24f;
-            float autoScale = Mathf.Min(size.x, size.y) * 0.11f;
+            float yMultiplier = GetRuneYOffsetMultiplier(tile);
+            float spacingMultiplier = GetRuneSpacingMultiplier(tile);
+            float scaleMultiplier = GetRuneScaleMultiplier(tile);
+
+            float runeY = size.y * 0.18f * yMultiplier;
+            float spacing = size.x * 0.20f * spacingMultiplier;
+            float autoScale = Mathf.Min(size.x, size.y) * 0.14f * scaleMultiplier;
 
             Vector3[] positions =
             {
         new Vector3(-spacing, runeY, 0f),
-       new Vector3(0f, runeY, 0f),
+        new Vector3(0f,      runeY, 0f),
         new Vector3( spacing, runeY, 0f)
     };
 
+            Color runeColor = GetRuneColor(tile);
+            runeColor.a *= Mathf.Lerp(0.45f, 1f, CalculateSpecialRewardVisualStrength(remaining, tile.SpecialRewardTurnLimit));
+
             for (int i = 0; i < runeCount; i++)
             {
-
                 GameObject go = new GameObject($"SpecialRune_{i}");
                 go.transform.SetParent(parent, false);
                 go.transform.localPosition = positions[i];
                 go.transform.localScale = Vector3.one * autoScale;
 
                 SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
-                sr.sprite = specialRuneSprite;
+                sr.sprite = runeSprite;
                 sr.sortingLayerName = sortingLayerName;
                 sr.sortingOrder = tileSortingOrder + specialRewardVisualSortingOffset + 1;
-                sr.color = new Color(1f, 0.95f, 0.25f, 1f);
+                sr.color = runeColor;
 
                 GlowPulse pulse = go.AddComponent<GlowPulse>();
                 pulse.Init(pulseSpeed, specialRewardPulseAmount);
             }
         }
 
+        private bool TryGetSpecialRewardProfile(
+    BoardTileInstance tile,
+    out SpecialRewardVisualProfile profile)
+        {
+            profile = null;
 
+            if (tile == null || tile.TileType == null)
+                return false;
+
+            if (specialRewardVisualDatabase == null)
+                return false;
+
+            return specialRewardVisualDatabase.TryGetProfile(tile.TileType, out profile);
+        }
+
+        private Sprite GetCornerSparkSprite(BoardTileInstance tile)
+        {
+            if (TryGetSpecialRewardProfile(tile, out SpecialRewardVisualProfile profile) &&
+                profile.CornerSparkSprite != null)
+            {
+                return profile.CornerSparkSprite;
+            }
+
+            return specialCornerSparkSprite;
+        }
+
+        private Sprite GetRuneSprite(BoardTileInstance tile)
+        {
+            if (TryGetSpecialRewardProfile(tile, out SpecialRewardVisualProfile profile) &&
+                profile.RuneSprite != null)
+            {
+                return profile.RuneSprite;
+            }
+
+            return specialRuneSprite;
+        }
+
+        private Color GetCornerSparkColor(BoardTileInstance tile)
+        {
+            if (TryGetSpecialRewardProfile(tile, out SpecialRewardVisualProfile profile))
+                return profile.CornerSparkColor;
+
+            return defaultSpecialCornerSparkColor;
+        }
+
+        private Color GetRuneColor(BoardTileInstance tile)
+        {
+            if (TryGetSpecialRewardProfile(tile, out SpecialRewardVisualProfile profile))
+                return profile.RuneColor;
+
+            return defaultSpecialRuneColor;
+        }
+
+        private float GetCornerSparkScaleMultiplier(BoardTileInstance tile)
+        {
+            if (TryGetSpecialRewardProfile(tile, out SpecialRewardVisualProfile profile))
+                return profile.CornerSparkScaleMultiplier;
+
+            return 1f;
+        }
+
+        private float GetRuneScaleMultiplier(BoardTileInstance tile)
+        {
+            if (TryGetSpecialRewardProfile(tile, out SpecialRewardVisualProfile profile))
+                return profile.RuneScaleMultiplier;
+
+            return 1f;
+        }
+
+        private float GetRuneSpacingMultiplier(BoardTileInstance tile)
+        {
+            if (TryGetSpecialRewardProfile(tile, out SpecialRewardVisualProfile profile))
+                return profile.RuneSpacingMultiplier;
+
+            return 1f;
+        }
+
+        private float GetRuneYOffsetMultiplier(BoardTileInstance tile)
+        {
+            if (TryGetSpecialRewardProfile(tile, out SpecialRewardVisualProfile profile))
+                return profile.RuneYOffsetMultiplier;
+
+            return 1f;
+        }
 
         private int GetVisualIndex(int slotIndex)
         {

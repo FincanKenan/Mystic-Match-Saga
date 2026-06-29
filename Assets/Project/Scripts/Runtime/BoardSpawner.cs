@@ -145,9 +145,10 @@ namespace ZenMatch.Runtime
         [SerializeField] private bool showGlowOnExposedLine = false;
 
         [Header("Special Reward Tile Visuals")]
-        [SerializeField] private Sprite specialCornerSparkSprite;
-        [SerializeField] private Sprite specialRuneSprite;
-        [SerializeField] private int specialRewardVisualSortingOffset = 3;
+[SerializeField] private Sprite specialCornerSparkSprite;
+[SerializeField] private Sprite specialRuneSprite;
+[SerializeField] private SpecialRewardVisualDatabaseSO specialRewardVisualDatabase;
+[SerializeField] private int specialRewardVisualSortingOffset = 3;
 
         [Header("Special Reward Tray")]
         [SerializeField] private SpecialRewardTrayView specialRewardTrayView;
@@ -1825,9 +1826,10 @@ namespace ZenMatch.Runtime
                 showGlowOnExposedLine);
 
             view.ConfigureSpecialRewardVisuals(
-                specialCornerSparkSprite,
-                specialRuneSprite,
-                specialRewardVisualSortingOffset);
+    specialCornerSparkSprite,
+    specialRuneSprite,
+    specialRewardVisualDatabase,
+    specialRewardVisualSortingOffset);
 
             view.Rebuild();
 

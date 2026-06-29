@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: df2abb707c4edb34a9c5f90addb187d6, type: 3}
-  m_Name: Special_1
+  m_Name: SpecialGift_01
   m_EditorClassIdentifier: 
-  levelNumber: 101
-  layout: {fileID: 11400000, guid: 289174901c873b4449868dc178b52967, type: 2}
+  levelNumber: 103
+  layout: {fileID: 11400000, guid: 9e4cabd60b6dd0c40941c834ab0d12b3, type: 2}
   tileBag: {fileID: 11400000, guid: e6fc3c03d09c8d24a943cc859b01b3d4, type: 2}
   useSpecialTraySettings: 0
   startingActiveTrayCapacity: 7
   useBackgroundOverride: 0
-  backgroundLayerBottomOverride: {fileID: -7758987736131382979, guid: 32c77536f63970645baf5577785f3554, type: 3}
-  backgroundLayerTopOverride: {fileID: -8078968449097588848, guid: f8cc83ec7189b654c8f0e56d761c6f79, type: 3}
+  backgroundLayerBottomOverride: {fileID: 7108675125740071113, guid: 2fc300c6c9ac1b24ca987ae19bb81d8a, type: 3}
+  backgroundLayerTopOverride: {fileID: -8001208057857852343, guid: c293dc6156c16e04e9ad8278fc1bb3ed, type: 3}

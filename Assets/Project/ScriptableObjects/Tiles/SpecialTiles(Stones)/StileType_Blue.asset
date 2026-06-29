@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d402be2c06fdbda4aaf57ecc31f06a5e, type: 3}
+  m_Name: StileType_Blue
+  m_EditorClassIdentifier: 
+  tileId: Tile_02
+  displayName: Tile 02
+  icon: {fileID: 7444942064852270849, guid: bdc52f2be58bf0549ae113bdf7f0be73, type: 3}

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d6fe4eaac53ff34b8ef34a055c58c93, type: 3}
+  m_Name: SpecialRewardVisualDatabase_Main
+  m_EditorClassIdentifier: 
+  profiles:
+  - tileType: {fileID: 11400000, guid: e6b760f8ae8bf9348b5b8e67dc6e0c40, type: 2}
+    cornerSparkSprite: {fileID: 21300000, guid: f7d578097d96dd34a88e3b4b15760c23, type: 3}
+    runeSprite: {fileID: 21300000, guid: 0b5d542b593d5bb4b825999a3575708c, type: 3}
+    cornerSparkColor: {r: 0.19824673, g: 0.2588352, b: 0.9339623, a: 0.89411765}
+    runeColor: {r: 0, g: 0.06844139, b: 1, a: 1}
+    cornerSparkScaleMultiplier: 1.05
+    runeScaleMultiplier: 0.8
+    runeSpacingMultiplier: 0.8
+    runeYOffsetMultiplier: 1.3

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d6a23a505127a8a4f8ba459b786c93ef, type: 3}
-  m_Name: Special_3_Gift
+  m_Name: SpecialGift_01
   m_EditorClassIdentifier: 
   layoutId: Normal_1
   category: 0
@@ -519,5 +519,5 @@ MonoBehaviour:
     - StonePoint_Stack_1
     safeSelectionCount: 3
     fadeSelectionCount: 4
-    rewardOnCollect: {fileID: 0}
+    rewardOnCollect: {fileID: 11400000, guid: b20bf162d9be44a4687df08952c5b9de, type: 2}
     missionTags: []
