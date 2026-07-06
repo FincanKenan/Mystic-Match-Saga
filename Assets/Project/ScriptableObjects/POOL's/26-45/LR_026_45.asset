@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minLevel: 26
   maxLevel: 45
+  layoutSelectionMode: 0
   tileBag: {fileID: 11400000, guid: 027c941027e3cc8409f8f24d3d41596f, type: 2}
   backgroundLayerBottom: {fileID: 3229507492666951288, guid: 9872d30bcc8badb4f8031c854c366476, type: 3}
   backgroundLayerTop: {fileID: -8985808423211435256, guid: 40370233a2d8ef34eacfcd5aca86c3e3, type: 3}

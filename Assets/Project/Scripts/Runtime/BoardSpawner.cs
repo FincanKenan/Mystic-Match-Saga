@@ -822,19 +822,9 @@ namespace ZenMatch.Runtime
                 return;
             }
 
-            List<WeightedLayoutReference> weightedLayouts = rule.GetAllAllowedWeightedLayouts();
-            if (weightedLayouts.Count == 0)
-            {
-                Debug.LogError("[BoardSpawner] Rule içinde kullanılabilir weighted layout yok.", this);
-                return;
-            }
-
-            BoardLayoutSO selectedLayout = PickWeightedLayout(weightedLayouts, rng);
+            BoardLayoutSO selectedLayout = ResolveLayoutForRule(rule, rng);
             if (selectedLayout == null)
-            {
-                Debug.LogError("[BoardSpawner] Weighted layout seçimi null geldi.", this);
                 return;
-            }
 
             EnsureStacksRoot();
 
@@ -954,13 +944,75 @@ namespace ZenMatch.Runtime
             if (introAnimator != null)
                 introAnimator.PlayIntro(stacksRoot);
 
+            string spawnModeText = rule.LayoutSelectionMode == LayoutSelectionMode.SequentialByLevelNumber
+    ? "SIRALI"
+    : "HAVUZ";
+
             Debug.Log(
-    $"[BoardSpawner] HAVUZ spawn tamamlandı. " +
-    $"CurrentLevel: {currentLevel}, " +
-    $"SelectedLayoutAsset: {selectedLayout.name}, " +
-    $"SelectedLayoutId: {selectedLayout.LayoutId}, " +
-    $"RequestedTiles: {requestedTotalTiles}, FinalTiles: {generatedTiles.Count}, StackCount: {_runtimeStacks.Count}",
-    this);
+                $"[BoardSpawner] {spawnModeText} spawn tamamlandı. " +
+                $"CurrentLevel: {currentLevel}, " +
+                $"SelectionMode: {rule.LayoutSelectionMode}, " +
+                $"SelectedLayoutAsset: {selectedLayout.name}, " +
+                $"SelectedLayoutId: {selectedLayout.LayoutId}, " +
+                $"RequestedTiles: {requestedTotalTiles}, FinalTiles: {generatedTiles.Count}, StackCount: {_runtimeStacks.Count}",
+                this);
+        }
+
+        private BoardLayoutSO ResolveLayoutForRule(LevelRangeRuleSO rule, System.Random rng)
+        {
+            if (rule == null)
+                return null;
+
+            if (rule.LayoutSelectionMode == LayoutSelectionMode.SequentialByLevelNumber)
+            {
+                if (rule.TryGetSequentialLayoutForLevel(currentLevel, out BoardLayoutSO sequentialLayout) &&
+                    sequentialLayout != null)
+                {
+                    Debug.Log(
+                        $"[BoardSpawner] Sıralı layout seçildi. " +
+                        $"CurrentLevel: {currentLevel}, SelectedLayoutAsset: {sequentialLayout.name}",
+                        this);
+
+                    return sequentialLayout;
+                }
+
+                Debug.LogError(
+                    $"[BoardSpawner] SequentialByLevelNumber aktif ama Level_{currentLevel} bulunamadı. " +
+                    $"Rule: {rule.name}. " +
+                    $"Çözüm: Allowed Normal Layouts içine Level_{currentLevel} assetini ekle veya liste sırasını MinLevel'e göre düzenle.",
+                    this);
+
+                return null;
+            }
+
+            if (rule.LayoutSelectionMode == LayoutSelectionMode.WeightedRandomPool)
+            {
+                List<WeightedLayoutReference> weightedLayouts = rule.GetAllAllowedWeightedLayouts();
+
+                if (weightedLayouts.Count == 0)
+                {
+                    Debug.LogError("[BoardSpawner] Rule içinde kullanılabilir weighted layout yok.", this);
+                    return null;
+                }
+
+                BoardLayoutSO selectedLayout = PickWeightedLayout(weightedLayouts, rng);
+
+                if (selectedLayout == null)
+                {
+                    Debug.LogError("[BoardSpawner] Weighted layout seçimi null geldi.", this);
+                    return null;
+                }
+
+                Debug.Log(
+                    $"[BoardSpawner] Havuz layout seçildi. " +
+                    $"CurrentLevel: {currentLevel}, SelectedLayoutAsset: {selectedLayout.name}",
+                    this);
+
+                return selectedLayout;
+            }
+
+            Debug.LogError($"[BoardSpawner] Bilinmeyen LayoutSelectionMode: {rule.LayoutSelectionMode}", this);
+            return null;
         }
 
         private void ApplyBackgroundFromFixedLevel(FixedLevelSO fixedLevel)

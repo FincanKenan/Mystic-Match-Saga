@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6a23a505127a8a4f8ba459b786c93ef, type: 3}
   m_Name: Level_14
   m_EditorClassIdentifier: 
-  layoutId: Normal_1
+  layoutId: 'Level_14 '
   category: 0
   groups:
   - groupId: Group_01
@@ -29,7 +29,12 @@ MonoBehaviour:
       requiredCompletedPointIds:
       - L14-N1-Point_6
       minStackHeight: 6
-      maxStackHeight: 10
+      maxStackHeight: 8
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L14-N1-Point_3
       stackDirection: 2
@@ -41,7 +46,12 @@ MonoBehaviour:
       requiredCompletedPointIds:
       - L14-N1-Point_6
       minStackHeight: 6
-      maxStackHeight: 10
+      maxStackHeight: 8
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L14-N1-Point_4
       stackDirection: 3
@@ -53,7 +63,12 @@ MonoBehaviour:
       requiredCompletedPointIds:
       - 
       minStackHeight: 6
-      maxStackHeight: 10
+      maxStackHeight: 8
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L14-N1-Point_5
       stackDirection: 3
@@ -65,7 +80,12 @@ MonoBehaviour:
       requiredCompletedPointIds:
       - 
       minStackHeight: 6
-      maxStackHeight: 10
+      maxStackHeight: 8
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L14-N1-Point_6
       stackDirection: 3
@@ -78,5 +98,11 @@ MonoBehaviour:
       - L14-N1-Point_5
       - L14-N1-Point_4
       minStackHeight: 6
-      maxStackHeight: 10
+      maxStackHeight: 8
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
+  rewardGifts: []
