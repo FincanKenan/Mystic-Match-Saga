@@ -47,16 +47,11 @@ namespace ZenMatch.Runtime.RewardMissions
 
         private void Awake()
         {
-            if (boardSpawner == null)
-                boardSpawner = FindFirstObjectByType<BoardSpawner>();
-
-            if (rewardGrantService == null)
-                rewardGrantService = RewardGrantService.Instance != null
-                    ? RewardGrantService.Instance
-                    : FindFirstObjectByType<RewardGrantService>();
-
+            ResolveReferences();
             EnsureGiftsRoot();
         }
+
+        
 
         public void Initialize(IReadOnlyList<RewardGiftReference> giftReferences, int levelNumber = -1)
         {
@@ -66,14 +61,7 @@ namespace ZenMatch.Runtime.RewardMissions
             _successfulTileSelections = 0;
             _initialized = false;
 
-            if (boardSpawner == null)
-                boardSpawner = FindFirstObjectByType<BoardSpawner>();
-
-            if (rewardGrantService == null)
-                rewardGrantService = RewardGrantService.Instance != null
-                    ? RewardGrantService.Instance
-                    : FindFirstObjectByType<RewardGrantService>();
-
+            ResolveReferences();
             EnsureGiftsRoot();
             BuildAnchorMap();
 
@@ -111,15 +99,30 @@ namespace ZenMatch.Runtime.RewardMissions
                     continue;
                 }
 
-                RewardGiftView view = RewardGiftView.Create(
-                    objectName: $"RewardGift_{reference.giftId}",
-                    parent: giftsRoot,
-                    sprite: reference.giftSprite,
-                    worldPosition: anchor.WorldPosition,
-                    offset: reference.spriteOffset,
-                    scale: reference.spriteScale,
-                    sortingLayerName: sortingLayerName,
-                    sortingOrder: baseSortingOrder + (i * sortingOrderStep));
+                RewardGiftView view;
+
+                if (anchor.TryGetGiftVisualRenderer(out SpriteRenderer sceneRenderer))
+                {
+                    view = RewardGiftView.CreateFromSceneRenderer(
+                        reference.giftId,
+                        sceneRenderer,
+                        reference.giftSprite,
+                        sortingLayerName,
+                        baseSortingOrder + (i * sortingOrderStep));
+                }
+                else
+                {
+                    view = RewardGiftView.CreateWorldLocked(
+                        reference.giftId,
+                        giftsRoot,
+                        reference.giftSprite,
+                        anchor.transform.position,
+                        reference.spriteOffset,
+                        reference.spriteScale,
+                        sortingLayerName,
+                        baseSortingOrder + (i * sortingOrderStep));
+                }
+                
 
                 RewardGiftRuntime runtimeGift = new RewardGiftRuntime(reference, view);
                 _runtimeGifts.Add(runtimeGift);
@@ -131,6 +134,19 @@ namespace ZenMatch.Runtime.RewardMissions
 
             if (logDebug)
                 Debug.Log($"[RewardGiftController] Initialized. GiftCount: {_runtimeGifts.Count}", this);
+        }
+
+        private void ResolveReferences()
+        {
+            if (boardSpawner == null)
+                boardSpawner = FindFirstObjectByType<BoardSpawner>();
+
+            if (rewardGrantService == null)
+            {
+                rewardGrantService = RewardGrantService.Instance != null
+                    ? RewardGrantService.Instance
+                    : FindFirstObjectByType<RewardGrantService>();
+            }
         }
 
         private void BuildAnchorMap()
@@ -261,7 +277,7 @@ namespace ZenMatch.Runtime.RewardMissions
                 levelNumber: _levelNumber,
                 sourceId: reference.giftId,
                 sourceDisplayName: reference.displayName,
-                tags: reference.missionTags);
+                tags: BuildGiftMissionTags(reference));
 
             RewardEvents.RaiseRewardGiftCollected(context);
 
@@ -274,6 +290,45 @@ namespace ZenMatch.Runtime.RewardMissions
                     $"[RewardGiftController] Gift collected. Gift: {reference.giftId}, SelectionCount: {_successfulTileSelections}",
                     this);
             }
+        }
+
+        private List<string> BuildGiftMissionTags(RewardGiftReference reference)
+        {
+            List<string> tags = new List<string>();
+
+            if (reference == null)
+                return tags;
+
+            AddMissionTag(tags, "reward_gift");
+            AddMissionTag(tags, reference.giftId);
+            AddMissionTag(tags, reference.GetSceneAnchorId());
+
+            if (reference.missionTags != null)
+            {
+                for (int i = 0; i < reference.missionTags.Count; i++)
+                    AddMissionTag(tags, reference.missionTags[i]);
+            }
+
+            return tags;
+        }
+
+        private void AddMissionTag(List<string> tags, string tag)
+        {
+            if (tags == null)
+                return;
+
+            if (string.IsNullOrWhiteSpace(tag))
+                return;
+
+            string normalized = tag.Trim();
+
+            for (int i = 0; i < tags.Count; i++)
+            {
+                if (string.Equals(tags[i], normalized, StringComparison.OrdinalIgnoreCase))
+                    return;
+            }
+
+            tags.Add(normalized);
         }
 
         public RewardGiftControllerSnapshot CaptureSnapshot()

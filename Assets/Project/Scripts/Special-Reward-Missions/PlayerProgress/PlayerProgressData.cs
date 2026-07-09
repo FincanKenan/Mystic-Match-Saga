@@ -24,12 +24,16 @@ namespace ZenMatch.Runtime.PlayerProgress
         public List<int> completedLevels = new();
         public List<PlayerBoosterAmount> boosters = new();
 
+        // Eski/global daily reset bilgisi olarak kalabilir.
+        // Yeni daily görev kilidi PlayerMissionProgressData.nextAvailableUtcTicks ile yönetilecek.
         public string lastDailyMissionResetUtc;
+
         public List<PlayerMissionProgressData> missionProgresses = new();
 
         public static PlayerProgressData CreateNew()
         {
             string now = DateTime.UtcNow.ToString("O");
+
             return new PlayerProgressData
             {
                 saveVersion = 1,
@@ -52,13 +56,19 @@ namespace ZenMatch.Runtime.PlayerProgress
             };
         }
 
+        public void EnsureCollections()
+        {
+            completedLevels ??= new List<int>();
+            boosters ??= new List<PlayerBoosterAmount>();
+            missionProgresses ??= new List<PlayerMissionProgressData>();
+        }
+
         public PlayerMissionProgressData GetMissionProgress(string missionId)
         {
             if (string.IsNullOrWhiteSpace(missionId))
                 return null;
 
-            if (missionProgresses == null)
-                missionProgresses = new List<PlayerMissionProgressData>();
+            EnsureCollections();
 
             for (int i = 0; i < missionProgresses.Count; i++)
             {
@@ -67,7 +77,7 @@ namespace ZenMatch.Runtime.PlayerProgress
                 if (progress == null)
                     continue;
 
-                if (progress.missionId == missionId)
+                if (string.Equals(progress.missionId, missionId, StringComparison.Ordinal))
                     return progress;
             }
 
@@ -76,13 +86,15 @@ namespace ZenMatch.Runtime.PlayerProgress
 
         public PlayerMissionProgressData GetOrCreateMissionProgress(string missionId)
         {
+            if (string.IsNullOrWhiteSpace(missionId))
+                return null;
+
+            EnsureCollections();
+
             PlayerMissionProgressData progress = GetMissionProgress(missionId);
 
             if (progress != null)
                 return progress;
-
-            if (missionProgresses == null)
-                missionProgresses = new List<PlayerMissionProgressData>();
 
             progress = new PlayerMissionProgressData(missionId);
             missionProgresses.Add(progress);
@@ -100,8 +112,7 @@ namespace ZenMatch.Runtime.PlayerProgress
             if (string.IsNullOrWhiteSpace(boosterId))
                 return 0;
 
-            if (boosters == null)
-                boosters = new List<PlayerBoosterAmount>();
+            EnsureCollections();
 
             for (int i = 0; i < boosters.Count; i++)
             {
@@ -122,8 +133,7 @@ namespace ZenMatch.Runtime.PlayerProgress
             if (string.IsNullOrWhiteSpace(boosterId))
                 return;
 
-            if (boosters == null)
-                boosters = new List<PlayerBoosterAmount>();
+            EnsureCollections();
 
             amount = Math.Max(0, amount);
 
@@ -175,8 +185,10 @@ namespace ZenMatch.Runtime.PlayerProgress
 
         public bool HasCompletedLevel(int levelNumber)
         {
-            if (completedLevels == null)
-                completedLevels = new List<int>();
+            if (levelNumber <= 0)
+                return false;
+
+            EnsureCollections();
 
             return completedLevels.Contains(levelNumber);
         }
@@ -186,8 +198,7 @@ namespace ZenMatch.Runtime.PlayerProgress
             if (levelNumber <= 0)
                 return;
 
-            if (completedLevels == null)
-                completedLevels = new List<int>();
+            EnsureCollections();
 
             if (!completedLevels.Contains(levelNumber))
                 completedLevels.Add(levelNumber);

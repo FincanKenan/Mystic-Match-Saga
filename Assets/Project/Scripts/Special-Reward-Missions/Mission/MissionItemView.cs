@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -24,9 +26,14 @@ namespace ZenMatch.Runtime.Missions
         [Header("State")]
         [SerializeField] private TMP_Text stateText;
 
+        [Header("Daily Timer")]
+        [SerializeField] private TMP_Text dailyTimerText;
+        [SerializeField] private string dailyRemainingTextFormat = "Kalan: {0}";
+        [SerializeField, Min(0.25f)] private float dailyTimerRefreshInterval = 1f;
+
         [Header("Text Values")]
-        [SerializeField] private string collectText = "Collect";
-        [SerializeField] private string continueText = "Devam";
+        [SerializeField] private string collectText = "Topla";
+        [SerializeField] private string continueText = "Bekliyor";
         [SerializeField] private string claimedText = "Alýndý";
         [SerializeField] private string completedText = "Tamamlandý";
         [SerializeField] private string dailyClaimedStateText = "Bugün alýndý";
@@ -34,10 +41,14 @@ namespace ZenMatch.Runtime.Missions
         private MissionDefinitionSO _mission;
         private MissionProgressService _missionService;
 
+        private float _nextDailyTimerRefreshTime;
+
         private void OnEnable()
         {
             if (collectButton != null)
                 collectButton.onClick.AddListener(HandleCollectClicked);
+
+            _nextDailyTimerRefreshTime = 0f;
         }
 
         private void OnDisable()
@@ -46,10 +57,30 @@ namespace ZenMatch.Runtime.Missions
                 collectButton.onClick.RemoveListener(HandleCollectClicked);
         }
 
+        private void Update()
+        {
+            if (_mission == null)
+                return;
+
+            if (_mission.Category != MissionCategory.Daily)
+                return;
+
+            if (_missionService == null)
+                return;
+
+            if (Time.unscaledTime < _nextDailyTimerRefreshTime)
+                return;
+
+            _nextDailyTimerRefreshTime = Time.unscaledTime + Mathf.Max(0.25f, dailyTimerRefreshInterval);
+
+            Refresh();
+        }
+
         public void Setup(MissionDefinitionSO mission, MissionProgressService missionService)
         {
             _mission = mission;
             _missionService = missionService;
+            _nextDailyTimerRefreshTime = 0f;
 
             Refresh();
         }
@@ -77,9 +108,11 @@ namespace ZenMatch.Runtime.Missions
             }
 
             if (titleText != null)
+            {
                 titleText.text = string.IsNullOrWhiteSpace(_mission.DisplayName)
                     ? _mission.name
                     : _mission.DisplayName;
+            }
 
             if (descriptionText != null)
                 descriptionText.text = _mission.Description ?? string.Empty;
@@ -106,33 +139,36 @@ namespace ZenMatch.Runtime.Missions
 
             StringBuilder builder = new StringBuilder();
 
-            IReadOnlyListWrapper requirements = new IReadOnlyListWrapper(_mission);
+            IReadOnlyList<MissionRequirement> requirements = _mission.Requirements;
 
-            for (int i = 0; i < requirements.Count; i++)
+            if (requirements != null)
             {
-                MissionRequirement requirement = requirements.Get(i);
+                for (int i = 0; i < requirements.Count; i++)
+                {
+                    MissionRequirement requirement = requirements[i];
 
-                if (requirement == null)
-                    continue;
+                    if (requirement == null)
+                        continue;
 
-                int current = progress.GetRequirementCount(requirement.RequirementId);
-                int required = requirement.RequiredCount;
+                    int current = progress.GetRequirementCount(requirement.RequirementId);
+                    int required = requirement.RequiredCount;
 
-                current = Mathf.Clamp(current, 0, required);
+                    current = Mathf.Clamp(current, 0, required);
 
-                totalCurrent += current;
-                totalRequired += required;
+                    totalCurrent += current;
+                    totalRequired += required;
 
-                string name = GetRequirementDisplayName(requirement);
+                    string requirementName = GetRequirementDisplayName(requirement);
 
-                if (builder.Length > 0)
-                    builder.AppendLine();
+                    if (builder.Length > 0)
+                        builder.AppendLine();
 
-                builder.Append(name);
-                builder.Append(": ");
-                builder.Append(current);
-                builder.Append("/");
-                builder.Append(required);
+                    builder.Append(requirementName);
+                    builder.Append(": ");
+                    builder.Append(current);
+                    builder.Append("/");
+                    builder.Append(required);
+                }
             }
 
             if (requirementText != null)
@@ -150,15 +186,26 @@ namespace ZenMatch.Runtime.Missions
 
         private void RefreshCollectState(PlayerMissionProgressData progress)
         {
+            TimeSpan remainingLockTime = TimeSpan.Zero;
+
+            bool isDaily = _mission.Category == MissionCategory.Daily;
+
+            if (isDaily && _missionService != null)
+                remainingLockTime = _missionService.GetDailyRemainingLockTime(_mission.MissionId);
+
+            bool isDailyLocked = isDaily && remainingLockTime > TimeSpan.Zero;
+
             bool isCompleted = progress != null && progress.isCompleted;
             bool isRewardClaimed = progress != null && progress.isRewardClaimed;
 
             if (collectButton != null)
-                collectButton.interactable = isCompleted && !isRewardClaimed;
+                collectButton.interactable = isCompleted && !isRewardClaimed && !isDailyLocked;
 
             if (collectButtonText != null)
             {
-                if (isRewardClaimed)
+                if (isDailyLocked)
+                    collectButtonText.text = dailyClaimedStateText;
+                else if (isRewardClaimed)
                     collectButtonText.text = claimedText;
                 else if (isCompleted)
                     collectButtonText.text = collectText;
@@ -168,13 +215,47 @@ namespace ZenMatch.Runtime.Missions
 
             if (stateText != null)
             {
-                if (_mission.Category == MissionCategory.Daily && isRewardClaimed)
+                if (isDailyLocked)
                     stateText.text = dailyClaimedStateText;
                 else if (isCompleted && !isRewardClaimed)
                     stateText.text = completedText;
                 else
                     stateText.text = string.Empty;
             }
+
+            RefreshDailyTimerText(isDailyLocked, remainingLockTime);
+        }
+
+        private void RefreshDailyTimerText(bool isDailyLocked, TimeSpan remainingLockTime)
+        {
+            if (dailyTimerText == null)
+                return;
+
+            if (!isDailyLocked)
+            {
+                dailyTimerText.text = string.Empty;
+                dailyTimerText.gameObject.SetActive(false);
+                return;
+            }
+
+            dailyTimerText.gameObject.SetActive(true);
+
+            string formattedTime = FormatRemainingTime(remainingLockTime);
+            dailyTimerText.text = string.Format(dailyRemainingTextFormat, formattedTime);
+        }
+
+        private string FormatRemainingTime(TimeSpan remaining)
+        {
+            if (remaining < TimeSpan.Zero)
+                remaining = TimeSpan.Zero;
+
+            if (remaining.TotalDays >= 1d)
+                return $"{(int)remaining.TotalDays}g {remaining.Hours:00}:{remaining.Minutes:00}:{remaining.Seconds:00}";
+
+            if (remaining.TotalHours >= 1d)
+                return $"{(int)remaining.TotalHours:00}:{remaining.Minutes:00}:{remaining.Seconds:00}";
+
+            return $"{remaining.Minutes:00}:{remaining.Seconds:00}";
         }
 
         private string GetRequirementDisplayName(MissionRequirement requirement)
@@ -188,6 +269,9 @@ namespace ZenMatch.Runtime.Missions
             if (!string.IsNullOrWhiteSpace(requirement.RequiredTag))
                 return requirement.RequiredTag;
 
+            if (!string.IsNullOrWhiteSpace(requirement.RequiredSourceId))
+                return requirement.RequiredSourceId;
+
             return requirement.SourceType.ToString();
         }
 
@@ -200,31 +284,6 @@ namespace ZenMatch.Runtime.Missions
 
             if (claimed)
                 Refresh();
-        }
-
-        private readonly struct IReadOnlyListWrapper
-        {
-            private readonly MissionDefinitionSO mission;
-
-            public IReadOnlyListWrapper(MissionDefinitionSO mission)
-            {
-                this.mission = mission;
-            }
-
-            public int Count => mission != null && mission.Requirements != null
-                ? mission.Requirements.Count
-                : 0;
-
-            public MissionRequirement Get(int index)
-            {
-                if (mission == null || mission.Requirements == null)
-                    return null;
-
-                if (index < 0 || index >= mission.Requirements.Count)
-                    return null;
-
-                return mission.Requirements[index];
-            }
         }
     }
 }

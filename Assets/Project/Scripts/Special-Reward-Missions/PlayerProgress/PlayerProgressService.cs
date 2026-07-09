@@ -46,6 +46,9 @@ namespace ZenMatch.Runtime.PlayerProgress
 
         public void LoadOrCreate()
         {
+            if (_storage == null)
+                _storage = new LocalPlayerProgressStorage();
+
             Data = _storage.Load();
 
             if (Data == null || string.IsNullOrWhiteSpace(Data.playerId))
@@ -58,6 +61,14 @@ namespace ZenMatch.Runtime.PlayerProgress
             }
             else
             {
+                Data.EnsureCollections();
+
+                if (string.IsNullOrWhiteSpace(Data.createdUtc))
+                    Data.createdUtc = DateTime.UtcNow.ToString("O");
+
+                if (string.IsNullOrWhiteSpace(Data.lastUpdatedUtc))
+                    Data.lastUpdatedUtc = DateTime.UtcNow.ToString("O");
+
                 if (logDebug)
                     Debug.Log($"[PlayerProgressService] Progress loaded. PlayerId: {Data.playerId}", this);
             }
@@ -71,6 +82,9 @@ namespace ZenMatch.Runtime.PlayerProgress
             if (Data == null)
                 return;
 
+            Data.EnsureCollections();
+            Data.Touch();
+
             _storage.Save(Data);
         }
 
@@ -78,6 +92,8 @@ namespace ZenMatch.Runtime.PlayerProgress
         {
             if (Data == null)
                 return;
+
+            Data.EnsureCollections();
 
             if (saveImmediately)
                 Save();
@@ -87,6 +103,9 @@ namespace ZenMatch.Runtime.PlayerProgress
 
         public void DeleteLocalProgress()
         {
+            if (_storage == null)
+                _storage = new LocalPlayerProgressStorage();
+
             _storage.Delete();
 
             Data = PlayerProgressData.CreateNew();

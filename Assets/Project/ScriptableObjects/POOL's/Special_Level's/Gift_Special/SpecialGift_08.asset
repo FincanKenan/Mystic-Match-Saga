@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df2abb707c4edb34a9c5f90addb187d6, type: 3}
+  m_Name: SpecialGift_08
+  m_EditorClassIdentifier: 
+  levelNumber: 108
+  layout: {fileID: 11400000, guid: 149ef377ac5256940bb0618cd6a8bde7, type: 2}
+  tileBag: {fileID: 11400000, guid: e6fc3c03d09c8d24a943cc859b01b3d4, type: 2}
+  useSpecialTraySettings: 0
+  startingActiveTrayCapacity: 7
+  useBackgroundOverride: 0
+  backgroundLayerBottomOverride: {fileID: 7108675125740071113, guid: 2fc300c6c9ac1b24ca987ae19bb81d8a, type: 3}
+  backgroundLayerTopOverride: {fileID: -8001208057857852343, guid: c293dc6156c16e04e9ad8278fc1bb3ed, type: 3}

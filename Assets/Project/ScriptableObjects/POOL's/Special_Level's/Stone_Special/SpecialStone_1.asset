@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df2abb707c4edb34a9c5f90addb187d6, type: 3}
   m_Name: SpecialStone_1
   m_EditorClassIdentifier: 
-  levelNumber: 101
+  levelNumber: 111
   layout: {fileID: 11400000, guid: 289174901c873b4449868dc178b52967, type: 2}
-  tileBag: {fileID: 11400000, guid: e6fc3c03d09c8d24a943cc859b01b3d4, type: 2}
+  tileBag: {fileID: 11400000, guid: cd127de0ec63c97468b9701c956070a7, type: 2}
   useSpecialTraySettings: 0
   startingActiveTrayCapacity: 7
   useBackgroundOverride: 0

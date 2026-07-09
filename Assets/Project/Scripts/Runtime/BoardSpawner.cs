@@ -6,6 +6,7 @@ using UnityEngine;
 using ZenMatch.Authoring;
 using ZenMatch.Data;
 using ZenMatch.UI;
+using ZenMatch.Runtime.Rewards;
 
 namespace ZenMatch.Runtime
 {
@@ -153,6 +154,12 @@ namespace ZenMatch.Runtime
         [Header("Special Reward Tray")]
         [SerializeField] private SpecialRewardTrayView specialRewardTrayView;
 
+        [Header("Reward Services")]
+        [SerializeField] private RewardGrantService rewardGrantService;
+
+        [Header("Mission Events")]
+        [SerializeField] private bool countExpiredSpecialTilesForMissions = true;
+
         [Header("Generation")]
         [SerializeField] private bool spawnOnStart = true;
         [SerializeField] private bool useRandomSeed = true;
@@ -160,6 +167,7 @@ namespace ZenMatch.Runtime
 
         [Header("Debug")]
         [SerializeField] private bool logTileDistribution = true;
+
 
         private readonly List<BoardStack> _runtimeStacks = new();
         private readonly List<BoardStackView> _runtimeViews = new();
@@ -1136,6 +1144,32 @@ namespace ZenMatch.Runtime
             if (removedTile == null)
                 return;
 
+            bool wasSpecialRewardActiveBeforeTake =
+                removedTile.IsSpecialTile &&
+                removedTile.IsSpecialRewardActive;
+
+            SpecialStoneRewardReference specialStoneRewardReference = null;
+
+            if (removedTile.IsSpecialTile)
+                specialStoneRewardReference = FindSpecialStoneRewardReference(removedTile);
+
+            if (removedTile.IsSpecialTile &&
+                (countExpiredSpecialTilesForMissions || wasSpecialRewardActiveBeforeTake))
+            {
+                RewardContext context = CreateSpecialTileRewardContext(
+                    takenPointId,
+                    removedTile,
+                    wasSpecialRewardActiveBeforeTake,
+                    specialStoneRewardReference);
+
+                RewardEvents.RaiseSpecialTileCollected(context);
+
+                TryGrantSpecialStoneReward(
+                    specialStoneRewardReference,
+                    context,
+                    wasSpecialRewardActiveBeforeTake);
+            }
+
             SpecialRewardMoveSnapshot snapshot = new SpecialRewardMoveSnapshot
             {
                 RemovedTile = removedTile,
@@ -1162,6 +1196,163 @@ namespace ZenMatch.Runtime
 
             if (snapshot.AffectedTilesBefore.Count > 0)
                 _specialRewardUndoSnapshots[removedTile] = snapshot;
+        }
+
+
+
+        private SpecialStoneRewardReference FindSpecialStoneRewardReference(BoardTileInstance tile)
+        {
+            if (tile == null)
+                return null;
+
+            if (!tile.IsSpecialTile)
+                return null;
+
+            if (LastSpawnedLayout == null)
+                return null;
+
+            if (LastSpawnedLayout.TryGetSpecialStoneReward(
+                    tile.SpecialTileGroupId,
+                    tile.TileType,
+                    out SpecialStoneRewardReference rewardReference))
+            {
+                return rewardReference;
+            }
+
+            return null;
+        }
+
+        private RewardContext CreateSpecialTileRewardContext(
+            string takenPointId,
+            BoardTileInstance tile,
+            bool wasRewardActive,
+            SpecialStoneRewardReference rewardReference)
+        {
+            return new RewardContext(
+                sourceType: RewardSourceType.SpecialTile,
+                levelNumber: currentLevel,
+                sourceId: tile.TileType != null ? tile.TileType.TileId : string.Empty,
+                sourceDisplayName: tile.TileType != null ? tile.TileType.DisplayName : string.Empty,
+                tags: BuildSpecialTileMissionTags(
+                    takenPointId,
+                    tile,
+                    wasRewardActive,
+                    rewardReference));
+        }
+
+        private List<string> BuildSpecialTileMissionTags(
+            string takenPointId,
+            BoardTileInstance tile,
+            bool wasRewardActive,
+            SpecialStoneRewardReference rewardReference)
+        {
+            List<string> tags = new List<string>();
+
+            if (tile == null)
+                return tags;
+
+            AddMissionTag(tags, "special_tile");
+
+            if (wasRewardActive)
+                AddMissionTag(tags, "special_reward_active");
+            else
+                AddMissionTag(tags, "special_reward_inactive");
+
+            if (!string.IsNullOrWhiteSpace(takenPointId))
+                AddMissionTag(tags, takenPointId);
+
+            if (!string.IsNullOrWhiteSpace(tile.SpecialTileGroupId))
+                AddMissionTag(tags, tile.SpecialTileGroupId);
+
+            if (tile.TileType != null)
+            {
+                AddMissionTag(tags, tile.TileType.TileId);
+
+                if (tile.TileType.MissionTags != null)
+                {
+                    for (int i = 0; i < tile.TileType.MissionTags.Count; i++)
+                        AddMissionTag(tags, tile.TileType.MissionTags[i]);
+                }
+            }
+
+            if (rewardReference != null)
+            {
+                AddMissionTag(tags, rewardReference.ruleId);
+
+                if (rewardReference.missionTags != null)
+                {
+                    for (int i = 0; i < rewardReference.missionTags.Count; i++)
+                        AddMissionTag(tags, rewardReference.missionTags[i]);
+                }
+            }
+
+            return tags;
+        }
+
+        private void TryGrantSpecialStoneReward(
+    SpecialStoneRewardReference rewardReference,
+    RewardContext context,
+    bool wasRewardActive)
+        {
+            Debug.Log(
+                $"[BoardSpawner] TryGrantSpecialStoneReward çağrıldı. " +
+                $"RewardRef: {(rewardReference != null ? rewardReference.ruleId : "NULL")} | " +
+                $"WasRewardActive: {wasRewardActive}",
+                this);
+
+            if (rewardReference == null)
+                return;
+
+            Debug.Log(
+                $"[BoardSpawner] Matched special reward. Rule: {rewardReference.ruleId}, " +
+                $"RewardPack: {(rewardReference.rewardOnCollect != null ? rewardReference.rewardOnCollect.name : "NULL")}, " +
+                $"GrantOnlyActive: {rewardReference.grantOnlyWhileRewardActive}",
+                this);
+
+            if (rewardReference.rewardOnCollect == null)
+                return;
+
+            if (rewardReference.grantOnlyWhileRewardActive && !wasRewardActive)
+                return;
+
+            ResolveRewardGrantService();
+
+            if (rewardGrantService == null)
+            {
+                Debug.LogWarning("[BoardSpawner] RewardGrantService bulunamadı. Special stone reward verilemedi.", this);
+                return;
+            }
+
+            rewardGrantService.GrantReward(rewardReference.rewardOnCollect, context);
+        }
+
+        private void ResolveRewardGrantService()
+        {
+            if (rewardGrantService != null)
+                return;
+
+            rewardGrantService = RewardGrantService.Instance != null
+                ? RewardGrantService.Instance
+                : FindFirstObjectByType<RewardGrantService>();
+        }
+
+        private void AddMissionTag(List<string> tags, string tag)
+        {
+            if (tags == null)
+                return;
+
+            if (string.IsNullOrWhiteSpace(tag))
+                return;
+
+            string normalized = tag.Trim();
+
+            for (int i = 0; i < tags.Count; i++)
+            {
+                if (string.Equals(tags[i], normalized, StringComparison.OrdinalIgnoreCase))
+                    return;
+            }
+
+            tags.Add(normalized);
         }
 
         private SpecialRewardTileState CaptureSpecialRewardState(BoardTileInstance tile)

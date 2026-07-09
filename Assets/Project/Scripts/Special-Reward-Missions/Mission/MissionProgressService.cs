@@ -11,6 +11,9 @@ namespace ZenMatch.Runtime.Missions
     {
         public static MissionProgressService Instance { get; private set; }
 
+        [Header("Daily Mission")]
+        [SerializeField, Min(1)] private int dailyMissionCooldownMinutes = 1;
+
         [Header("Lifetime")]
         [SerializeField] private bool dontDestroyOnLoad = true;
 
@@ -67,7 +70,7 @@ namespace ZenMatch.Runtime.Missions
         {
             ResolveReferences();
             EnsureMissionProgresses();
-            CheckDailyReset();
+            UnlockExpiredDailyMissions();
         }
 
         private void ResolveReferences()
@@ -95,19 +98,23 @@ namespace ZenMatch.Runtime.Missions
             ApplyMissionEvent(context, 1);
         }
 
-        public void NotifyLevelCompleted()
+        public void NotifyLevelCompleted(int levelNumber = -1)
         {
             RewardContext context = new RewardContext(
                 sourceType: RewardSourceType.LevelComplete,
-                levelNumber: -1,
+                levelNumber: levelNumber,
                 sourceId: "level_complete",
-                sourceDisplayName: "Level Complete");
+                sourceDisplayName: "Level Complete",
+                tags: new[] { "level_complete" });
 
             ApplyMissionEvent(context, 1);
         }
 
         public void NotifyBoosterUsed(string boosterId)
         {
+            if (string.IsNullOrWhiteSpace(boosterId))
+                return;
+
             RewardContext context = new RewardContext(
                 sourceType: RewardSourceType.BoosterUsed,
                 levelNumber: -1,
@@ -131,8 +138,29 @@ namespace ZenMatch.Runtime.Missions
             if (progressService == null || progressService.Data == null)
                 return;
 
-            CheckDailyReset();
             EnsureMissionProgresses();
+            UnlockExpiredDailyMissions();
+
+            if (logDebug)
+            {
+                Debug.Log($"[MissionProgressService] ApplyMissionEvent received. Context: {context}, Amount: {amount}, MissionCount: {(missionDefinitions == null ? 0 : missionDefinitions.Count)}", this);
+
+                if (missionDefinitions != null)
+                {
+                    for (int d = 0; d < missionDefinitions.Count; d++)
+                    {
+                        MissionDefinitionSO debugMission = missionDefinitions[d];
+
+                        Debug.Log(
+                            debugMission == null
+                                ? $"[MissionProgressService] Mission[{d}] = NULL"
+                                : $"[MissionProgressService] Mission[{d}] = {debugMission.DisplayName} | Id: {debugMission.MissionId} | Category: {debugMission.Category}",
+                            this);
+                    }
+                }
+            }
+
+            DateTime nowUtc = DateTime.UtcNow;
 
             for (int i = 0; i < missionDefinitions.Count; i++)
             {
@@ -147,11 +175,31 @@ namespace ZenMatch.Runtime.Missions
                 if (progress == null)
                     continue;
 
-                if (progress.isCompleted && !progress.isRewardClaimed)
-                    continue;
+                EnsureRequirementProgresses(mission, progress);
 
-                if (mission.Category == MissionCategory.Daily && progress.isRewardClaimed)
+                if (IsMissionLocked(mission, progress, nowUtc))
+                {
+                    if (logDebug)
+                        Debug.Log($"[MissionProgressService] Mission skipped because locked: {mission.DisplayName}", this);
+
                     continue;
+                }
+
+                if (progress.isCompleted && !progress.isRewardClaimed)
+                {
+                    if (logDebug)
+                        Debug.Log($"[MissionProgressService] Mission skipped because completed but not claimed: {mission.DisplayName}", this);
+
+                    continue;
+                }
+
+                if (progress.isRewardClaimed)
+                {
+                    if (logDebug)
+                        Debug.Log($"[MissionProgressService] Mission skipped because reward already claimed: {mission.DisplayName}", this);
+
+                    continue;
+                }
 
                 bool changed = false;
 
@@ -165,7 +213,21 @@ namespace ZenMatch.Runtime.Missions
                         continue;
 
                     if (!requirement.Matches(context))
+                    {
+                        if (logDebug)
+                        {
+                            Debug.Log(
+                                $"[MissionProgressService] Requirement not matched. Mission: {mission.DisplayName}, " +
+                                $"Requirement: {requirement.RequirementId}, " +
+                                $"Requirement SourceType: {requirement.SourceType}, " +
+                                $"RequiredSourceId: {requirement.RequiredSourceId}, " +
+                                $"RequiredTag: {requirement.RequiredTag}, " +
+                                $"Context: {context}",
+                                this);
+                        }
+
                         continue;
+                    }
 
                     int current = progress.GetRequirementCount(requirement.RequirementId);
                     int target = requirement.RequiredCount;
@@ -175,6 +237,16 @@ namespace ZenMatch.Runtime.Missions
 
                     int next = Mathf.Min(current + amount, target);
                     progress.SetRequirementCount(requirement.RequirementId, next);
+
+                    if (logDebug)
+                    {
+                        Debug.Log(
+                            $"[MissionProgressService] Mission progressed. Mission: {mission.DisplayName}, " +
+                            $"Requirement: {requirement.RequirementId}, {current}/{target} -> {next}/{target}, " +
+                            $"Context: {context}",
+                            this);
+                    }
+
                     changed = true;
                 }
 
@@ -182,6 +254,7 @@ namespace ZenMatch.Runtime.Missions
                     continue;
 
                 bool wasCompleted = progress.isCompleted;
+
                 progress.isCompleted = IsMissionCompleted(mission, progress);
                 progress.Touch();
 
@@ -206,6 +279,9 @@ namespace ZenMatch.Runtime.Missions
             if (progressService == null || progressService.Data == null)
                 return false;
 
+            EnsureMissionProgresses();
+            UnlockExpiredDailyMissions();
+
             MissionDefinitionSO mission = FindMission(missionId);
 
             if (mission == null)
@@ -215,6 +291,11 @@ namespace ZenMatch.Runtime.Missions
                 progressService.Data.GetOrCreateMissionProgress(mission.MissionId);
 
             if (progress == null)
+                return false;
+
+            DateTime nowUtc = DateTime.UtcNow;
+
+            if (IsMissionLocked(mission, progress, nowUtc))
                 return false;
 
             if (!progress.isCompleted)
@@ -233,21 +314,29 @@ namespace ZenMatch.Runtime.Missions
                     sourceType: claimSource,
                     levelNumber: -1,
                     sourceId: mission.MissionId,
-                    sourceDisplayName: mission.DisplayName);
+                    sourceDisplayName: mission.DisplayName,
+                    tags: new[] { mission.MissionId, mission.Category.ToString() });
 
                 if (rewardGrantService == null)
                     rewardGrantService = RewardGrantService.Instance;
+
+                if (rewardGrantService == null)
+                    rewardGrantService = FindFirstObjectByType<RewardGrantService>();
 
                 if (rewardGrantService != null)
                     rewardGrantService.GrantReward(mission.RewardOnClaim, context);
             }
 
-            progress.isRewardClaimed = true;
-            progress.Touch();
-
-            if (mission.Category == MissionCategory.Mini && mission.RepeatOnClaim)
+            if (mission.Category == MissionCategory.Daily)
             {
-                progress.ResetProgress();
+                progress.MarkRewardClaimed(nowUtc, GetDailyMissionCooldown());
+            }
+            else
+            {
+                progress.MarkRewardClaimed(nowUtc);
+
+                if (mission.RepeatOnClaim)
+                    progress.ResetProgress();
             }
 
             progressService.NotifyChanged();
@@ -267,6 +356,9 @@ namespace ZenMatch.Runtime.Missions
             if (progressService == null || progressService.Data == null)
                 return null;
 
+            EnsureMissionProgresses();
+            UnlockExpiredDailyMissions();
+
             return progressService.Data.GetOrCreateMissionProgress(missionId);
         }
 
@@ -285,7 +377,7 @@ namespace ZenMatch.Runtime.Missions
                 if (mission == null)
                     continue;
 
-                if (mission.MissionId == missionId)
+                if (string.Equals(mission.MissionId, missionId, StringComparison.Ordinal))
                     return mission;
             }
 
@@ -318,7 +410,28 @@ namespace ZenMatch.Runtime.Missions
             return true;
         }
 
-        private void EnsureMissionProgresses()
+        public bool IsMissionLocked(MissionDefinitionSO mission, PlayerMissionProgressData progress, DateTime nowUtc)
+        {
+            if (mission == null || progress == null)
+                return false;
+
+            if (mission.Category != MissionCategory.Daily)
+                return false;
+
+            if (!progress.isRewardClaimed)
+                return false;
+
+            long effectiveNextAvailableTicks = GetEffectiveDailyNextAvailableUtcTicks(progress);
+
+            return effectiveNextAvailableTicks > 0L &&
+                   nowUtc.Ticks < effectiveNextAvailableTicks;
+        }
+
+        
+
+        [ContextMenu("Debug/Reset Daily Missions")]
+        [ContextMenu("Debug/Reset Daily Missions")]
+        private void DebugResetDailyMissions()
         {
             ResolveReferences();
 
@@ -326,57 +439,9 @@ namespace ZenMatch.Runtime.Missions
                 return;
 
             if (missionDefinitions == null)
-                missionDefinitions = new List<MissionDefinitionSO>();
-
-            for (int i = 0; i < missionDefinitions.Count; i++)
-            {
-                MissionDefinitionSO mission = missionDefinitions[i];
-
-                if (mission == null || !mission.IsValid())
-                    continue;
-
-                PlayerMissionProgressData progress =
-                    progressService.Data.GetOrCreateMissionProgress(mission.MissionId);
-
-                IReadOnlyList<MissionRequirement> requirements = mission.Requirements;
-
-                for (int r = 0; r < requirements.Count; r++)
-                {
-                    MissionRequirement requirement = requirements[r];
-
-                    if (requirement == null)
-                        continue;
-
-                    progress.SetRequirementCount(
-                        requirement.RequirementId,
-                        progress.GetRequirementCount(requirement.RequirementId));
-                }
-            }
-
-            progressService.NotifyChanged();
-        }
-
-        private void CheckDailyReset()
-        {
-            ResolveReferences();
-
-            if (progressService == null || progressService.Data == null)
                 return;
 
-            DateTime todayUtc = DateTime.UtcNow.Date;
-
-            bool shouldReset = true;
-
-            if (!string.IsNullOrWhiteSpace(progressService.Data.lastDailyMissionResetUtc) &&
-                DateTime.TryParse(progressService.Data.lastDailyMissionResetUtc, out DateTime lastReset))
-            {
-                shouldReset = lastReset.Date != todayUtc;
-            }
-
-            if (!shouldReset)
-                return;
-
-            progressService.Data.lastDailyMissionResetUtc = DateTime.UtcNow.ToString("O");
+            bool changed = false;
 
             for (int i = 0; i < missionDefinitions.Count; i++)
             {
@@ -388,13 +453,238 @@ namespace ZenMatch.Runtime.Missions
                 PlayerMissionProgressData progress =
                     progressService.Data.GetOrCreateMissionProgress(mission.MissionId);
 
+                if (progress == null)
+                    continue;
+
                 progress.ResetProgress();
+                changed = true;
+
+                OnMissionProgressChanged?.Invoke(mission, progress);
             }
 
-            progressService.NotifyChanged();
+            if (changed)
+            {
+                progressService.NotifyChanged();
 
-            if (logDebug)
-                Debug.Log("[MissionProgressService] Daily missions reset.", this);
+                if (logDebug)
+                    Debug.Log("[MissionProgressService] Daily missions reset manually.", this);
+            }
+        }
+
+        public TimeSpan GetDailyRemainingLockTime(string missionId)
+        {
+            MissionDefinitionSO mission = FindMission(missionId);
+
+            if (mission == null || mission.Category != MissionCategory.Daily)
+                return TimeSpan.Zero;
+
+            PlayerMissionProgressData progress = GetProgress(missionId);
+
+            if (progress == null)
+                return TimeSpan.Zero;
+
+            if (!progress.isRewardClaimed)
+                return TimeSpan.Zero;
+
+            long nowTicks = DateTime.UtcNow.Ticks;
+            long effectiveNextAvailableTicks = GetEffectiveDailyNextAvailableUtcTicks(progress);
+
+            if (effectiveNextAvailableTicks <= nowTicks)
+                return TimeSpan.Zero;
+
+            return new TimeSpan(effectiveNextAvailableTicks - nowTicks);
+        }
+
+        private TimeSpan GetDailyMissionCooldown()
+        {
+            int minutes = Mathf.Max(1, dailyMissionCooldownMinutes);
+            return TimeSpan.FromMinutes(minutes);
+        }
+
+        private long GetEffectiveDailyNextAvailableUtcTicks(PlayerMissionProgressData progress)
+        {
+            if (progress == null)
+                return 0L;
+
+            // Yeni ve daha güvenilir mantýk:
+            // lastClaimUtcTicks varsa süreyi mevcut inspector ayarýna göre hesapla.
+            if (progress.lastClaimUtcTicks > 0L)
+                return progress.lastClaimUtcTicks + GetDailyMissionCooldown().Ticks;
+
+            // Eski save uyumluluðu için fallback.
+            return progress.nextAvailableUtcTicks;
+        }
+
+        public void RefreshDailyMissionLocks()
+        {
+            UnlockExpiredDailyMissions();
+        }
+
+        private void EnsureMissionProgresses()
+        {
+            ResolveReferences();
+
+            if (progressService == null || progressService.Data == null)
+                return;
+
+            progressService.Data.EnsureCollections();
+
+            missionDefinitions ??= new List<MissionDefinitionSO>();
+
+            bool changed = false;
+
+            for (int i = 0; i < missionDefinitions.Count; i++)
+            {
+                MissionDefinitionSO mission = missionDefinitions[i];
+
+                if (mission == null || !mission.IsValid())
+                    continue;
+
+                PlayerMissionProgressData progress =
+                    progressService.Data.GetOrCreateMissionProgress(mission.MissionId);
+
+                if (progress == null)
+                    continue;
+
+                progress.EnsureCollections();
+
+                if (EnsureRequirementProgresses(mission, progress))
+                    changed = true;
+
+                bool completed = IsMissionCompleted(mission, progress);
+
+                if (progress.isCompleted != completed && !progress.isRewardClaimed)
+                {
+                    progress.isCompleted = completed;
+                    progress.Touch();
+                    changed = true;
+                }
+            }
+
+            if (changed)
+                progressService.NotifyChanged();
+        }
+
+        private bool EnsureRequirementProgresses(MissionDefinitionSO mission, PlayerMissionProgressData progress)
+        {
+            if (mission == null || progress == null)
+                return false;
+
+            IReadOnlyList<MissionRequirement> requirements = mission.Requirements;
+
+            if (requirements == null)
+                return false;
+
+            bool changed = false;
+
+            for (int r = 0; r < requirements.Count; r++)
+            {
+                MissionRequirement requirement = requirements[r];
+
+                if (requirement == null)
+                    continue;
+
+                int current = progress.GetRequirementCount(requirement.RequirementId);
+                int clamped = Mathf.Clamp(current, 0, requirement.RequiredCount);
+
+                if (current != clamped)
+                {
+                    progress.SetRequirementCount(requirement.RequirementId, clamped);
+                    changed = true;
+                    continue;
+                }
+
+                if (!HasRequirementProgress(progress, requirement.RequirementId))
+                {
+                    progress.SetRequirementCount(requirement.RequirementId, 0);
+                    changed = true;
+                }
+            }
+
+            return changed;
+        }
+
+        private bool HasRequirementProgress(PlayerMissionProgressData progress, string requirementId)
+        {
+            if (progress == null || string.IsNullOrWhiteSpace(requirementId))
+                return false;
+
+            progress.EnsureCollections();
+
+            for (int i = 0; i < progress.requirementProgresses.Count; i++)
+            {
+                PlayerMissionRequirementSaveData item = progress.requirementProgresses[i];
+
+                if (item == null)
+                    continue;
+
+                if (string.Equals(item.requirementId, requirementId, StringComparison.Ordinal))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void UnlockExpiredDailyMissions()
+        {
+            ResolveReferences();
+
+            if (progressService == null || progressService.Data == null)
+                return;
+
+            if (missionDefinitions == null)
+                return;
+
+            DateTime nowUtc = DateTime.UtcNow;
+            bool changed = false;
+
+            for (int i = 0; i < missionDefinitions.Count; i++)
+            {
+                MissionDefinitionSO mission = missionDefinitions[i];
+
+                if (mission == null || mission.Category != MissionCategory.Daily)
+                    continue;
+
+                PlayerMissionProgressData progress =
+                    progressService.Data.GetOrCreateMissionProgress(mission.MissionId);
+
+                if (progress == null)
+                    continue;
+
+                if (progress.isRewardClaimed && progress.nextAvailableUtcTicks <= 0L)
+                {
+                    progress.ResetProgress();
+                    changed = true;
+                    continue;
+                }
+
+                if (!progress.isRewardClaimed)
+                    continue;
+
+                long effectiveNextAvailableTicks = GetEffectiveDailyNextAvailableUtcTicks(progress);
+
+                if (effectiveNextAvailableTicks <= 0L)
+                {
+                    progress.ResetProgress();
+                    changed = true;
+                    OnMissionProgressChanged?.Invoke(mission, progress);
+                    continue;
+                }
+
+                if (nowUtc.Ticks >= effectiveNextAvailableTicks)
+                {
+                    progress.ResetProgress();
+                    changed = true;
+
+                    OnMissionProgressChanged?.Invoke(mission, progress);
+
+                    if (logDebug)
+                        Debug.Log($"[MissionProgressService] Daily mission unlocked: {mission.DisplayName}", this);
+                }
+            }
+
+            if (changed)
+                progressService.NotifyChanged();
         }
     }
 }

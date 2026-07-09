@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileId: Tile_02
   displayName: Tile 02
-  icon: {fileID: 7444942064852270849, guid: bdc52f2be58bf0549ae113bdf7f0be73, type: 3}
+  icon: {fileID: 21300000, guid: 6deaa407636a4f14e9ef32c322d4d320, type: 3}
+  missionTags: []

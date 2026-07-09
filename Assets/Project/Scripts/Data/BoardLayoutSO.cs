@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ZenMatch.Runtime.RewardMissions;
+using ZenMatch.Runtime.Rewards;
 
 namespace ZenMatch.Data
 {
@@ -19,10 +20,15 @@ namespace ZenMatch.Data
         [Tooltip("Bu layout içinde yer alan hediyeye ulaþma özel bölüm ödülleri.")]
         [SerializeField] private List<RewardGiftReference> rewardGifts = new();
 
+        [Header("Special Stone Rewards")]
+        [Tooltip("Bu layout içinde özel taþ toplandýðýnda verilecek anlýk ödüller ve görev tagleri.")]
+        [SerializeField] private List<SpecialStoneRewardReference> specialStoneRewards = new();
+
         public string LayoutId => layoutId;
         public LayoutCategory Category => category;
         public IReadOnlyList<SpawnGroupDefinition> Groups => groups;
         public IReadOnlyList<RewardGiftReference> RewardGifts => rewardGifts;
+        public IReadOnlyList<SpecialStoneRewardReference> SpecialStoneRewards => specialStoneRewards;
 
         private void OnValidate()
         {
@@ -50,6 +56,17 @@ namespace ZenMatch.Data
 
                 rewardGifts[i].Validate();
             }
+
+            if (specialStoneRewards == null)
+                specialStoneRewards = new List<SpecialStoneRewardReference>();
+
+            for (int i = 0; i < specialStoneRewards.Count; i++)
+            {
+                if (specialStoneRewards[i] == null)
+                    specialStoneRewards[i] = new SpecialStoneRewardReference();
+
+                specialStoneRewards[i].Validate();
+            }
         }
 
         public bool HasRewardGifts()
@@ -67,10 +84,60 @@ namespace ZenMatch.Data
                 gift.Validate();
 
                 if (!string.IsNullOrWhiteSpace(gift.giftId) &&
-     !string.IsNullOrWhiteSpace(gift.GetSceneAnchorId()))
+                    !string.IsNullOrWhiteSpace(gift.GetSceneAnchorId()))
                 {
                     return true;
                 }
+            }
+
+            return false;
+        }
+
+        public bool HasSpecialStoneRewards()
+        {
+            if (specialStoneRewards == null || specialStoneRewards.Count == 0)
+                return false;
+
+            for (int i = 0; i < specialStoneRewards.Count; i++)
+            {
+                SpecialStoneRewardReference reward = specialStoneRewards[i];
+
+                if (reward == null)
+                    continue;
+
+                reward.Validate();
+
+                if (reward.HasValidTarget())
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool TryGetSpecialStoneReward(
+            string specialTileGroupId,
+            TileTypeSO tileType,
+            out SpecialStoneRewardReference rewardReference)
+        {
+            rewardReference = null;
+
+            if (specialStoneRewards == null || specialStoneRewards.Count == 0)
+                return false;
+
+            for (int i = 0; i < specialStoneRewards.Count; i++)
+            {
+                SpecialStoneRewardReference reward = specialStoneRewards[i];
+
+                if (reward == null)
+                    continue;
+
+                reward.Validate();
+
+                if (!reward.Matches(specialTileGroupId, tileType))
+                    continue;
+
+                rewardReference = reward;
+                return true;
             }
 
             return false;

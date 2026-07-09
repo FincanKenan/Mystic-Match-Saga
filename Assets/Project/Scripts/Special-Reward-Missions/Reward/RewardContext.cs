@@ -34,7 +34,7 @@ namespace ZenMatch.Runtime.Rewards
                 : tags
                     .Where(t => !string.IsNullOrWhiteSpace(t))
                     .Select(t => t.Trim())
-                    .Distinct()
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList();
         }
 
@@ -43,7 +43,15 @@ namespace ZenMatch.Runtime.Rewards
             if (string.IsNullOrWhiteSpace(tag))
                 return false;
 
-            return tags.Contains(tag.Trim());
+            string normalized = tag.Trim();
+
+            for (int i = 0; i < tags.Count; i++)
+            {
+                if (string.Equals(tags[i], normalized, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
         }
 
         public override string ToString()

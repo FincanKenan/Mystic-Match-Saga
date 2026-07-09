@@ -13,7 +13,10 @@ namespace ZenMatch.Runtime.Missions
         [Header("Target")]
         [SerializeField] private RewardSourceType sourceType = RewardSourceType.RewardGift;
 
-        [Tooltip("Boþ býrakýlýrsa bu sourceType içindeki her þey sayýlýr. Örn: RewardGift ise her hediye sayýlýr.")]
+        [Tooltip("Boþ býrakýlýrsa sourceId kontrolü yapýlmaz. Örn: sadece Gift_01 toplansýn istersen buraya Gift_01 yaz.")]
+        [SerializeField] private string requiredSourceId;
+
+        [Tooltip("Boþ býrakýlýrsa tag kontrolü yapýlmaz. Örn: gift_blue, gift_yellow, special_stone_blue.")]
         [SerializeField] private string requiredTag;
 
         [Min(1)]
@@ -24,6 +27,7 @@ namespace ZenMatch.Runtime.Missions
 
         public string RequirementId => requirementId;
         public RewardSourceType SourceType => sourceType;
+        public string RequiredSourceId => requiredSourceId;
         public string RequiredTag => requiredTag;
         public int RequiredCount => requiredCount;
         public string DisplayName => displayName;
@@ -36,11 +40,9 @@ namespace ZenMatch.Runtime.Missions
             if (requiredCount < 1)
                 requiredCount = 1;
 
-            if (displayName == null)
-                displayName = string.Empty;
-
-            if (requiredTag == null)
-                requiredTag = string.Empty;
+            displayName ??= string.Empty;
+            requiredSourceId ??= string.Empty;
+            requiredTag ??= string.Empty;
         }
 
         public bool Matches(RewardContext context)
@@ -51,10 +53,24 @@ namespace ZenMatch.Runtime.Missions
             if (context.SourceType != sourceType)
                 return false;
 
-            if (string.IsNullOrWhiteSpace(requiredTag))
-                return true;
+            if (!string.IsNullOrWhiteSpace(requiredSourceId))
+            {
+                if (!string.Equals(
+                        context.SourceId,
+                        requiredSourceId.Trim(),
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
 
-            return context.HasTag(requiredTag);
+            if (!string.IsNullOrWhiteSpace(requiredTag))
+            {
+                if (!context.HasTag(requiredTag))
+                    return false;
+            }
+
+            return true;
         }
     }
 }

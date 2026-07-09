@@ -75,6 +75,35 @@ namespace ZenMatch.Runtime.RewardMissions
                 spriteScale = 1f;
         }
 
+        private void NormalizeMissionTags()
+        {
+            if (missionTags == null)
+                missionTags = new List<string>();
+
+            for (int i = missionTags.Count - 1; i >= 0; i--)
+            {
+                if (string.IsNullOrWhiteSpace(missionTags[i]))
+                {
+                    missionTags.RemoveAt(i);
+                    continue;
+                }
+
+                missionTags[i] = missionTags[i].Trim();
+            }
+
+            for (int i = missionTags.Count - 1; i >= 0; i--)
+            {
+                for (int j = 0; j < i; j++)
+                {
+                    if (string.Equals(missionTags[i], missionTags[j], StringComparison.OrdinalIgnoreCase))
+                    {
+                        missionTags.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+        }
+
         public string GetSceneAnchorId()
         {
             if (!string.IsNullOrWhiteSpace(sceneAnchorId))
