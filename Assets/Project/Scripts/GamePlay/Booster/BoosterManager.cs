@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ZenMatch.Data;
 using ZenMatch.Runtime;
+using ZenMatch.Runtime.PlayerProgress;
 using ZenMatch.UI;
 
 namespace ZenMatch.Gameplay.Boosters
@@ -15,6 +16,7 @@ namespace ZenMatch.Gameplay.Boosters
         [SerializeField] private LevelController levelController;
         [SerializeField] private BoardSpawner boardSpawner;
         [SerializeField] private TrayView trayView;
+        [SerializeField] private PlayerWalletService walletService;
 
         [Header("Magic FX")]
         [SerializeField] private GameObject magicBurstEffectPrefab;
@@ -29,6 +31,7 @@ namespace ZenMatch.Gameplay.Boosters
         [SerializeField] private int temporaryExtraSlotMoveCount = 2;
 
         private int _pendingExtraSlotMovesRemaining;
+        private bool _shuffleInProgress;
 
         public bool HasPendingExtraSlotUse => _pendingExtraSlotMovesRemaining > 0;
         public int PendingExtraSlotMovesRemaining => _pendingExtraSlotMovesRemaining;
@@ -46,6 +49,11 @@ namespace ZenMatch.Gameplay.Boosters
 
         private void Awake()
         {
+            ResolveReferences();
+        }
+
+        private void ResolveReferences()
+        {
             if (levelController == null)
                 levelController = FindFirstObjectByType<LevelController>();
 
@@ -54,31 +62,90 @@ namespace ZenMatch.Gameplay.Boosters
 
             if (trayView == null)
                 trayView = FindFirstObjectByType<TrayView>();
+
+            if (walletService == null)
+                walletService = PlayerWalletService.Instance;
+
+            if (walletService == null)
+                walletService = FindFirstObjectByType<PlayerWalletService>();
         }
 
         public void UseBooster(BoosterType boosterType)
         {
+            ResolveReferences();
+
             if (levelController != null && levelController.IsMoveInProgress)
                 return;
+
+            if (_shuffleInProgress)
+                return;
+
+            string boosterId = boosterType.ToPlayerBoosterId();
+
+            if (string.IsNullOrWhiteSpace(boosterId))
+            {
+                Debug.LogWarning($"[BoosterManager] Booster id bulunamadý. BoosterType: {boosterType}", this);
+                return;
+            }
+
+            if (!HasBoosterRight(boosterId))
+            {
+                Debug.Log($"[BoosterManager] Booster hakký yok. BoosterType: {boosterType}, BoosterId: {boosterId}", this);
+                return;
+            }
 
             switch (boosterType)
             {
                 case BoosterType.BackMove:
-                    TryBackMove();
+                    if (TryBackMove())
+                        SpendBoosterRight(boosterType, boosterId);
                     break;
 
                 case BoosterType.AutoCompleteTriple:
-                    TryAutoCompleteTriple();
+                    if (TryAutoCompleteTriple())
+                        SpendBoosterRight(boosterType, boosterId);
                     break;
 
                 case BoosterType.ShuffleBoard:
-                    TryShuffleBoard();
+                    TryStartShuffleBoard(boosterType, boosterId);
                     break;
 
                 case BoosterType.TemporaryExtraSlot:
-                    ActivateTemporaryExtraSlot();
+                    if (ActivateTemporaryExtraSlot())
+                        SpendBoosterRight(boosterType, boosterId);
                     break;
             }
+        }
+
+        private bool HasBoosterRight(string boosterId)
+        {
+            if (walletService == null)
+            {
+                Debug.LogWarning("[BoosterManager] PlayerWalletService bulunamadý.", this);
+                return false;
+            }
+
+            return walletService.GetBoosterAmount(boosterId) > 0;
+        }
+
+        private bool SpendBoosterRight(BoosterType boosterType, string boosterId)
+        {
+            if (walletService == null)
+            {
+                Debug.LogWarning("[BoosterManager] PlayerWalletService bulunamadý.", this);
+                return false;
+            }
+
+            bool spent = walletService.TrySpendBooster(boosterId, 1);
+
+            if (!spent)
+            {
+                Debug.LogWarning($"[BoosterManager] Booster çalýþtý ama hak düþülemedi. BoosterType: {boosterType}, BoosterId: {boosterId}", this);
+                return false;
+            }
+
+            Debug.Log($"[BoosterManager] Booster hakký harcandý. BoosterType: {boosterType}, BoosterId: {boosterId}", this);
+            return true;
         }
 
         public void NotifyTileAddedToTray()
@@ -88,7 +155,7 @@ namespace ZenMatch.Gameplay.Boosters
 
             _pendingExtraSlotMovesRemaining--;
 
-            Debug.Log($"[BoosterManager] Temporary extra slot tur tüketildi. Kalan tur: {_pendingExtraSlotMovesRemaining}");
+            Debug.Log($"[BoosterManager] Temporary extra slot tur tüketildi. Kalan tur: {_pendingExtraSlotMovesRemaining}", this);
 
             if (_pendingExtraSlotMovesRemaining <= 0)
             {
@@ -97,66 +164,74 @@ namespace ZenMatch.Gameplay.Boosters
                     trayState.RemoveTemporaryCapacityBonus(temporaryExtraSlotAmount);
 
                 _pendingExtraSlotMovesRemaining = 0;
-                Debug.Log("[BoosterManager] Temporary extra slot tamamen bitti.");
+                Debug.Log("[BoosterManager] Temporary extra slot tamamen bitti.", this);
             }
 
             RefreshTrayView();
         }
 
-        private void ActivateTemporaryExtraSlot()
+        private bool ActivateTemporaryExtraSlot()
         {
             TrayState trayState = TrayState;
             if (trayState == null)
             {
-                Debug.LogWarning("[BoosterManager] TrayState bulunamadý.");
-                return;
+                Debug.LogWarning("[BoosterManager] TrayState bulunamadý.", this);
+                return false;
             }
 
             if (_pendingExtraSlotMovesRemaining > 0)
             {
-                Debug.Log("[BoosterManager] Temporary extra slot zaten aktif.");
-                return;
+                Debug.Log("[BoosterManager] Temporary extra slot zaten aktif.", this);
+                return false;
             }
 
             trayState.AddTemporaryCapacityBonus(temporaryExtraSlotAmount);
             _pendingExtraSlotMovesRemaining = Mathf.Max(1, temporaryExtraSlotMoveCount);
 
-            Debug.Log($"[BoosterManager] Temporary extra slot aktif edildi. Toplam tur: {_pendingExtraSlotMovesRemaining}");
+            Debug.Log($"[BoosterManager] Temporary extra slot aktif edildi. Toplam tur: {_pendingExtraSlotMovesRemaining}", this);
             RefreshTrayView();
+
+            return true;
         }
 
-        private void TryBackMove()
+        private bool TryBackMove()
         {
             if (levelController == null)
             {
-                Debug.LogWarning("[BoosterManager] LevelController bulunamadý.");
-                return;
+                Debug.LogWarning("[BoosterManager] LevelController bulunamadý.", this);
+                return false;
             }
 
             bool success = levelController.TryUndoLastMove();
+
             if (!success)
-                Debug.Log("[BoosterManager] Geri alýnabilecek son hamle bulunamadý.");
+            {
+                Debug.Log("[BoosterManager] Geri alýnabilecek son hamle bulunamadý.", this);
+                return false;
+            }
+
+            return true;
         }
 
-        private void TryAutoCompleteTriple()
+        private bool TryAutoCompleteTriple()
         {
             TrayState trayState = TrayState;
             if (trayState == null)
             {
-                Debug.LogWarning("[BoosterManager] TrayState bulunamadý.");
-                return;
+                Debug.LogWarning("[BoosterManager] TrayState bulunamadý.", this);
+                return false;
             }
 
             if (!TryFindPairInTray(trayState, out TileTypeSO targetType))
             {
-                Debug.Log("[BoosterManager] AutoCompleteTriple için tray içinde uygun ikili bulunamadý.");
-                return;
+                Debug.Log("[BoosterManager] AutoCompleteTriple için tray içinde uygun ikili bulunamadý.", this);
+                return false;
             }
 
             if (boardSpawner == null)
             {
-                Debug.LogWarning("[BoosterManager] BoardSpawner bulunamadý.");
-                return;
+                Debug.LogWarning("[BoosterManager] BoardSpawner bulunamadý.", this);
+                return false;
             }
 
             if (!boardSpawner.TryTakeAnyNonHiddenTileOfType(
@@ -165,31 +240,31 @@ namespace ZenMatch.Gameplay.Boosters
                     out string pointId,
                     out Vector3 sourceWorldPosition))
             {
-                Debug.Log($"[BoosterManager] Board üzerinde hidden olmayan {targetType.name} tipi tile bulunamadý.");
-                return;
+                Debug.Log($"[BoosterManager] Board üzerinde hidden olmayan {targetType.name} tipi tile bulunamadý.", this);
+                return false;
             }
 
             if (removedTile == null || removedTile.TileType == null)
             {
-                Debug.LogWarning("[BoosterManager] Çekilen tile geçersiz geldi.");
-                return;
+                Debug.LogWarning("[BoosterManager] Çekilen tile geçersiz geldi.", this);
+                return false;
             }
 
             if (magicBurstEffectPrefab != null)
-            {
                 Instantiate(magicBurstEffectPrefab, sourceWorldPosition, Quaternion.identity);
-            }
 
             if (levelController == null)
             {
-                Debug.LogWarning("[BoosterManager] LevelController bulunamadý.");
-                return;
+                Debug.LogWarning("[BoosterManager] LevelController bulunamadý.", this);
+                return false;
             }
 
             levelController.ClearUndoHistory();
 
-            Debug.Log($"[BoosterManager] AutoCompleteTriple çalýþtý. TargetType: {targetType.name}, PointId: {pointId}");
+            Debug.Log($"[BoosterManager] AutoCompleteTriple çalýþtý. TargetType: {targetType.name}, PointId: {pointId}", this);
             levelController.PlayBoosterTileToTray(removedTile, sourceWorldPosition);
+
+            return true;
         }
 
         private bool TryFindPairInTray(TrayState trayState, out TileTypeSO targetType)
@@ -223,22 +298,27 @@ namespace ZenMatch.Gameplay.Boosters
             return false;
         }
 
-        private void TryShuffleBoard()
+        private void TryStartShuffleBoard(BoosterType boosterType, string boosterId)
         {
             if (boardSpawner == null)
             {
-                Debug.LogWarning("[BoosterManager] BoardSpawner bulunamadý.");
+                Debug.LogWarning("[BoosterManager] BoardSpawner bulunamadý.", this);
                 return;
             }
+
+            if (_shuffleInProgress)
+                return;
 
             if (levelController != null)
                 levelController.ClearUndoHistory();
 
-            StartCoroutine(ShuffleBoardRoutine());
+            StartCoroutine(ShuffleBoardRoutine(boosterType, boosterId));
         }
 
-        private IEnumerator ShuffleBoardRoutine()
+        private IEnumerator ShuffleBoardRoutine(BoosterType boosterType, string boosterId)
         {
+            _shuffleInProgress = true;
+
             if (levelController != null)
                 levelController.SetInputEnabled(false);
 
@@ -250,20 +330,26 @@ namespace ZenMatch.Gameplay.Boosters
             System.Random rng = new System.Random();
 
             bool success = boardSpawner.TryShuffleAllTiles(rng);
+
             if (!success)
             {
-                Debug.Log("[BoosterManager] Shuffle için yeterli tile bulunamadý.");
+                Debug.Log("[BoosterManager] Shuffle için yeterli tile bulunamadý.", this);
 
                 if (levelController != null)
                     levelController.SetInputEnabled(true);
 
+                _shuffleInProgress = false;
                 yield break;
             }
 
-            Debug.Log("[BoosterManager] ShuffleBoard çalýþtý.");
+            SpendBoosterRight(boosterType, boosterId);
+
+            Debug.Log("[BoosterManager] ShuffleBoard çalýþtý.", this);
 
             if (levelController != null)
                 levelController.SetInputEnabled(true);
+
+            _shuffleInProgress = false;
         }
 
         private IEnumerator PlayShuffleFxRoutine(List<Transform> targets)

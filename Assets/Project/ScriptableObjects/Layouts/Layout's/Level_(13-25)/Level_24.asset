@@ -29,6 +29,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 6
       maxStackHeight: 12
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L24-N1-Point_1_2
       stackDirection: 2
@@ -40,52 +45,79 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 6
       maxStackHeight: 12
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L24-N1-Point_1_3
       stackDirection: 6
       stackLayoutMode: 0
       visibilityMode: 0
-      stackOpenDirection: 0
+      stackOpenDirection: 4
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - L24-N1-Point_1_1
       minStackHeight: 6
       maxStackHeight: 12
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L24-N1-Point_1_4
       stackDirection: 7
       stackLayoutMode: 0
       visibilityMode: 0
-      stackOpenDirection: 0
+      stackOpenDirection: 4
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - L24-N1-Point_1_1
       minStackHeight: 6
       maxStackHeight: 12
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L24-N1-Point_1_5
       stackDirection: 6
       stackLayoutMode: 0
       visibilityMode: 0
-      stackOpenDirection: 4
+      stackOpenDirection: 3
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - L24-N1-Point_1_2
       minStackHeight: 6
       maxStackHeight: 12
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L24-N1-Point_1_6
       stackDirection: 7
       stackLayoutMode: 0
       visibilityMode: 0
-      stackOpenDirection: 4
+      stackOpenDirection: 3
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - L24-N1-Point_1_2
       minStackHeight: 6
       maxStackHeight: 12
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
+  rewardGifts: []
+  specialStoneRewards: []

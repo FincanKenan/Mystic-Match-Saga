@@ -29,6 +29,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_2
       stackDirection: 6
@@ -41,6 +46,11 @@ MonoBehaviour:
       - L27-N1-Point_1_1
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_3
       stackDirection: 1
@@ -53,6 +63,11 @@ MonoBehaviour:
       - L27-N1-Point_1_2
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_4
       stackDirection: 6
@@ -64,6 +79,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_5
       stackDirection: 7
@@ -76,6 +96,11 @@ MonoBehaviour:
       - L27-N1-Point_1_4
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_6
       stackDirection: 1
@@ -88,6 +113,11 @@ MonoBehaviour:
       - L27-N1-Point_1_5
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_7
       stackDirection: 7
@@ -99,6 +129,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_8
       stackDirection: 6
@@ -111,6 +146,11 @@ MonoBehaviour:
       - L27-N1-Point_1_7
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_9
       stackDirection: 1
@@ -123,6 +163,11 @@ MonoBehaviour:
       - L27-N1-Point_1_8
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_10
       stackDirection: 6
@@ -134,6 +179,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_11
       stackDirection: 7
@@ -146,6 +196,11 @@ MonoBehaviour:
       - L27-N1-Point_1_10
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_12
       stackDirection: 1
@@ -158,6 +213,11 @@ MonoBehaviour:
       - L27-N1-Point_1_11
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_13
       stackDirection: 2
@@ -169,4 +229,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 6
       maxStackHeight: 6
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
+  rewardGifts: []
+  specialStoneRewards: []

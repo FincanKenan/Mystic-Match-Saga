@@ -27,8 +27,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - Triangle_Down-Back_1-2.
-      - Triangle_Down-Back_2-2.
+      - Plus_Ver_Front_2
       minStackHeight: 5
       maxStackHeight: 5
       isSpecialTile: 0
@@ -151,6 +150,7 @@ MonoBehaviour:
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - St_Line_V-Back_2
+      - Plus_Hori_Front_2
       minStackHeight: 1
       maxStackHeight: 1
       isSpecialTile: 0
@@ -168,8 +168,6 @@ MonoBehaviour:
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-2.
-      - Triangle_Down-Back_2
-      - Triple_Up-Back_2
       minStackHeight: 1
       maxStackHeight: 1
       isSpecialTile: 0
@@ -188,6 +186,7 @@ MonoBehaviour:
       requiredCompletedPointIds:
       - Cr_R-Front_1
       - St_Line_V-Back_1
+      - Triangle_Down-Back_3
       minStackHeight: 1
       maxStackHeight: 1
       isSpecialTile: 0
@@ -206,6 +205,7 @@ MonoBehaviour:
       requiredCompletedPointIds:
       - Cr_L-Front_1
       - St_Line_V-Back_1
+      - Triangle_Down-Back_3
       minStackHeight: 1
       maxStackHeight: 1
       isSpecialTile: 0
@@ -223,6 +223,7 @@ MonoBehaviour:
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - St_Line_V-Back_2
+      - Plus_Ver_Back_1
       minStackHeight: 1
       maxStackHeight: 1
       isSpecialTile: 0
@@ -257,8 +258,7 @@ MonoBehaviour:
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
-      - Triangle_Down-Back_1-3.
-      - Triangle_Down-Back_2-3.
+      - Plus_Hori_Back_2
       minStackHeight: 5
       maxStackHeight: 5
       isSpecialTile: 0
@@ -694,6 +694,8 @@ MonoBehaviour:
       requiredCompletedPointIds:
       - St_Line_V-Back_2
       - St_Line_V-Back_1
+      - St_Line_H-Back_1
+      - St_Line_H-Back_2
       minStackHeight: 1
       maxStackHeight: 1
       isSpecialTile: 1

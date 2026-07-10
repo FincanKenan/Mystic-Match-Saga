@@ -15,13 +15,13 @@ namespace ZenMatch.Runtime.PlayerProgress
         [SerializeField] private GameObject coinRoot;
         [SerializeField] private Image coinIcon;
         [SerializeField] private TMP_Text coinText;
-        [SerializeField] private string coinTextFormat = "x{0}";
+        [SerializeField] private string coinTextFormat = "{0}";
 
         [Header("Life UI")]
         [SerializeField] private GameObject lifeRoot;
         [SerializeField] private Image lifeIcon;
         [SerializeField] private TMP_Text lifeText;
-        [SerializeField] private string lifeTextFormat = "x{0}";
+        [SerializeField] private string lifeTextFormat = "{0}";
 
         [Header("Behaviour")]
         [SerializeField] private bool showCoins = true;

@@ -20,7 +20,7 @@ MonoBehaviour:
     startLocked: 0
     points:
     - pointId: L25-N1-Point_1_1
-      stackDirection: 3
+      stackDirection: 2
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
@@ -28,11 +28,16 @@ MonoBehaviour:
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - L25-N1-Point_1_3
-      minStackHeight: 9
-      maxStackHeight: 9
+      minStackHeight: 6
+      maxStackHeight: 6
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L25-N1-Point_1_2
-      stackDirection: 3
+      stackDirection: 2
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
@@ -40,8 +45,13 @@ MonoBehaviour:
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - L25-N1-Point_1_4
-      minStackHeight: 9
-      maxStackHeight: 9
+      minStackHeight: 6
+      maxStackHeight: 6
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L25-N1-Point_1_3
       stackDirection: 8
@@ -53,6 +63,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 12
       maxStackHeight: 15
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L25-N1-Point_1_4
       stackDirection: 9
@@ -64,20 +79,30 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 12
       maxStackHeight: 15
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L25-N1-Point_1_5
       stackDirection: 0
       stackLayoutMode: 0
       visibilityMode: 0
-      stackOpenDirection: 4
+      stackOpenDirection: 3
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds: []
       minStackHeight: 6
       maxStackHeight: 12
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L25-N1-Point_1_6
-      stackDirection: 3
+      stackDirection: 2
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 4
@@ -85,6 +110,13 @@ MonoBehaviour:
       unlocksTraySlotOnComplete: 0
       requiredCompletedPointIds:
       - L25-N1-Point_1_5
-      minStackHeight: 9
-      maxStackHeight: 9
+      minStackHeight: 6
+      maxStackHeight: 6
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
+  rewardGifts: []
+  specialStoneRewards: []

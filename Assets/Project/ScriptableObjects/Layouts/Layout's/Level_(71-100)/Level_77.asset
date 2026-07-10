@@ -29,6 +29,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Plus_Ver_Back_1
       stackDirection: 0
@@ -42,6 +47,11 @@ MonoBehaviour:
       - Plus_Ver_Front_2
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Plus_Hori_Back_1
       stackDirection: 0
@@ -55,6 +65,11 @@ MonoBehaviour:
       - Plus_Hori_Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_1
       stackDirection: 0
@@ -68,6 +83,11 @@ MonoBehaviour:
       - StonePoint_Stack_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_Line_V-Back_1
       stackDirection: 0
@@ -80,6 +100,11 @@ MonoBehaviour:
       - St_Line_V-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Cr_R-Back_1
       stackDirection: 0
@@ -92,6 +117,11 @@ MonoBehaviour:
       - Cr_R-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_D-Back_1-2.
       stackDirection: 0
@@ -105,6 +135,11 @@ MonoBehaviour:
       - Cr_R-Back_2
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Cr_L-Back_1
       stackDirection: 0
@@ -117,6 +152,11 @@ MonoBehaviour:
       - Cr_L-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_D-Back_1
       stackDirection: 0
@@ -130,6 +170,11 @@ MonoBehaviour:
       - Cr_L-Back_2
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Plus_Ver_Back_2
       stackDirection: 0
@@ -143,6 +188,11 @@ MonoBehaviour:
       - Plus_Ver_Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Plus_Hori_Back_2
       stackDirection: 0
@@ -156,6 +206,11 @@ MonoBehaviour:
       - Plus_Hori_Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_2
       stackDirection: 0
@@ -169,6 +224,11 @@ MonoBehaviour:
       - StonePoint_Stack_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_Line_V-Back_2
       stackDirection: 0
@@ -182,6 +242,11 @@ MonoBehaviour:
       - Triangle_Up-Back_3
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_D-Front_1-2.
       stackDirection: 0
@@ -193,6 +258,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_D-Front_1
       stackDirection: 0
@@ -204,6 +274,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Cr_L-Back_2
       stackDirection: 0
@@ -216,6 +291,11 @@ MonoBehaviour:
       - Cr_L-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: StonePoint_Stack_2
       stackDirection: 0
@@ -228,6 +308,11 @@ MonoBehaviour:
       - St_Line_V-Back_1
       minStackHeight: 4
       maxStackHeight: 4
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Cr_R-Back_2
       stackDirection: 0
@@ -240,6 +325,11 @@ MonoBehaviour:
       - Cr_R-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: StonePoint_Stack_3
       stackDirection: 5
@@ -252,6 +342,11 @@ MonoBehaviour:
       - St_Line_V-Back_2
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Plus_Hori_Front_1
       stackDirection: 0
@@ -263,6 +358,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Cr_L-Front_1
       stackDirection: 0
@@ -274,6 +374,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_3
       stackDirection: 0
@@ -286,6 +391,11 @@ MonoBehaviour:
       - Triangle_Up-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Cr_R-Front_1
       stackDirection: 0
@@ -297,6 +407,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Plus_Ver_Front_1
       stackDirection: 0
@@ -308,6 +423,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_Line_V-Front_1
       stackDirection: 0
@@ -319,6 +439,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Front_1
       stackDirection: 0
@@ -330,6 +455,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: StonePoint_Stack_4
       stackDirection: 5
@@ -342,6 +472,11 @@ MonoBehaviour:
       - St_Line_V-Back_2
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Plus_Hori_Front_2
       stackDirection: 0
@@ -353,6 +488,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Plus_Ver_Front_2
       stackDirection: 0
@@ -364,6 +504,11 @@ MonoBehaviour:
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: StonePoint_Stack_5
       stackDirection: 4
@@ -376,6 +521,11 @@ MonoBehaviour:
       - StonePoint_Stack_4
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: StonePoint_Stack_6
       stackDirection: 4
@@ -388,6 +538,11 @@ MonoBehaviour:
       - StonePoint_Stack_3
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: StonePoint_Stack_7
       stackDirection: 7
@@ -400,6 +555,11 @@ MonoBehaviour:
       - StonePoint_Stack_5
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: StonePoint_Stack_8
       stackDirection: 6
@@ -412,6 +572,11 @@ MonoBehaviour:
       - StonePoint_Stack_6
       minStackHeight: 3
       maxStackHeight: 3
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: StonePoint_Stack_9
       stackDirection: 0
@@ -425,4 +590,11 @@ MonoBehaviour:
       - StonePoint_Stack_8
       minStackHeight: 4
       maxStackHeight: 4
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
+  rewardGifts: []
+  specialStoneRewards: []

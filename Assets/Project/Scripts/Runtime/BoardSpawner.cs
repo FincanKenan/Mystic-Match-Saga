@@ -7,6 +7,7 @@ using ZenMatch.Authoring;
 using ZenMatch.Data;
 using ZenMatch.UI;
 using ZenMatch.Runtime.Rewards;
+using ZenMatch.Runtime.PlayerProgress;
 
 namespace ZenMatch.Runtime
 {
@@ -90,6 +91,15 @@ namespace ZenMatch.Runtime
         [SerializeField] private FixedLevelDatabaseSO fixedLevelDatabase;
         [SerializeField] private LevelGenerationDatabaseSO generationDatabase;
         [Min(1)][SerializeField] private int currentLevel = 1;
+
+        [Header("Level Progression")]
+        [SerializeField] private LevelProgressionDatabaseSO progressionDatabase;
+        [SerializeField] private bool useProgressionDatabase = true;
+
+        [Tooltip("Açık olursa Play Mode'da Inspector'daki Current Level kullanılır. Test için açık bırakılır.")]
+        [SerializeField] private bool useInspectorCurrentLevelInPlayMode = false;
+
+        [SerializeField] private PlayerProgressService progressService;
 
         [Header("Scene References")]
         [SerializeField] private Transform stacksRoot;
@@ -197,14 +207,35 @@ namespace ZenMatch.Runtime
         }
 
         [ContextMenu("Spawn Board")]
+        [ContextMenu("Spawn Board")]
         public void SpawnBoard()
         {
+            ApplyLevelSourceForPlayMode();
+
             ClearSpawnedBoard();
             LastSpawnedFixedLevel = null;
 
             System.Random rng = useRandomSeed
                 ? new System.Random()
                 : new System.Random(fixedSeed);
+
+            if (useProgressionDatabase && progressionDatabase != null)
+            {
+                if (progressionDatabase.TryResolveLevel(currentLevel, out LevelProgressionResolvedLevel resolved) &&
+                    resolved != null &&
+                    resolved.IsValid)
+                {
+                    SpawnResolvedProgressionLevel(resolved, rng);
+                    return;
+                }
+
+                Debug.LogError(
+                    $"[BoardSpawner] Progression database içinde Level {currentLevel} için geçerli entry bulunamadı. " +
+                    $"Manual range entry veya pool range ayarlarını kontrol et.",
+                    this);
+
+                return;
+            }
 
             bool shouldTryFixedLevel =
                 !useFixedLevelsOnlyInRange ||
@@ -217,6 +248,378 @@ namespace ZenMatch.Runtime
             }
 
             SpawnProceduralFromRange(rng);
+        }
+
+        private void ResolveProgressService()
+        {
+            if (progressService == null)
+                progressService = PlayerProgressService.Instance;
+
+            if (progressService == null)
+                progressService = FindFirstObjectByType<PlayerProgressService>();
+        }
+
+        private void ApplyLevelSourceForPlayMode()
+        {
+            if (!Application.isPlaying)
+                return;
+
+            if (useInspectorCurrentLevelInPlayMode)
+            {
+                currentLevel = Mathf.Max(1, currentLevel);
+                Debug.Log($"[BoardSpawner] Debug current level kullanılıyor: {currentLevel}", this);
+                return;
+            }
+
+            ResolveProgressService();
+
+            if (progressService == null || progressService.Data == null)
+            {
+                Debug.LogWarning("[BoardSpawner] PlayerProgressService bulunamadı. Inspector currentLevel kullanılacak.", this);
+                currentLevel = Mathf.Max(1, currentLevel);
+                return;
+            }
+
+            int levelFromSave = progressService.Data.lastPlayedLevel;
+
+            if (levelFromSave <= 0)
+                levelFromSave = progressService.Data.highestUnlockedLevel;
+
+            currentLevel = Mathf.Max(1, levelFromSave);
+
+            Debug.Log($"[BoardSpawner] CurrentLevel save'den alındı: {currentLevel}", this);
+        }
+
+        private void SpawnResolvedProgressionLevel(LevelProgressionResolvedLevel resolved, System.Random rng)
+        {
+            if (resolved == null)
+            {
+                Debug.LogError("[BoardSpawner] Resolved progression level null.", this);
+                return;
+            }
+
+            switch (resolved.SourceType)
+            {
+                case LevelProgressionResolvedSourceType.ManualFixedLevel:
+                    SpawnFixedLevelAsset(resolved.FixedLevel, rng);
+                    return;
+
+                case LevelProgressionResolvedSourceType.ManualBoardLayout:
+                    SpawnManualBoardLayoutLevel(resolved, rng);
+                    return;
+
+                case LevelProgressionResolvedSourceType.PoolRule:
+                    Debug.LogWarning("[BoardSpawner] PoolRule desteği sonraki adımda bağlanacak. Şimdilik manual level test ediyoruz.", this);
+                    return;
+
+                default:
+                    Debug.LogError($"[BoardSpawner] Desteklenmeyen progression source type: {resolved.SourceType}", this);
+                    return;
+            }
+        }
+
+        private void SpawnManualBoardLayoutLevel(LevelProgressionResolvedLevel resolved, System.Random rng)
+        {
+            if (resolved == null)
+            {
+                Debug.LogError("[BoardSpawner] Manual progression resolved data null.", this);
+                return;
+            }
+
+            BoardLayoutSO selectedLayout = resolved.BoardLayout;
+            if (selectedLayout == null)
+            {
+                Debug.LogError($"[BoardSpawner] Manual level {currentLevel} için BoardLayoutSO atanmadı.", this);
+                return;
+            }
+
+            TileBagSO tileBag = resolved.TileBag;
+            if (tileBag == null)
+            {
+                Debug.LogError($"[BoardSpawner] Manual level {currentLevel} için TileBagSO bulunamadı. Manual Range Default TileBag alanını kontrol et.", this);
+                return;
+            }
+
+            if (!tileBag.HasValidEntries())
+            {
+                Debug.LogError($"[BoardSpawner] Manual level {currentLevel} TileBag içinde geçerli entry yok.", this);
+                return;
+            }
+
+            ApplyManualProgressionBackground(
+                resolved.BackgroundLayerBottom,
+                resolved.BackgroundLayerTop);
+
+            EnsureStacksRoot();
+
+            Dictionary<string, BoardPointAnchor> anchorMap = BuildAnchorMap(
+                FindAnchorsForLayout(selectedLayout, null));
+
+            List<ResolvedSpawnPoint> resolvedPoints = ResolveLayoutSpawnPoints(selectedLayout, anchorMap);
+            LogResolvedPoints(selectedLayout, resolvedPoints);
+
+            if (resolvedPoints.Count == 0)
+            {
+                Debug.LogError($"[BoardSpawner] Manual level {currentLevel} için scene anchor bulunamadı. Layout: {selectedLayout.LayoutId}", this);
+                return;
+            }
+
+            int minTotalTiles = Mathf.Max(3, resolved.MinTotalTiles);
+            int maxTotalTiles = Mathf.Max(minTotalTiles, resolved.MaxTotalTiles);
+
+            int requestedTotalTiles = rng.Next(minTotalTiles, maxTotalTiles + 1);
+            int normalizedTotalTiles = BoardGenerationMath.RoundUpToMultipleOfThree(requestedTotalTiles);
+
+            int minPossibleTiles = ComputeMinPossibleTiles(resolvedPoints);
+            int maxPossibleTiles = ComputeMaxPossibleTiles(resolvedPoints);
+
+            if (normalizedTotalTiles > maxPossibleTiles)
+            {
+                Debug.LogWarning(
+                    $"[BoardSpawner] Manual level tile sayısı point maksimum kapasitesini aşıyor. " +
+                    $"Requested: {requestedTotalTiles}, Normalized: {normalizedTotalTiles}, MaxPossible: {maxPossibleTiles}. " +
+                    $"Tile sayısı kapasiteye göre düşürülecek.",
+                    this);
+
+                normalizedTotalTiles = maxPossibleTiles;
+            }
+
+            normalizedTotalTiles = BoardGenerationMath.RoundDownToMultipleOfThree(normalizedTotalTiles);
+
+            if (normalizedTotalTiles < minPossibleTiles)
+            {
+                int raised = BoardGenerationMath.RoundUpToMultipleOfThree(minPossibleTiles);
+
+                if (raised <= maxPossibleTiles)
+                {
+                    normalizedTotalTiles = raised;
+                }
+                else
+                {
+                    Debug.LogError(
+                        $"[BoardSpawner] Manual level {currentLevel} için geçerli 3'ün katı tile sayısı üretilemedi. " +
+                        $"MinPossible: {minPossibleTiles}, MaxPossible: {maxPossibleTiles}",
+                        this);
+                    return;
+                }
+            }
+
+            if (normalizedTotalTiles < 3)
+            {
+                Debug.LogError($"[BoardSpawner] Manual level {currentLevel} final tile sayısı 3'ten küçük kaldı.", this);
+                return;
+            }
+
+            List<int> stackHeights = BuildStackHeights(
+                resolvedPoints,
+                normalizedTotalTiles,
+                rng);
+
+            if (stackHeights == null || stackHeights.Count != resolvedPoints.Count)
+            {
+                Debug.LogError($"[BoardSpawner] Manual level {currentLevel} stack height planı oluşturulamadı.", this);
+                return;
+            }
+
+            int normalTileCount = ComputeNormalTileCountForTileBag(resolvedPoints, stackHeights);
+            if (normalTileCount < 0)
+            {
+                Debug.LogError($"[BoardSpawner] Manual level {currentLevel} normal tile sayısı hesaplanamadı.", this);
+                return;
+            }
+
+            if (normalTileCount % 3 != 0)
+            {
+                Debug.LogError(
+                    $"[BoardSpawner] Manual level {currentLevel} normal tile sayısı 3'ün katı olmalı. " +
+                    $"NormalTileCount: {normalTileCount}. Special tile sayısını 3'ün katı yap.",
+                    this);
+                return;
+            }
+
+            List<TileTypeSO> generatedTiles = normalTileCount > 0
+                ? TileTripleDistributionBuilder.BuildTripleDistributedTiles(tileBag, normalTileCount, rng)
+                : new List<TileTypeSO>();
+
+            if (generatedTiles == null || generatedTiles.Count != normalTileCount)
+            {
+                Debug.LogError(
+                    $"[BoardSpawner] Manual level {currentLevel} için tile distribution oluşturulamadı. " +
+                    $"Expected: {normalTileCount}, Actual: {(generatedTiles == null ? 0 : generatedTiles.Count)}",
+                    this);
+                return;
+            }
+
+            if (generatedTiles.Count > 0 && !AreAllTileCountsMultipleOfThree(generatedTiles))
+            {
+                LogInvalidTileCounts(generatedTiles);
+                Debug.LogError($"[BoardSpawner] Manual level {currentLevel} tile dağılımında 3'ün katı olmayan type bulundu.", this);
+                return;
+            }
+
+            if (logTileDistribution)
+                LogTileDistribution(generatedTiles);
+
+            BuildRuntimeStacksFromPlan(resolvedPoints, stackHeights, generatedTiles);
+
+            LastSpawnedFixedLevel = null;
+            LastSpawnedLayout = selectedLayout;
+
+            InitializeSpecialRewardTray();
+            RefreshAllLockStates();
+
+            BoardSpawnIntroAnimator introAnimator = GetComponent<BoardSpawnIntroAnimator>();
+            if (introAnimator != null)
+                introAnimator.PlayIntro(stacksRoot);
+
+            Debug.Log(
+                $"[BoardSpawner] Manual progression spawn tamamlandı. " +
+                $"PlayerLevel: {currentLevel}, Layout: {selectedLayout.LayoutId}, " +
+                $"RequestedTiles: {requestedTotalTiles}, FinalTiles: {generatedTiles.Count}, StackCount: {_runtimeStacks.Count}",
+                this);
+        }
+
+        private bool SpawnFixedLevelAsset(FixedLevelSO fixedLevel, System.Random rng)
+        {
+            if (fixedLevel == null)
+            {
+                Debug.LogError($"[BoardSpawner] Manual fixed level {currentLevel} için FixedLevelSO null.", this);
+                return false;
+            }
+
+            LastSpawnedFixedLevel = fixedLevel;
+
+            BoardLayoutSO layout = fixedLevel.Layout;
+            if (layout == null)
+            {
+                Debug.LogError($"[BoardSpawner] Manual fixed level {currentLevel} için BoardLayoutSO atanmadı.", this);
+                return true;
+            }
+
+            TileBagSO tileBag = fixedLevel.TileBag;
+            if (tileBag == null)
+            {
+                Debug.LogError($"[BoardSpawner] Manual fixed level {currentLevel} için TileBagSO atanmadı.", this);
+                return true;
+            }
+
+            if (!tileBag.HasValidEntries())
+            {
+                Debug.LogError($"[BoardSpawner] Manual fixed level {currentLevel} TileBag içinde geçerli entry yok.", this);
+                return true;
+            }
+
+            ApplyBackgroundFromFixedLevel(fixedLevel);
+            EnsureStacksRoot();
+
+            Dictionary<string, BoardPointAnchor> anchorMap = BuildAnchorMap(
+                FindAnchorsForLayout(layout, fixedLevel));
+
+            List<ResolvedSpawnPoint> resolvedPoints = ResolveLayoutSpawnPoints(layout, anchorMap);
+            LogResolvedPoints(layout, resolvedPoints);
+
+            if (resolvedPoints.Count == 0)
+            {
+                Debug.LogError($"[BoardSpawner] Manual fixed level {currentLevel} için scene anchor bulunamadı. Layout: {layout.LayoutId}", this);
+                return true;
+            }
+
+            int totalTiles = ComputeFixedTotalTiles(resolvedPoints);
+            if (totalTiles < 3)
+            {
+                Debug.LogError($"[BoardSpawner] Manual fixed level {currentLevel} toplam tile sayısı 3'ten küçük.", this);
+                return true;
+            }
+
+            if (totalTiles % 3 != 0)
+            {
+                Debug.LogError(
+                    $"[BoardSpawner] Manual fixed level {currentLevel} toplam tile sayısı 3'ün katı olmalı. CurrentTotal: {totalTiles}",
+                    this);
+                return true;
+            }
+
+            List<int> stackHeights = BuildExactStackHeightsFromResolvedPoints(resolvedPoints);
+            if (stackHeights == null || stackHeights.Count != resolvedPoints.Count)
+            {
+                Debug.LogError($"[BoardSpawner] Manual fixed level {currentLevel} stack height planı oluşturulamadı.", this);
+                return true;
+            }
+
+            int normalTileCount = ComputeNormalTileCountForTileBag(resolvedPoints, stackHeights);
+            if (normalTileCount < 0)
+            {
+                Debug.LogError($"[BoardSpawner] Manual fixed level {currentLevel} normal tile sayısı hesaplanamadı.", this);
+                return true;
+            }
+
+            if (normalTileCount % 3 != 0)
+            {
+                Debug.LogError(
+                    $"[BoardSpawner] Manual fixed level {currentLevel} normal tile sayısı 3'ün katı olmalı. " +
+                    $"NormalTileCount: {normalTileCount}. Special tile sayısını 3'ün katı yap.",
+                    this);
+                return true;
+            }
+
+            List<TileTypeSO> generatedTiles = normalTileCount > 0
+                ? TileTripleDistributionBuilder.BuildTripleDistributedTiles(tileBag, normalTileCount, rng)
+                : new List<TileTypeSO>();
+
+            if (generatedTiles == null || generatedTiles.Count != normalTileCount)
+            {
+                Debug.LogError(
+                    $"[BoardSpawner] Manual fixed level {currentLevel} için tile distribution oluşturulamadı. " +
+                    $"Expected: {normalTileCount}, Actual: {(generatedTiles == null ? 0 : generatedTiles.Count)}",
+                    this);
+                return true;
+            }
+
+            if (generatedTiles.Count > 0 && !AreAllTileCountsMultipleOfThree(generatedTiles))
+            {
+                LogInvalidTileCounts(generatedTiles);
+                Debug.LogError($"[BoardSpawner] Manual fixed level {currentLevel} tile dağılımında 3'ün katı olmayan type bulundu.", this);
+                return true;
+            }
+
+            if (logTileDistribution)
+                LogTileDistribution(generatedTiles);
+
+            BuildRuntimeStacksFromPlan(resolvedPoints, stackHeights, generatedTiles);
+
+            LastSpawnedLayout = layout;
+
+            InitializeSpecialRewardTray();
+            RefreshAllLockStates();
+
+            BoardSpawnIntroAnimator introAnimator = GetComponent<BoardSpawnIntroAnimator>();
+            if (introAnimator != null)
+                introAnimator.PlayIntro(stacksRoot);
+
+            Debug.Log(
+                $"[BoardSpawner] Manual fixed progression spawn tamamlandı. " +
+                $"PlayerLevel: {currentLevel}, FixedAssetLevel: {fixedLevel.LevelNumber}, Layout: {layout.LayoutId}, " +
+                $"FinalTiles: {totalTiles}, StackCount: {_runtimeStacks.Count}",
+                this);
+
+            return true;
+        }
+
+        private void ApplyManualProgressionBackground(Sprite bottom, Sprite top)
+        {
+            if (bottom == null && top == null)
+                return;
+
+            if (backgroundPresenter == null)
+                backgroundPresenter = FindFirstObjectByType<BackgroundPresenter>();
+
+            if (backgroundPresenter == null)
+            {
+                Debug.LogWarning("[BoardSpawner] Scene içinde BackgroundPresenter bulunamadı.", this);
+                return;
+            }
+
+            backgroundPresenter.Apply(bottom, top);
         }
 
         [ContextMenu("Clear Spawned Board")]
