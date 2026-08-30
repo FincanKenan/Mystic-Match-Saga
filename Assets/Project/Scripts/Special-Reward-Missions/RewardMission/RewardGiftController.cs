@@ -49,6 +49,9 @@ namespace ZenMatch.Runtime.RewardMissions
         {
             ResolveReferences();
             EnsureGiftsRoot();
+
+            _anchorById.Clear();
+
         }
 
         
@@ -64,6 +67,13 @@ namespace ZenMatch.Runtime.RewardMissions
             ResolveReferences();
             EnsureGiftsRoot();
             BuildAnchorMap();
+
+            if (boardSpawner != null)
+            {
+                boardSpawner
+                    .ConfigureRewardGiftRequiredPointVisuals(
+                        giftReferences);
+            }
 
             if (giftReferences == null || giftReferences.Count == 0)
             {
@@ -82,47 +92,139 @@ namespace ZenMatch.Runtime.RewardMissions
 
                 reference.Validate();
 
-                string anchorId = reference.GetSceneAnchorId();
+                RewardGiftView view = null;
 
-                if (string.IsNullOrWhiteSpace(anchorId))
+                // =========================================================
+                // YENÝ SÝSTEM:
+                // Hediye doðrudan seçilen Board Point / Stack pozisyonuna gider.
+                // =========================================================
+
+                if (reference.HasTargetPoint() &&
+                    boardSpawner != null)
                 {
-                    Debug.LogWarning($"[RewardGiftController] Gift anchor id boþ. Gift: {reference.giftId}", this);
+                    string targetPointId =
+                        reference.GetTargetPointId();
+
+                    if (boardSpawner.TryGetPointWorldPosition(
+                            targetPointId,
+                            out Vector3 pointWorldPosition))
+                    {
+                        view =
+                            RewardGiftView.CreateWorldLocked(
+                                reference.giftId,
+                                giftsRoot,
+                                reference.giftSprite,
+                                pointWorldPosition,
+                                reference.spriteOffset,
+                                reference.spriteScale,
+                                sortingLayerName,
+                                baseSortingOrder +
+                                (i * sortingOrderStep));
+
+                        if (logDebug)
+                        {
+                            Debug.Log(
+                                $"[RewardGiftController] " +
+                                $"Gift Board Point'e yerleþtirildi. " +
+                                $"Gift: {reference.giftId} | " +
+                                $"Point: {targetPointId} | " +
+                                $"WorldPos: {pointWorldPosition}",
+                                this);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning(
+                            $"[RewardGiftController] " +
+                            $"Target Board Point bulunamadý. " +
+                            $"Gift: {reference.giftId} | " +
+                            $"Point: {targetPointId}",
+                            this);
+                    }
+                }
+
+                // =========================================================
+                // ESKÝ SÝSTEM FALLBACK:
+                // TargetPoint kullanýlamazsa eski RewardGiftAnchor'ý kullan.
+                // =========================================================
+
+                if (view == null)
+                {
+                    string anchorId =
+                        reference.GetSceneAnchorId();
+
+                    if (string.IsNullOrWhiteSpace(anchorId))
+                    {
+                        Debug.LogWarning(
+                            $"[RewardGiftController] " +
+                            $"Gift için ne TargetPoint ne de " +
+                            $"SceneAnchor bulundu. Gift: {reference.giftId}",
+                            this);
+
+                        continue;
+                    }
+
+                    if (_anchorById.Count == 0)
+                    {
+                        BuildAnchorMap();
+                    }
+
+                    if (!_anchorById.TryGetValue(
+                            anchorId,
+                            out RewardGiftAnchor anchor) ||
+                        anchor == null)
+                    {
+                        Debug.LogWarning(
+                            $"[RewardGiftController] " +
+                            $"RewardGiftAnchor bulunamadý. " +
+                            $"Gift: {reference.giftId}, " +
+                            $"AnchorId: {anchorId}",
+                            this);
+
+                        continue;
+                    }
+
+                    if (anchor.TryGetGiftVisualRenderer(
+                            out SpriteRenderer sceneRenderer))
+                    {
+                        view =
+                            RewardGiftView.CreateFromSceneRenderer(
+                                reference.giftId,
+                                sceneRenderer,
+                                reference.giftSprite,
+                                sortingLayerName,
+                                baseSortingOrder +
+                                (i * sortingOrderStep));
+                    }
+                    else
+                    {
+                        view =
+                            RewardGiftView.CreateWorldLocked(
+                                reference.giftId,
+                                giftsRoot,
+                                reference.giftSprite,
+                                anchor.transform.position,
+                                reference.spriteOffset,
+                                reference.spriteScale,
+                                sortingLayerName,
+                                baseSortingOrder +
+                                (i * sortingOrderStep));
+                    }
+
+                    if (logDebug)
+                    {
+                        Debug.Log(
+                            $"[RewardGiftController] " +
+                            $"Legacy Gift Anchor kullanýldý. " +
+                            $"Gift: {reference.giftId} | " +
+                            $"Anchor: {anchorId}",
+                            this);
+                    }
+                }
+
+                if (view == null)
                     continue;
-                }
 
-                if (!_anchorById.TryGetValue(anchorId, out RewardGiftAnchor anchor) || anchor == null)
-                {
-                    Debug.LogWarning(
-                        $"[RewardGiftController] RewardGiftAnchor bulunamadý. Gift: {reference.giftId}, AnchorId: {anchorId}",
-                        this);
-
-                    continue;
-                }
-
-                RewardGiftView view;
-
-                if (anchor.TryGetGiftVisualRenderer(out SpriteRenderer sceneRenderer))
-                {
-                    view = RewardGiftView.CreateFromSceneRenderer(
-                        reference.giftId,
-                        sceneRenderer,
-                        reference.giftSprite,
-                        sortingLayerName,
-                        baseSortingOrder + (i * sortingOrderStep));
-                }
-                else
-                {
-                    view = RewardGiftView.CreateWorldLocked(
-                        reference.giftId,
-                        giftsRoot,
-                        reference.giftSprite,
-                        anchor.transform.position,
-                        reference.spriteOffset,
-                        reference.spriteScale,
-                        sortingLayerName,
-                        baseSortingOrder + (i * sortingOrderStep));
-                }
-                
 
                 RewardGiftRuntime runtimeGift = new RewardGiftRuntime(reference, view);
                 _runtimeGifts.Add(runtimeGift);

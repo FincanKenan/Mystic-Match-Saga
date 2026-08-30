@@ -25,4 +25,4 @@ MonoBehaviour:
     requiredCount: 5
     displayName: "Sar\u0131 \xD6zel Ta\u015F"
   rewardOnClaim: {fileID: 11400000, guid: 1ccf28a515c19304eaa62f5c48375e8a, type: 2}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 20948f5ae4eaf364f98bfa5668337f21, type: 3}

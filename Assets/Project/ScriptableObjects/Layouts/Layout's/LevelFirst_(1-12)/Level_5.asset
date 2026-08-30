@@ -25,9 +25,18 @@ MonoBehaviour:
       visibilityMode: 0
       stackOpenDirection: 0
       startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 9
       maxStackHeight: 9
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: T5-N1-Point_2
       stackDirection: 2
@@ -35,27 +44,58 @@ MonoBehaviour:
       visibilityMode: 0
       stackOpenDirection: 0
       startsLocked: 0
+      unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 9
       maxStackHeight: 9
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: T5-N1-Point_3
       stackDirection: 0
       stackLayoutMode: 0
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 0
-      requiredCompletedPointIds: []
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
+      requiredCompletedPointIds:
+      - T5-N1-Point_1
       minStackHeight: 6
       maxStackHeight: 6
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: T5-N1-Point_4
       stackDirection: 0
       stackLayoutMode: 0
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 0
-      requiredCompletedPointIds: []
+      startsLocked: 1
+      unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
+      requiredCompletedPointIds:
+      - T5-N1-Point_2
       minStackHeight: 6
       maxStackHeight: 6
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
+  rewardGifts: []
+  specialStoneRewards: []

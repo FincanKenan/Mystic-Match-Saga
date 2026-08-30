@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,162 +8,450 @@ using ZenMatch.Runtime.PlayerProgress;
 namespace ZenMatch.UI
 {
     [RequireComponent(typeof(Button))]
-    public class BoosterButtonUI : MonoBehaviour
+    [DisallowMultipleComponent]
+    public sealed class BoosterButtonUI : MonoBehaviour
     {
+        // =========================================================
+        // BOOSTER
+        // =========================================================
+
         [Header("Booster")]
-        [SerializeField] private BoosterType boosterType;
-        [SerializeField] private BoosterManager boosterManager;
+        [SerializeField]
+        private BoosterType boosterType;
+
+        [SerializeField]
+        private BoosterManager boosterManager;
+
+        // =========================================================
+        // REFERENCES
+        // =========================================================
 
         [Header("References")]
-        [SerializeField] private PlayerWalletService walletService;
-        [SerializeField] private PlayerProgressService progressService;
+        [SerializeField]
+        private PlayerWalletService walletService;
+
+        [SerializeField]
+        private PlayerProgressService progressService;
+
+        // =========================================================
+        // COUNT UI
+        // =========================================================
 
         [Header("Count UI")]
-        [SerializeField] private GameObject countRoot;
-        [SerializeField] private TMP_Text countText;
-        [SerializeField] private string countTextFormat = "{0}";
+        [SerializeField]
+        private GameObject countRoot;
+
+        [SerializeField]
+        private TMP_Text countText;
+
+        [SerializeField]
+        private string countTextFormat = "{0}";
+
+        // =========================================================
+        // BEHAVIOUR
+        // =========================================================
 
         [Header("Behaviour")]
-        [SerializeField] private bool refreshOnEnable = true;
+        [SerializeField]
+        private bool refreshOnEnable = true;
 
-        [Tooltip("Açýk olursa booster sayýsý 0 iken buton pasif olur. Kapalý kalýrsa butona basýlabilir ama BoosterManager hakký olmadýðý için çalýþtýrmaz.")]
-        [SerializeField] private bool disableButtonWhenCountIsZero = false;
+        [Tooltip(
+            "Açýk olursa booster sayýsý 0 iken buton pasif olur. " +
+            "Kapalýysa buton aktif kalýr.")]
+        [SerializeField]
+        private bool disableButtonWhenCountIsZero = false;
+
+        [Tooltip(
+            "Event kaçýrýlýrsa UI bu aralýkla wallet ile " +
+            "kendini tekrar senkronize eder.")]
+        [Min(0.05f)]
+        [SerializeField]
+        private float safetyRefreshInterval = 0.25f;
+
+        // =========================================================
+        // RUNTIME
+        // =========================================================
 
         private Button _button;
         private string _boosterId;
 
+        private PlayerWalletService
+            _subscribedWalletService;
+
+        private PlayerProgressService
+            _subscribedProgressService;
+
+        private float _nextSafetyRefreshTime;
+
+        private int _lastDisplayedAmount =
+            int.MinValue;
+
+        // =========================================================
+        // UNITY
+        // =========================================================
+
         private void Awake()
         {
-            _button = GetComponent<Button>();
+            _button =
+                GetComponent<Button>();
 
             if (_button != null)
-                _button.onClick.AddListener(OnClicked);
+            {
+                _button.onClick.AddListener(
+                    OnClicked);
+            }
 
-            _boosterId = boosterType.ToPlayerBoosterId();
+            RefreshBoosterId();
 
-            ResolveReferences();
+            RebindServices();
         }
 
         private void OnEnable()
         {
-            ResolveReferences();
-            Subscribe();
+            RefreshBoosterId();
+
+            RebindServices();
 
             if (refreshOnEnable)
-                Refresh();
+            {
+                Refresh(true);
+            }
+
+            _nextSafetyRefreshTime =
+                Time.unscaledTime +
+                safetyRefreshInterval;
+        }
+
+        private void Update()
+        {
+            if (Time.unscaledTime <
+                _nextSafetyRefreshTime)
+            {
+                return;
+            }
+
+            _nextSafetyRefreshTime =
+                Time.unscaledTime +
+                safetyRefreshInterval;
+
+            // Sahne geçiþi / singleton deðiþimi
+            // olduysa doðru servise yeniden baðlan.
+            RebindServices();
+
+            // Event herhangi bir sebeple kaçýrýlmýþsa
+            // UI yine wallet ile eþleþir.
+            Refresh(false);
         }
 
         private void OnDisable()
         {
-            Unsubscribe();
+            UnsubscribeServices();
         }
 
         private void OnDestroy()
         {
+            UnsubscribeServices();
+
             if (_button != null)
-                _button.onClick.RemoveListener(OnClicked);
+            {
+                _button.onClick.RemoveListener(
+                    OnClicked);
+            }
         }
 
-        private void ResolveReferences()
+        // =========================================================
+        // BOOSTER ID
+        // =========================================================
+
+        private void RefreshBoosterId()
         {
+            _boosterId =
+                boosterType
+                    .ToPlayerBoosterId();
+        }
+
+        // =========================================================
+        // SERVICE BINDING
+        // =========================================================
+
+        private void RebindServices()
+        {
+            PlayerWalletService
+                newWalletService =
+                    PlayerWalletService.Instance;
+
+            if (newWalletService == null)
+            {
+                if (walletService != null)
+                {
+                    newWalletService =
+                        walletService;
+                }
+                else
+                {
+                    newWalletService =
+                        FindFirstObjectByType<
+                            PlayerWalletService>();
+                }
+            }
+
+            PlayerProgressService
+                newProgressService =
+                    PlayerProgressService.Instance;
+
+            if (newProgressService == null)
+            {
+                if (progressService != null)
+                {
+                    newProgressService =
+                        progressService;
+                }
+                else
+                {
+                    newProgressService =
+                        FindFirstObjectByType<
+                            PlayerProgressService>();
+                }
+            }
+
+            // =====================================================
+            // WALLET
+            // =====================================================
+
+            if (_subscribedWalletService !=
+                newWalletService)
+            {
+                if (_subscribedWalletService != null)
+                {
+                    _subscribedWalletService
+                        .OnBoosterChanged -=
+                        HandleBoosterChanged;
+                }
+
+                _subscribedWalletService =
+                    newWalletService;
+
+                walletService =
+                    newWalletService;
+
+                if (_subscribedWalletService != null)
+                {
+                    _subscribedWalletService
+                        .OnBoosterChanged +=
+                        HandleBoosterChanged;
+                }
+            }
+
+            // =====================================================
+            // PROGRESS
+            // =====================================================
+
+            if (_subscribedProgressService !=
+                newProgressService)
+            {
+                if (_subscribedProgressService != null)
+                {
+                    _subscribedProgressService
+                        .OnProgressLoaded -=
+                        HandleProgressLoaded;
+
+                    _subscribedProgressService
+                        .OnProgressChanged -=
+                        HandleProgressChanged;
+                }
+
+                _subscribedProgressService =
+                    newProgressService;
+
+                progressService =
+                    newProgressService;
+
+                if (_subscribedProgressService != null)
+                {
+                    _subscribedProgressService
+                        .OnProgressLoaded +=
+                        HandleProgressLoaded;
+
+                    _subscribedProgressService
+                        .OnProgressChanged +=
+                        HandleProgressChanged;
+                }
+            }
+
             if (boosterManager == null)
-                boosterManager = FindFirstObjectByType<BoosterManager>();
-
-            if (walletService == null)
-                walletService = PlayerWalletService.Instance;
-
-            if (walletService == null)
-                walletService = FindFirstObjectByType<PlayerWalletService>();
-
-            if (progressService == null)
-                progressService = PlayerProgressService.Instance;
-
-            if (progressService == null)
-                progressService = FindFirstObjectByType<PlayerProgressService>();
-
-            if (string.IsNullOrWhiteSpace(_boosterId))
-                _boosterId = boosterType.ToPlayerBoosterId();
-        }
-
-        private void Subscribe()
-        {
-            if (walletService != null)
-                walletService.OnBoosterChanged += HandleBoosterChanged;
-
-            if (progressService != null)
             {
-                progressService.OnProgressLoaded += HandleProgressLoaded;
-                progressService.OnProgressChanged += HandleProgressChanged;
+                boosterManager =
+                    FindFirstObjectByType<
+                        BoosterManager>();
             }
         }
 
-        private void Unsubscribe()
+        private void UnsubscribeServices()
         {
-            if (walletService != null)
-                walletService.OnBoosterChanged -= HandleBoosterChanged;
-
-            if (progressService != null)
+            if (_subscribedWalletService != null)
             {
-                progressService.OnProgressLoaded -= HandleProgressLoaded;
-                progressService.OnProgressChanged -= HandleProgressChanged;
+                _subscribedWalletService
+                    .OnBoosterChanged -=
+                    HandleBoosterChanged;
             }
+
+            if (_subscribedProgressService != null)
+            {
+                _subscribedProgressService
+                    .OnProgressLoaded -=
+                    HandleProgressLoaded;
+
+                _subscribedProgressService
+                    .OnProgressChanged -=
+                    HandleProgressChanged;
+            }
+
+            _subscribedWalletService = null;
+            _subscribedProgressService = null;
         }
 
-        private void HandleBoosterChanged(string changedBoosterId, int amount)
+        // =========================================================
+        // EVENTS
+        // =========================================================
+
+        private void HandleBoosterChanged(
+            string changedBoosterId,
+            int amount)
         {
-            if (!string.Equals(changedBoosterId, _boosterId, System.StringComparison.Ordinal))
+            if (!string.Equals(
+                    changedBoosterId,
+                    _boosterId,
+                    StringComparison.Ordinal))
+            {
                 return;
+            }
 
-            Refresh(amount);
+            // X'ten +1 Booster geldiðinde
+            // doðrudan burasý çalýþýr.
+            ApplyAmount(
+                amount);
         }
 
-        private void HandleProgressLoaded(PlayerProgressData data)
+        private void HandleProgressLoaded(
+            PlayerProgressData data)
         {
-            Refresh();
+            Refresh(true);
         }
 
-        private void HandleProgressChanged(PlayerProgressData data)
+        private void HandleProgressChanged(
+            PlayerProgressData data)
         {
-            Refresh();
+            Refresh(false);
         }
+
+        // =========================================================
+        // CLICK
+        // =========================================================
 
         private void OnClicked()
         {
-            ResolveReferences();
+            RebindServices();
 
             if (boosterManager == null)
             {
-                Debug.LogWarning("[BoosterButtonUI] BoosterManager atanmadý.", this);
+                Debug.LogWarning(
+                    "[BoosterButtonUI] " +
+                    "BoosterManager atanmadý.",
+                    this);
+
                 return;
             }
 
-            boosterManager.UseBooster(boosterType);
+            boosterManager.UseBooster(
+                boosterType);
         }
+
+        // =========================================================
+        // REFRESH
+        // =========================================================
 
         public void Refresh()
         {
-            ResolveReferences();
+            Refresh(true);
+        }
+
+        private void Refresh(
+            bool force)
+        {
+            RebindServices();
+
+            if (string.IsNullOrWhiteSpace(
+                    _boosterId))
+            {
+                RefreshBoosterId();
+            }
 
             int amount = 0;
 
-            if (walletService != null && !string.IsNullOrWhiteSpace(_boosterId))
-                amount = walletService.GetBoosterAmount(_boosterId);
+            if (walletService != null &&
+                !string.IsNullOrWhiteSpace(
+                    _boosterId))
+            {
+                amount =
+                    walletService
+                        .GetBoosterAmount(
+                            _boosterId);
+            }
 
-            Refresh(amount);
+            amount =
+                Mathf.Max(
+                    0,
+                    amount);
+
+            bool countRootNeedsRepair =
+                countRoot != null &&
+                !countRoot.activeSelf;
+
+            if (!force &&
+                !countRootNeedsRepair &&
+                amount ==
+                _lastDisplayedAmount)
+            {
+                return;
+            }
+
+            ApplyAmount(
+                amount);
         }
 
-        private void Refresh(int amount)
+        private void ApplyAmount(
+            int amount)
         {
-            amount = Mathf.Max(0, amount);
+            amount =
+                Mathf.Max(
+                    0,
+                    amount);
 
-            if (countRoot != null)
-                countRoot.SetActive(true);
+            _lastDisplayedAmount =
+                amount;
+
+            // Count UI her zaman görünür.
+            if (countRoot != null &&
+                !countRoot.activeSelf)
+            {
+                countRoot.SetActive(
+                    true);
+            }
 
             if (countText != null)
-                countText.text = string.Format(countTextFormat, amount);
+            {
+                countText.text =
+                    string.Format(
+                        countTextFormat,
+                        amount);
+            }
 
-            if (_button != null && disableButtonWhenCountIsZero)
-                _button.interactable = amount > 0;
+            if (_button != null &&
+                disableButtonWhenCountIsZero)
+            {
+                _button.interactable =
+                    amount > 0;
+            }
         }
     }
 }

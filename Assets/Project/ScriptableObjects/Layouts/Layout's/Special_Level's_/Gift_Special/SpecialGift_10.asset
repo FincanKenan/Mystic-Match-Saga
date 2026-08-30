@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layoutId: SpecialGift_10
   category: 1
+  useSpecialTraySettings: 0
+  startingActiveTrayCapacity: 7
   groups:
   - groupId: Group_01
     role: 0
@@ -26,6 +28,9 @@ MonoBehaviour:
       stackOpenDirection: 3
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Plus_Ver_Front_2
       minStackHeight: 5
@@ -43,6 +48,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Cr_R-Front_1
       - St_Line_V-Back_1
@@ -62,6 +70,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Plus_Ver_Front_1
       - Plus_Ver_Front_2
@@ -80,6 +91,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Cr_L-Front_1
       - St_Line_V-Back_1
@@ -99,6 +113,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Plus_Hori_Front_2
       - Plus_Hori_Front_1
@@ -117,6 +134,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - St_Line_V-Back_2
       - Plus_Hori_Front_2
@@ -135,6 +155,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-3.
       minStackHeight: 1
@@ -152,6 +175,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - St_Line_V-Front_1
       minStackHeight: 1
@@ -169,6 +195,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-2.
       minStackHeight: 1
@@ -186,6 +215,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Triangle_Down-Front_1
       minStackHeight: 1
@@ -203,6 +235,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Triple_Up-Front_1
       - Triangle_Down-Back_1
@@ -221,6 +256,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Plus_Ver_Front_2
       - Plus_Ver_Front_1
@@ -239,6 +277,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Plus_Hori_Front_2
       - Plus_Hori_Front_1
@@ -257,6 +298,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-3.
       minStackHeight: 1
@@ -274,6 +318,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-2.
       minStackHeight: 1
@@ -291,6 +338,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Triangle_Down-Front_1
       minStackHeight: 1
@@ -308,6 +358,9 @@ MonoBehaviour:
       stackOpenDirection: 3
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Plus_Hori_Back_2
       minStackHeight: 5
@@ -325,6 +378,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Cr_R-Front_1
       minStackHeight: 1
@@ -342,6 +398,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - St_Line_H-Front_1
       minStackHeight: 1
@@ -359,6 +418,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Cr_L-Front_1
       minStackHeight: 1
@@ -376,6 +438,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Triple_Up-Front_1
       - Triangle_Down-Back_2
@@ -394,6 +459,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - St_Line_V-Back_2
       - Plus_Ver_Back_1
@@ -412,6 +480,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
@@ -428,6 +499,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
@@ -444,6 +518,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
@@ -460,6 +537,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-3.
       minStackHeight: 1
@@ -477,6 +557,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
@@ -493,6 +576,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-2.
       minStackHeight: 1
@@ -510,6 +596,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
@@ -526,6 +615,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - Triangle_Down-Front_1
       minStackHeight: 1
@@ -543,6 +635,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
@@ -559,6 +654,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
@@ -575,6 +673,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
@@ -591,6 +692,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
@@ -607,6 +711,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
@@ -623,6 +730,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
@@ -639,6 +749,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
@@ -651,6 +764,7 @@ MonoBehaviour:
   rewardGifts:
   - giftId: Gift_Yellow
     displayName: Gift_Yellow
+    targetPointId: Triangle_Down-Back_2
     sceneAnchorId: Gift_Yellow
     giftSprite: {fileID: 21300000, guid: a47f0635f2dbf9d4a9afcfb1dbc68437, type: 3}
     spriteOffset: {x: 0, y: 0}
@@ -668,6 +782,7 @@ MonoBehaviour:
     - gift_yellow
   - giftId: Gift_Red
     displayName: Gift_Red
+    targetPointId: 
     sceneAnchorId: Gift_Red
     giftSprite: {fileID: 21300000, guid: e9c02a172d0dd6040bbd0e742f178878, type: 3}
     spriteOffset: {x: 0, y: 0}

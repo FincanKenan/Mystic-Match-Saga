@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layoutId: Normal_1
   category: 1
+  useSpecialTraySettings: 1
+  startingActiveTrayCapacity: 6
   groups:
   - groupId: Group_01
     role: 0
@@ -26,9 +28,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 1
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 6
       maxStackHeight: 6
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: T12-N1-Point_2
       stackDirection: 3
@@ -37,9 +47,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 9
       maxStackHeight: 9
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: T12-N1-Point_3
       stackDirection: 3
@@ -48,10 +66,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - T12-N1-Point_2
       minStackHeight: 9
       maxStackHeight: 9
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: T12-N1-Point_4
       stackDirection: 3
@@ -60,8 +86,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - T12-N1-Point_2
       minStackHeight: 9
       maxStackHeight: 9
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
+  rewardGifts: []
+  specialStoneRewards: []

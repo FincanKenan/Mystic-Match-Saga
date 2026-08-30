@@ -11,29 +11,49 @@ namespace ZenMatch.Gameplay
         private int _temporaryCapacityBonus;
         private int _lockedSlots;
 
+        // Yeni özel bölüm sistemi:
+        // Anahtar zamanýnda alýnamadýðýnda kilitlenen ve
+        // bölüm boyunca tekrar açýlamayan slot sayýsý.
+        private int _permanentLockedSlots;
+
         public int Capacity { get; }
 
         public int LockedSlots => _lockedSlots;
-        public int MaxVisualCapacity => Capacity;
+        public int PermanentLockedSlots => _permanentLockedSlots;
+
+        public int MaxVisualCapacity =>
+     Capacity + _temporaryCapacityBonus;
 
         public int CurrentCapacity
         {
             get
             {
-                int value = Capacity - _lockedSlots + _temporaryCapacityBonus;
+                int value =
+                    Capacity -
+                    _lockedSlots +
+                    _temporaryCapacityBonus;
+
                 return value < 1 ? 1 : value;
             }
         }
 
         public IReadOnlyList<TileTypeSO> Slots => _slots;
+
         public int Count => _slots.Count;
-        public bool IsFull => _slots.Count >= CurrentCapacity;
+
+        public bool IsFull =>
+            _slots.Count >= CurrentCapacity;
 
         public TrayState(int capacity)
         {
-            Capacity = capacity < 1 ? 1 : capacity;
+            Capacity =
+                capacity < 1
+                    ? 1
+                    : capacity;
+
             _temporaryCapacityBonus = 0;
             _lockedSlots = 0;
+            _permanentLockedSlots = 0;
         }
 
         public void ClearAll()
@@ -46,7 +66,8 @@ namespace ZenMatch.Gameplay
             return new List<TileTypeSO>(_slots);
         }
 
-        public void SetSlots(IReadOnlyList<TileTypeSO> slots)
+        public void SetSlots(
+            IReadOnlyList<TileTypeSO> slots)
         {
             _slots.Clear();
 
@@ -60,7 +81,8 @@ namespace ZenMatch.Gameplay
             }
         }
 
-        public void SetLockedSlots(int lockedSlots)
+        public void SetLockedSlots(
+            int lockedSlots)
         {
             if (lockedSlots < 0)
                 lockedSlots = 0;
@@ -68,10 +90,16 @@ namespace ZenMatch.Gameplay
             if (lockedSlots >= Capacity)
                 lockedSlots = Capacity - 1;
 
+            // Kalýcý kilitler normal sistemler
+            // veya Undo tarafýndan açýlamaz.
+            if (lockedSlots < _permanentLockedSlots)
+                lockedSlots = _permanentLockedSlots;
+
             _lockedSlots = lockedSlots;
         }
 
-        public void SetActiveCapacity(int activeCapacity)
+        public void SetActiveCapacity(
+            int activeCapacity)
         {
             if (activeCapacity < 1)
                 activeCapacity = 1;
@@ -79,19 +107,53 @@ namespace ZenMatch.Gameplay
             if (activeCapacity > Capacity)
                 activeCapacity = Capacity;
 
-            _lockedSlots = Capacity - activeCapacity;
+            _lockedSlots =
+                Capacity - activeCapacity;
+
+            // Yeni level / yeni tray kurulurken
+            // önceki levelin permanent cezalarý taþýnmaz.
+            _permanentLockedSlots = 0;
         }
+
+        // =====================================================
+        // NORMAL LOCK / UNLOCK
+        // =====================================================
 
         public bool UnlockOneLockedSlot()
         {
-            if (_lockedSlots <= 0)
+            // Sadece normal kilitler açýlabilir.
+            // Permanent kilitlere dokunulmaz.
+            if (_lockedSlots <= _permanentLockedSlots)
                 return false;
 
             _lockedSlots--;
+
             return true;
         }
 
-        public void Add(TileTypeSO tileType)
+        // =====================================================
+        // PERMANENT RISK LOCK
+        // =====================================================
+
+        public bool LockOnePermanentSlot()
+        {
+            // Oyuncunun en az 1 aktif slotu
+            // her zaman kalmalý.
+            if (_lockedSlots >= Capacity - 1)
+                return false;
+
+            _lockedSlots++;
+            _permanentLockedSlots++;
+
+            return true;
+        }
+
+        // =====================================================
+        // TILE OPERATIONS
+        // =====================================================
+
+        public void Add(
+            TileTypeSO tileType)
         {
             if (tileType == null)
                 return;
@@ -113,6 +175,7 @@ namespace ZenMatch.Gameplay
             for (int i = 0; i < _slots.Count; i++)
             {
                 TileTypeSO tile = _slots[i];
+
                 if (tile == null)
                     continue;
 
@@ -129,8 +192,11 @@ namespace ZenMatch.Gameplay
 
             for (int i = 0; i < orderedTypes.Count; i++)
             {
-                TileTypeSO type = orderedTypes[i];
-                int count = counts[type];
+                TileTypeSO type =
+                    orderedTypes[i];
+
+                int count =
+                    counts[type];
 
                 for (int c = 0; c < count; c++)
                     _slots.Add(type);
@@ -139,10 +205,17 @@ namespace ZenMatch.Gameplay
 
         public bool CanAdd()
         {
-            return _slots.Count < CurrentCapacity;
+            return
+                _slots.Count <
+                CurrentCapacity;
         }
 
-        public void AddTemporaryCapacityBonus(int amount)
+        // =====================================================
+        // TEMPORARY CAPACITY
+        // =====================================================
+
+        public void AddTemporaryCapacityBonus(
+            int amount)
         {
             if (amount <= 0)
                 return;
@@ -150,12 +223,14 @@ namespace ZenMatch.Gameplay
             _temporaryCapacityBonus += amount;
         }
 
-        public void RemoveTemporaryCapacityBonus(int amount)
+        public void RemoveTemporaryCapacityBonus(
+            int amount)
         {
             if (amount <= 0)
                 return;
 
             _temporaryCapacityBonus -= amount;
+
             if (_temporaryCapacityBonus < 0)
                 _temporaryCapacityBonus = 0;
         }
@@ -165,14 +240,24 @@ namespace ZenMatch.Gameplay
             _temporaryCapacityBonus = 0;
         }
 
-        public bool FindTripleIndices(out List<int> matchedSlotIndices)
-        {
-            matchedSlotIndices = new List<int>();
+        // =====================================================
+        // TRIPLE MATCH
+        // =====================================================
 
-            Dictionary<TileTypeSO, int> counts = new();
+        public bool FindTripleIndices(
+            out List<int> matchedSlotIndices)
+        {
+            matchedSlotIndices =
+                new List<int>();
+
+            Dictionary<TileTypeSO, int> counts =
+                new();
+
             for (int i = 0; i < _slots.Count; i++)
             {
-                TileTypeSO tile = _slots[i];
+                TileTypeSO tile =
+                    _slots[i];
+
                 if (tile == null)
                     continue;
 
@@ -192,6 +277,7 @@ namespace ZenMatch.Gameplay
                     if (_slots[i] == pair.Key)
                     {
                         matchedSlotIndices.Add(i);
+
                         if (matchedSlotIndices.Count == 3)
                             break;
                     }
@@ -206,33 +292,82 @@ namespace ZenMatch.Gameplay
             return false;
         }
 
-        public void RemoveIndices(List<int> slotIndices)
+        public void RemoveIndices(
+            List<int> slotIndices)
         {
-            if (slotIndices == null || slotIndices.Count == 0)
+            if (slotIndices == null ||
+                slotIndices.Count == 0)
+            {
                 return;
+            }
 
-            List<int> sorted = new List<int>(slotIndices);
+            List<int> sorted =
+                new List<int>(slotIndices);
+
             sorted.Sort();
 
             for (int i = sorted.Count - 1; i >= 0; i--)
             {
-                int index = sorted[i];
-                if (index < 0 || index >= _slots.Count)
+                int index =
+                    sorted[i];
+
+                if (index < 0 ||
+                    index >= _slots.Count)
+                {
                     continue;
+                }
 
                 _slots.RemoveAt(index);
             }
         }
 
+        // =====================================================
+        // UNDO
+        // =====================================================
+
+        public bool TryRemoveLast(
+            out TileTypeSO removedTile)
+        {
+            removedTile = null;
+
+            if (_slots.Count <= 0)
+                return false;
+
+            int lastIndex =
+                _slots.Count - 1;
+
+            removedTile =
+                _slots[lastIndex];
+
+            _slots.RemoveAt(lastIndex);
+
+            return removedTile != null;
+        }
+
+        // =====================================================
+        // DEBUG
+        // =====================================================
+
         public string GetDebugSummary()
         {
             if (_slots.Count == 0)
-                return $"[TrayState] EMPTY | Capacity: {CurrentCapacity} | MaxVisual: {MaxVisualCapacity} | Locked: {LockedSlots}";
+            {
+                return
+                    $"[TrayState] EMPTY" +
+                    $" | Capacity: {CurrentCapacity}" +
+                    $" | MaxVisual: {MaxVisualCapacity}" +
+                    $" | Locked: {LockedSlots}" +
+                    $" | PermanentLocked: {PermanentLockedSlots}";
+            }
 
-            Dictionary<TileTypeSO, int> counts = new();
+            Dictionary<TileTypeSO, int> counts =
+                new();
+
             for (int i = 0; i < _slots.Count; i++)
             {
-                TileTypeSO tile = _slots[i];
+                TileTypeSO tile =
+                    _slots[i];
+
                 if (tile == null)
                     continue;
 
@@ -242,40 +377,46 @@ namespace ZenMatch.Gameplay
                 counts[tile]++;
             }
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb =
+                new StringBuilder();
+
             sb.Append("[TrayState] ");
 
             bool first = true;
+
             foreach (var pair in counts)
             {
                 if (!first)
                     sb.Append(" | ");
 
-                string name = pair.Key != null ? pair.Key.name : "NULL";
-                sb.Append(name).Append(": ").Append(pair.Value);
+                string name =
+                    pair.Key != null
+                        ? pair.Key.name
+                        : "NULL";
+
+                sb.Append(name)
+                    .Append(": ")
+                    .Append(pair.Value);
 
                 first = false;
             }
 
-            sb.Append(" | Total: ").Append(_slots.Count);
-            sb.Append(" | Capacity: ").Append(CurrentCapacity);
-            sb.Append(" | MaxVisual: ").Append(MaxVisualCapacity);
-            sb.Append(" | Locked: ").Append(LockedSlots);
+            sb.Append(" | Total: ")
+                .Append(_slots.Count);
+
+            sb.Append(" | Capacity: ")
+                .Append(CurrentCapacity);
+
+            sb.Append(" | MaxVisual: ")
+                .Append(MaxVisualCapacity);
+
+            sb.Append(" | Locked: ")
+                .Append(LockedSlots);
+
+            sb.Append(" | PermanentLocked: ")
+                .Append(PermanentLockedSlots);
 
             return sb.ToString();
-        }
-        public bool TryRemoveLast(out TileTypeSO removedTile)
-        {
-            removedTile = null;
-
-            if (_slots.Count <= 0)
-                return false;
-
-            int lastIndex = _slots.Count - 1;
-            removedTile = _slots[lastIndex];
-            _slots.RemoveAt(lastIndex);
-
-            return removedTile != null;
         }
     }
 }

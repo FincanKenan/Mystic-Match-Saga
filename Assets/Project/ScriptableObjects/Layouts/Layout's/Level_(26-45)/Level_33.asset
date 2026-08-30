@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layoutId: Normal_1
   category: 0
+  useSpecialTraySettings: 0
+  startingActiveTrayCapacity: 7
   groups:
   - groupId: Group_01
     role: 0
@@ -24,80 +26,76 @@ MonoBehaviour:
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_4_1
-      - L33-N1-Point_4_2
-      - L33-N1-Point_4_3
-      - L33-N1-Point_4_4
-      - L33-N1-Point_4_5
-      - L33-N1-Point_4_6
-      - L33-N1-Point_4_7
-      - L33-N1-Point_4_8
-      - L33-N1-Point_4_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_1_2
       stackDirection: 0
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_4_1
-      - L33-N1-Point_4_2
-      - L33-N1-Point_4_3
-      - L33-N1-Point_4_4
-      - L33-N1-Point_4_5
-      - L33-N1-Point_4_6
-      - L33-N1-Point_4_7
-      - L33-N1-Point_4_8
-      - L33-N1-Point_4_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_1_3
       stackDirection: 0
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_4_1
-      - L33-N1-Point_4_2
-      - L33-N1-Point_4_3
-      - L33-N1-Point_4_4
-      - L33-N1-Point_4_5
-      - L33-N1-Point_4_6
-      - L33-N1-Point_4_7
-      - L33-N1-Point_4_8
-      - L33-N1-Point_4_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_1_4
       stackDirection: 0
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_4_1
-      - L33-N1-Point_4_2
-      - L33-N1-Point_4_3
-      - L33-N1-Point_4_4
-      - L33-N1-Point_4_5
-      - L33-N1-Point_4_6
-      - L33-N1-Point_4_7
-      - L33-N1-Point_4_8
-      - L33-N1-Point_4_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_1_5
       stackDirection: 0
@@ -106,10 +104,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L33-N1-Point_4_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_1_6
       stackDirection: 0
@@ -118,31 +124,38 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L33-N1-Point_4_1
       - L33-N1-Point_4_2
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_1_7
       stackDirection: 0
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_4_1
-      - L33-N1-Point_4_2
-      - L33-N1-Point_4_3
-      - L33-N1-Point_4_4
-      - L33-N1-Point_4_5
-      - L33-N1-Point_4_6
-      - L33-N1-Point_4_7
-      - L33-N1-Point_4_8
-      - L33-N1-Point_4_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_1_8
       stackDirection: 0
@@ -151,11 +164,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L33-N1-Point_4_1
       - L33-N1-Point_4_4
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_1_9
       stackDirection: 0
@@ -164,91 +185,95 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L33-N1-Point_4_2
       - L33-N1-Point_4_5
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_2_1
       stackDirection: 0
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_1_1
-      - L33-N1-Point_1_2
-      - L33-N1-Point_1_3
-      - L33-N1-Point_1_4
-      - L33-N1-Point_1_5
-      - L33-N1-Point_1_6
-      - L33-N1-Point_1_7
-      - L33-N1-Point_1_8
-      - L33-N1-Point_1_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_2_2
       stackDirection: 0
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_1_1
-      - L33-N1-Point_1_2
-      - L33-N1-Point_1_3
-      - L33-N1-Point_1_4
-      - L33-N1-Point_1_5
-      - L33-N1-Point_1_6
-      - L33-N1-Point_1_7
-      - L33-N1-Point_1_8
-      - L33-N1-Point_1_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_2_3
       stackDirection: 0
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_1_1
-      - L33-N1-Point_1_2
-      - L33-N1-Point_1_3
-      - L33-N1-Point_1_4
-      - L33-N1-Point_1_5
-      - L33-N1-Point_1_6
-      - L33-N1-Point_1_7
-      - L33-N1-Point_1_8
-      - L33-N1-Point_1_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_2_4
       stackDirection: 0
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_1_1
-      - L33-N1-Point_1_2
-      - L33-N1-Point_1_3
-      - L33-N1-Point_1_4
-      - L33-N1-Point_1_5
-      - L33-N1-Point_1_6
-      - L33-N1-Point_1_7
-      - L33-N1-Point_1_8
-      - L33-N1-Point_1_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_2_5
       stackDirection: 0
@@ -257,10 +282,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L33-N1-Point_1_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_2_6
       stackDirection: 0
@@ -269,31 +302,38 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L33-N1-Point_1_1
       - L33-N1-Point_1_2
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_2_7
       stackDirection: 0
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_1_1
-      - L33-N1-Point_1_2
-      - L33-N1-Point_1_3
-      - L33-N1-Point_1_4
-      - L33-N1-Point_1_5
-      - L33-N1-Point_1_6
-      - L33-N1-Point_1_7
-      - L33-N1-Point_1_8
-      - L33-N1-Point_1_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_2_8
       stackDirection: 0
@@ -302,10 +342,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L33-N1-Point_1_4
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_2_9
       stackDirection: 0
@@ -314,91 +362,95 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L33-N1-Point_1_4
       - L33-N1-Point_1_5
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_3_1
       stackDirection: 0
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_2_1
-      - L33-N1-Point_2_2
-      - L33-N1-Point_2_3
-      - L33-N1-Point_2_4
-      - L33-N1-Point_2_5
-      - L33-N1-Point_2_6
-      - L33-N1-Point_2_7
-      - L33-N1-Point_2_8
-      - L33-N1-Point_2_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_3_2
       stackDirection: 0
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_2_1
-      - L33-N1-Point_2_2
-      - L33-N1-Point_2_3
-      - L33-N1-Point_2_4
-      - L33-N1-Point_2_5
-      - L33-N1-Point_2_6
-      - L33-N1-Point_2_7
-      - L33-N1-Point_2_8
-      - L33-N1-Point_2_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_3_3
       stackDirection: 0
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_2_1
-      - L33-N1-Point_2_2
-      - L33-N1-Point_2_3
-      - L33-N1-Point_2_4
-      - L33-N1-Point_2_5
-      - L33-N1-Point_2_6
-      - L33-N1-Point_2_7
-      - L33-N1-Point_2_8
-      - L33-N1-Point_2_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_3_4
       stackDirection: 0
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_2_1
-      - L33-N1-Point_2_2
-      - L33-N1-Point_2_3
-      - L33-N1-Point_2_4
-      - L33-N1-Point_2_5
-      - L33-N1-Point_2_6
-      - L33-N1-Point_2_7
-      - L33-N1-Point_2_8
-      - L33-N1-Point_2_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_3_5
       stackDirection: 0
@@ -407,10 +459,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L33-N1-Point_2_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_3_6
       stackDirection: 0
@@ -419,31 +479,38 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L33-N1-Point_2_1
       - L33-N1-Point_2_2
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_3_7
       stackDirection: 0
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L33-N1-Point_2_1
-      - L33-N1-Point_2_2
-      - L33-N1-Point_2_3
-      - L33-N1-Point_2_4
-      - L33-N1-Point_2_5
-      - L33-N1-Point_2_6
-      - L33-N1-Point_2_7
-      - L33-N1-Point_2_8
-      - L33-N1-Point_2_9
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_3_8
       stackDirection: 0
@@ -452,10 +519,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L33-N1-Point_2_4
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_3_9
       stackDirection: 0
@@ -464,11 +539,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L33-N1-Point_2_4
       - L33-N1-Point_2_5
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_4_1
       stackDirection: 0
@@ -477,9 +560,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_4_2
       stackDirection: 0
@@ -488,9 +579,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_4_3
       stackDirection: 0
@@ -499,9 +598,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_4_4
       stackDirection: 0
@@ -510,9 +617,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_4_5
       stackDirection: 0
@@ -521,9 +636,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_4_6
       stackDirection: 0
@@ -532,9 +655,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_4_7
       stackDirection: 0
@@ -543,9 +674,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_4_8
       stackDirection: 0
@@ -554,9 +693,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: L33-N1-Point_4_9
       stackDirection: 0
@@ -565,7 +712,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
+  rewardGifts: []
+  specialStoneRewards: []

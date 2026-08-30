@@ -34,51 +34,141 @@ namespace ZenMatch.Data
     [Serializable]
     public sealed class SpawnPointReference
     {
-        [Tooltip("Bu point için benzersiz id. Scene'deki BoardPointAnchor.PointId ile ayný olmalý.")]
+        // =====================================================
+        // IDENTITY
+        // =====================================================
+
+        [Tooltip(
+            "Bu point için benzersiz id. " +
+            "Scene'deki BoardPointAnchor.PointId ile ayný olmalý.")]
         public string pointId;
 
-        [Tooltip("Bu noktadaki stack hangi yönde dizilsin?")]
-        public StackDirection stackDirection = StackDirection.Vertical;
+        // =====================================================
+        // STACK SETTINGS
+        // =====================================================
 
-        [Tooltip("Taþlar üst üste mi gelsin, açýk sýra halinde mi?")]
-        public StackLayoutMode stackLayoutMode = StackLayoutMode.Overlapped;
+        [Tooltip("Bu noktadaki stack hangi yönde dizilsin?")]
+        public StackDirection stackDirection =
+            StackDirection.Vertical;
+
+        [Tooltip(
+            "Taþlar üst üste mi gelsin, " +
+            "açýk sýra halinde mi?")]
+        public StackLayoutMode stackLayoutMode =
+            StackLayoutMode.Overlapped;
 
         [Tooltip("Bu noktadaki stack nasýl görünsün?")]
-        public StackVisibilityMode visibilityMode = StackVisibilityMode.Normal;
+        public StackVisibilityMode visibilityMode =
+            StackVisibilityMode.Normal;
 
-        [Tooltip("Taþlar hangi taraftan açýlmaya baþlasýn?")]
-        public StackOpenDirection stackOpenDirection = StackOpenDirection.Default;
+        [Tooltip(
+            "Taþlar hangi taraftan açýlmaya baþlasýn?")]
+        public StackOpenDirection stackOpenDirection =
+            StackOpenDirection.Default;
 
-        [Tooltip("Bu point baþlangýçta kapalý mý gelsin?")]
+        // =====================================================
+        // LOCK / UNLOCK
+        // =====================================================
+
+        [Tooltip(
+            "Bu point baþlangýçta kapalý mý gelsin?")]
         public bool startsLocked = false;
 
-        [Tooltip("Bu point tamamen temizlenince 1 kilitli tray slotu açar.")]
+        [Tooltip(
+            "Bu point tamamen temizlenince " +
+            "1 kilitli tray slotu açar.")]
         public bool unlocksTraySlotOnComplete = false;
 
-        [Tooltip("Bu point'in açýlmasý için tamamen bitmesi gereken point id listesi.")]
-        public List<string> requiredCompletedPointIds = new();
+        // =====================================================
+        // TRAY SLOT RISK
+        // =====================================================
+
+        [Header("Tray Slot Risk")]
+
+        [Tooltip(
+            "Açýksa bu point zamanýnda tamamlanamazsa " +
+            "bir aktif tray slotu bölüm boyunca kalýcý kilitlenir.")]
+        public bool protectsTraySlot = false;
+
+        [Min(0)]
+        [Tooltip(
+            "Risk taþý aktif ve eriþilebilir olduktan sonra " +
+            "kaç baþarýlý seçim boyunca tamamen görünür kalacaðý.")]
+        public int trayProtectionSafeSelectionCount = 5;
+
+        [Min(1)]
+        [Tooltip(
+            "Safe seçimler bittikten sonra " +
+            "kaç baþarýlý seçim boyunca fade olacaðý. " +
+            "Bu süre tamamlanýnca risk expire olur.")]
+        public int trayProtectionFadeSelectionCount = 3;
+
+        // GEÇÝCÝ UYUMLULUK:
+        // BoardSpawner bir sonraki adýmda doðrudan
+        // Safe/Fade deðerlerini okuyacak.
+        public int trayProtectionTurnLimit =>
+            Mathf.Max(
+                1,
+                trayProtectionSafeSelectionCount +
+                trayProtectionFadeSelectionCount);
+
+        // =====================================================
+        // DEPENDENCIES
+        // =====================================================
+
+        [Tooltip(
+            "Bu point'in açýlmasý için tamamen bitmesi " +
+            "gereken point id listesi.")]
+        public List<string> requiredCompletedPointIds =
+            new();
+
+        // =====================================================
+        // STACK HEIGHT
+        // =====================================================
 
         [Header("Point Stack Height")]
         [Min(1)] public int minStackHeight = 1;
         [Min(1)] public int maxStackHeight = 3;
 
+        // =====================================================
+        // SPECIAL TILE
+        // =====================================================
+
         [Header("Special Tile")]
-        [Tooltip("Açýksa bu point TileBag'den rastgele taþ almaz, verilen specialTile ile oluþturulur.")]
+
+        [Tooltip(
+            "Açýksa bu point TileBag'den rastgele taþ almaz, " +
+            "verilen specialTile ile oluþturulur.")]
         public bool isSpecialTile = false;
 
-        [Tooltip("Bu pointte oluþturulacak özel taþ tipi.")]
+        [Tooltip(
+            "Bu pointte oluþturulacak özel taþ tipi.")]
         public TileTypeSO specialTile;
 
-        [Tooltip("Özel taþ davranýþý. Þimdilik ödül/parlaklýk sistemi için Reward kullanýlýr.")]
-        public SpecialTileBehaviorType specialBehaviorType = SpecialTileBehaviorType.None;
+        [Tooltip(
+            "Özel taþ davranýþý. Þimdilik ödül/parlaklýk " +
+            "sistemi için Reward kullanýlýr.")]
+        public SpecialTileBehaviorType specialBehaviorType =
+            SpecialTileBehaviorType.None;
 
-        [Tooltip("Ayný özel taþ grubunu baðlamak için. Örn: Coin_Group_01")]
+        [Tooltip(
+            "Ayný özel taþ grubunu baðlamak için. " +
+            "Örn: Coin_Group_01")]
         public string specialTileGroupId;
 
-        [Tooltip("Özel taþ açýða çýktýktan sonra kaç geçerli hamle boyunca ödül/parlaklýk aktif kalsýn? 0 ise hiç sönmez.")]
-        [Min(0)] public int specialRewardTurnLimit = 3;
+        [Tooltip(
+            "Özel taþ açýða çýktýktan sonra kaç geçerli " +
+            "hamle boyunca ödül/parlaklýk aktif kalsýn? " +
+            "0 ise hiç sönmez.")]
+        [Min(0)]
+        public int specialRewardTurnLimit = 3;
 
-        [Tooltip("Ýleride inspector/debug için açýklama.")]
+        // =====================================================
+        // NOTE
+        // =====================================================
+
+        [Tooltip(
+            "Ýleride inspector/debug için açýklama.")]
         public string note;
     }
 
@@ -86,19 +176,27 @@ namespace ZenMatch.Data
     public sealed class SpawnGroupDefinition
     {
         [Header("Identity")]
-        [SerializeField] private string groupId = "Group_01";
-        [SerializeField] private GroupRole role = GroupRole.Normal;
+        [SerializeField]
+        private string groupId = "Group_01";
+
+        [SerializeField]
+        private GroupRole role = GroupRole.Normal;
 
         [Header("Stage Flags")]
-        [SerializeField] private bool startLocked = false;
+        [SerializeField]
+        private bool startLocked = false;
 
         [Header("Point References")]
-        [SerializeField] private List<SpawnPointReference> points = new();
+        [SerializeField]
+        private List<SpawnPointReference> points =
+            new();
 
         public string GroupId => groupId;
         public GroupRole Role => role;
         public bool StartLocked => startLocked;
-        public IReadOnlyList<SpawnPointReference> Points => points;
+
+        public IReadOnlyList<SpawnPointReference>
+            Points => points;
 
         public void Validate()
         {
@@ -106,61 +204,158 @@ namespace ZenMatch.Data
                 groupId = "Group_01";
 
             if (points == null)
-                points = new List<SpawnPointReference>();
+            {
+                points =
+                    new List<SpawnPointReference>();
+            }
 
-            for (int i = 0; i < points.Count; i++)
+            for (int i = 0;
+                 i < points.Count;
+                 i++)
             {
                 if (points[i] == null)
-                    points[i] = new SpawnPointReference();
-
-                if (points[i].pointId == null)
-                    points[i].pointId = string.Empty;
-
-                if (points[i].note == null)
-                    points[i].note = string.Empty;
-
-                if (points[i].requiredCompletedPointIds == null)
-                    points[i].requiredCompletedPointIds = new List<string>();
-
-                if (points[i].minStackHeight < 1)
-                    points[i].minStackHeight = 1;
-
-                if (points[i].maxStackHeight < points[i].minStackHeight)
-                    points[i].maxStackHeight = points[i].minStackHeight;
-
-                if (points[i].specialTileGroupId == null)
-                    points[i].specialTileGroupId = string.Empty;
-
-                if (points[i].specialRewardTurnLimit < 0)
-                    points[i].specialRewardTurnLimit = 0;
-
-                if (!points[i].isSpecialTile)
                 {
-                    points[i].specialTile = null;
-                    points[i].specialBehaviorType = SpecialTileBehaviorType.None;
-                    points[i].specialTileGroupId = string.Empty;
-                    points[i].specialRewardTurnLimit = 0;
+                    points[i] =
+                        new SpawnPointReference();
+                }
+
+                SpawnPointReference point =
+                    points[i];
+
+                // =============================================
+                // TEXT VALUES
+                // =============================================
+
+                if (point.pointId == null)
+                    point.pointId = string.Empty;
+
+                if (point.note == null)
+                    point.note = string.Empty;
+
+                if (point.specialTileGroupId == null)
+                {
+                    point.specialTileGroupId =
+                        string.Empty;
+                }
+
+                // =============================================
+                // DEPENDENCIES
+                // =============================================
+
+                if (point.requiredCompletedPointIds == null)
+                {
+                    point.requiredCompletedPointIds =
+                        new List<string>();
+                }
+
+                // =============================================
+                // STACK HEIGHT
+                // =============================================
+
+                if (point.minStackHeight < 1)
+                    point.minStackHeight = 1;
+
+                if (point.maxStackHeight <
+                    point.minStackHeight)
+                {
+                    point.maxStackHeight =
+                        point.minStackHeight;
+                }
+
+                // =============================================
+                // TRAY SLOT RISK
+                // =============================================
+
+                if (point.trayProtectionSafeSelectionCount < 0)
+                {
+                    point.trayProtectionSafeSelectionCount =
+                        0;
+                }
+
+                if (point.trayProtectionFadeSelectionCount < 1)
+                {
+                    point.trayProtectionFadeSelectionCount =
+                        1;
+                }
+
+                // Bir point ayný anda hem normal Unlock
+                // hem de Risk Point olamaz.
+                if (point.unlocksTraySlotOnComplete &&
+                    point.protectsTraySlot)
+                {
+                    point.protectsTraySlot = false;
+
+                    Debug.LogWarning(
+                        $"[SpawnGroupDefinition] " +
+                        $"Point '{point.pointId}' hem " +
+                        $"UnlocksTraySlot hem ProtectsTraySlot " +
+                        $"olarak ayarlanmýþ. " +
+                        $"ProtectsTraySlot otomatik kapatýldý.");
+                }
+
+                // =============================================
+                // SPECIAL REWARD
+                // =============================================
+
+                if (point.specialRewardTurnLimit < 0)
+                {
+                    point.specialRewardTurnLimit =
+                        0;
+                }
+
+                if (!point.isSpecialTile)
+                {
+                    point.specialTile = null;
+
+                    point.specialBehaviorType =
+                        SpecialTileBehaviorType.None;
+
+                    point.specialTileGroupId =
+                        string.Empty;
+
+                    point.specialRewardTurnLimit =
+                        0;
                 }
                 else
                 {
-                    points[i].minStackHeight = 1;
-                    points[i].maxStackHeight = 1;
+                    // Special tile point her zaman
+                    // tek taþ olarak oluþturulur.
+                    point.minStackHeight = 1;
+                    point.maxStackHeight = 1;
 
-                    if (points[i].specialBehaviorType == SpecialTileBehaviorType.None)
-                        points[i].specialBehaviorType = SpecialTileBehaviorType.Reward;
+                    if (point.specialBehaviorType ==
+                        SpecialTileBehaviorType.None)
+                    {
+                        point.specialBehaviorType =
+                            SpecialTileBehaviorType.Reward;
+                    }
                 }
             }
         }
 
-        public bool ContainsPoint(string pointId)
+        public bool ContainsPoint(
+            string pointId)
         {
-            if (string.IsNullOrWhiteSpace(pointId) || points == null)
-                return false;
-
-            for (int i = 0; i < points.Count; i++)
+            if (string.IsNullOrWhiteSpace(pointId) ||
+                points == null)
             {
-                if (string.Equals(points[i].pointId, pointId, StringComparison.Ordinal))
+                return false;
+            }
+
+            for (int i = 0;
+                 i < points.Count;
+                 i++)
+            {
+                if (points[i] == null)
+                    continue;
+
+                if (string.Equals(
+                        points[i].pointId,
+                        pointId,
+                        StringComparison.Ordinal))
+                {
                     return true;
+                }
             }
 
             return false;
@@ -168,7 +363,10 @@ namespace ZenMatch.Data
 
         public int GetPointCount()
         {
-            return points != null ? points.Count : 0;
+            return
+                points != null
+                    ? points.Count
+                    : 0;
         }
     }
 }

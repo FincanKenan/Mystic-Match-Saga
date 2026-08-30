@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ZenMatch.Data;
 using ZenMatch.UI;
+using ZenMatch.Runtime.Audio;
 
 namespace ZenMatch.Gameplay
 {
@@ -15,65 +17,129 @@ namespace ZenMatch.Gameplay
 
         public TrayState State => _state;
         public TrayView View => trayView;
-        public bool IsFull => _state != null && _state.IsFull;
 
+        public bool IsFull =>
+            _state != null &&
+            _state.IsFull;
 
+        // =========================================================
+        // EVENTS
+        // =========================================================
+
+        /// <summary>
+        /// Tray içinde baþarýlý bir üçlü eþleþme
+        /// gerçekleþtiðinde bir kez tetiklenir.
+        ///
+        /// Hýzlý eþleþtirme / combo sistemi
+        /// bu event'i dinleyecek.
+        /// </summary>
+        public event Action TripleMatched;
+
+        // =========================================================
+        // INITIALIZE
+        // =========================================================
 
         public void Initialize()
         {
             InitializeWithActiveCapacity(capacity);
         }
 
-
-
-        public void InitializeWithActiveCapacity(int activeCapacity)
+        public void InitializeWithActiveCapacity(
+            int activeCapacity)
         {
-            _state = new TrayState(capacity);
-            _state.SetActiveCapacity(activeCapacity);
+            _state =
+                new TrayState(capacity);
+
+            _state.SetActiveCapacity(
+                activeCapacity);
+
             RefreshView();
         }
 
-        public void ApplyActiveCapacity(int activeCapacity)
+        public void ApplyActiveCapacity(
+            int activeCapacity)
         {
             if (_state == null)
-                _state = new TrayState(capacity);
+            {
+                _state =
+                    new TrayState(capacity);
+            }
 
-            _state.SetActiveCapacity(activeCapacity);
+            _state.SetActiveCapacity(
+                activeCapacity);
+
             RefreshView();
         }
+
+        // =========================================================
+        // SLOT UNLOCK
+        // =========================================================
 
         public bool UnlockOneLockedSlot()
         {
             if (_state == null)
                 Initialize();
 
-            bool unlocked = _state.UnlockOneLockedSlot();
+            bool unlocked =
+                _state.UnlockOneLockedSlot();
+
             if (unlocked)
                 RefreshView();
 
             return unlocked;
         }
 
-
-
-        public bool UnlockOneLockedSlot(out int unlockedSlotIndex)
+        public bool UnlockOneLockedSlot(
+            out int unlockedSlotIndex)
         {
             unlockedSlotIndex = -1;
 
             if (_state == null)
                 Initialize();
 
-            int beforeCapacity = _state.CurrentCapacity;
+            int beforeCapacity =
+                _state.CurrentCapacity;
 
-            bool unlocked = _state.UnlockOneLockedSlot();
+            bool unlocked =
+                _state.UnlockOneLockedSlot();
 
             if (unlocked)
             {
-                unlockedSlotIndex = beforeCapacity;
+                unlockedSlotIndex =
+                    beforeCapacity;
+
                 RefreshView();
             }
 
             return unlocked;
+        }
+
+        // =========================================================
+        // SLOT LOCK
+        // =========================================================
+
+        public bool LockOnePermanentSlot(
+            out int lockedSlotIndex)
+        {
+            lockedSlotIndex = -1;
+
+            if (_state == null)
+                Initialize();
+
+            bool locked =
+                _state.LockOnePermanentSlot();
+
+            if (!locked)
+                return false;
+
+            // Slotlar saðdan sola kilitlenir.
+            lockedSlotIndex =
+                _state.MaxVisualCapacity -
+                _state.LockedSlots;
+
+            RefreshView();
+
+            return true;
         }
 
         public bool RelockOneSlot()
@@ -81,37 +147,63 @@ namespace ZenMatch.Gameplay
             if (_state == null)
                 return false;
 
-            int newLockedCount = _state.LockedSlots + 1;
+            int newLockedCount =
+                _state.LockedSlots + 1;
 
-            if (newLockedCount >= _state.MaxVisualCapacity)
+            if (newLockedCount >=
+                _state.MaxVisualCapacity)
+            {
                 return false;
+            }
 
-            _state.SetLockedSlots(newLockedCount);
+            _state.SetLockedSlots(
+                newLockedCount);
 
             RefreshView();
+
             return true;
         }
+
+        // =========================================================
+        // RESET / RESTORE
+        // =========================================================
 
         public void ResetTray()
         {
             if (_state == null)
-                _state = new TrayState(capacity);
+            {
+                _state =
+                    new TrayState(capacity);
+            }
             else
+            {
                 _state.ClearAll();
+            }
 
             RefreshView();
         }
 
-        public void RestoreSlots(IReadOnlyList<TileTypeSO> slots)
+        public void RestoreSlots(
+            IReadOnlyList<TileTypeSO> slots)
         {
             if (_state == null)
-                _state = new TrayState(capacity);
+            {
+                _state =
+                    new TrayState(capacity);
+            }
 
             _state.SetSlots(slots);
+
             RefreshView();
         }
 
-        public bool TryAddTile(TileTypeSO tileType, out bool clearedAny)
+        // =========================================================
+        // ADD TILE
+        // =========================================================
+
+        public bool TryAddTile(
+            TileTypeSO tileType,
+            out bool clearedAny)
         {
             clearedAny = false;
 
@@ -120,31 +212,60 @@ namespace ZenMatch.Gameplay
 
             if (!_state.CanAdd())
             {
-                Debug.Log("[TrayController] Tray dolu, tile eklenemedi.");
+                Debug.Log(
+                    "[TrayController] Tray dolu, " +
+                    "tile eklenemedi.");
+
                 return false;
             }
 
-            List<TileTypeSO> startSlots = _state.CreateSnapshot();
+            List<TileTypeSO> startSlots =
+                _state.CreateSnapshot();
 
             _state.Add(tileType);
 
-            // Görsel baþlangýç: yeni taþ en sona eklenmiþ gibi baþlasýn.
-            List<TileTypeSO> visualStartSlots = new List<TileTypeSO>(startSlots);
+            // Yeni taþ görsel olarak en sona
+            // eklenmiþ gibi baþlar.
+            List<TileTypeSO> visualStartSlots =
+                new List<TileTypeSO>(
+                    startSlots);
+
             if (tileType != null)
-                visualStartSlots.Add(tileType);
+            {
+                visualStartSlots.Add(
+                    tileType);
+            }
 
             _state.GroupSameTiles();
 
-            if (_state.FindTripleIndices(out List<int> matchedSlotIndices))
+            // =====================================================
+            // TRIPLE MATCH
+            // =====================================================
+
+            if (_state.FindTripleIndices(
+                    out List<int> matchedSlotIndices))
             {
                 clearedAny = true;
 
-                List<TileTypeSO> beforeSlots = new List<TileTypeSO>(_state.Slots);
+                // Hýzlý eþleþtirme / combo sistemi
+                // baþarýlý üçlüyü buradan öðrenir.
+                TripleMatched?.Invoke();
 
-                _state.RemoveIndices(matchedSlotIndices);
+                List<TileTypeSO> beforeSlots =
+                    new List<TileTypeSO>(
+                        _state.Slots);
+
+                _state.RemoveIndices(
+                    matchedSlotIndices);
+
                 _state.GroupSameTiles();
 
-                List<TileTypeSO> afterSlots = new List<TileTypeSO>(_state.Slots);
+                List<TileTypeSO> afterSlots =
+                    new List<TileTypeSO>(
+                        _state.Slots);
+
+                GameAudioService.Instance?.PlaySfx(
+                    GameSoundEvent.TripleMatch);
 
                 if (trayView != null)
                 {
@@ -164,11 +285,16 @@ namespace ZenMatch.Gameplay
                 return true;
             }
 
+            // =====================================================
+            // NORMAL ADD
+            // =====================================================
+
             if (trayView != null)
             {
                 trayView.PlayReorderSequence(
                     visualStartSlots,
-                    new List<TileTypeSO>(_state.Slots),
+                    new List<TileTypeSO>(
+                        _state.Slots),
                     _state.CurrentCapacity,
                     _state.MaxVisualCapacity,
                     _state.LockedSlots);
@@ -181,21 +307,37 @@ namespace ZenMatch.Gameplay
             return true;
         }
 
+        // =========================================================
+        // VIEW
+        // =========================================================
 
         public void RefreshView()
         {
             if (trayView != null)
-                trayView.Rebuild(_state);
+            {
+                trayView.Rebuild(
+                    _state);
+            }
         }
 
-        public bool TryRemoveLastTileForUndo(out TileTypeSO removedTile)
+        // =========================================================
+        // UNDO
+        // =========================================================
+
+        public bool TryRemoveLastTileForUndo(
+            out TileTypeSO removedTile)
         {
             removedTile = null;
 
-            if (_state == null || _state.Count <= 0)
+            if (_state == null ||
+                _state.Count <= 0)
+            {
                 return false;
+            }
 
-            bool success = _state.TryRemoveLast(out removedTile);
+            bool success =
+                _state.TryRemoveLast(
+                    out removedTile);
 
             if (success)
                 RefreshView();

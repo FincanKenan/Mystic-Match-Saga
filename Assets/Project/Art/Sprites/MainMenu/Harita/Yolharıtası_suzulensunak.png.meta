@@ -1,0 +1,455 @@
+fileFormatVersion: 2
+guid: d8e9c8eb837600f49909c596cb7428ca
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8132483371885850802
+    second: "Yolhar\u0131tas\u0131_suzulensunak_0"
+  - first:
+      213: 3833887462412284795
+    second: "Yolhar\u0131tas\u0131_suzulensunak_1"
+  - first:
+      213: 6704556194865866682
+    second: "Yolhar\u0131tas\u0131_suzulensunak_2"
+  - first:
+      213: -2298062872608864314
+    second: "Yolhar\u0131tas\u0131_suzulensunak_3"
+  - first:
+      213: 4777580951322953808
+    second: "Yolhar\u0131tas\u0131_suzulensunak_4"
+  - first:
+      213: 7295735414322485193
+    second: "Yolhar\u0131tas\u0131_suzulensunak_5"
+  - first:
+      213: -7066638912936137396
+    second: "Yolhar\u0131tas\u0131_suzulensunak_6"
+  - first:
+      213: 2570852904380124158
+    second: "Yolhar\u0131tas\u0131_suzulensunak_7"
+  - first:
+      213: -1683770268063607341
+    second: "Yolhar\u0131tas\u0131_suzulensunak_8"
+  - first:
+      213: 7369880958670149941
+    second: "Yolhar\u0131tas\u0131_suzulensunak_9"
+  - first:
+      213: 4800203653558977373
+    second: "Yolhar\u0131tas\u0131_suzulensunak_10"
+  - first:
+      213: 9051754409229683265
+    second: "Yolhar\u0131tas\u0131_suzulensunak_11"
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: "Yolhar\u0131tas\u0131_suzulensunak_0"
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 605
+        width: 8
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b0f60bf9826cd070800000000000000
+      internalID: 8132483371885850802
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Yolhar\u0131tas\u0131_suzulensunak_1"
+      rect:
+        serializedVersion: 2
+        x: 443
+        y: 71
+        width: 1268
+        height: 900
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7378e19554b43530800000000000000
+      internalID: 3833887462412284795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Yolhar\u0131tas\u0131_suzulensunak_2"
+      rect:
+        serializedVersion: 2
+        x: 359
+        y: 543
+        width: 44
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab7ef93465e5b0d50800000000000000
+      internalID: 6704556194865866682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Yolhar\u0131tas\u0131_suzulensunak_3"
+      rect:
+        serializedVersion: 2
+        x: 1714
+        y: 446
+        width: 41
+        height: 121
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c782a63ef3ab10e0800000000000000
+      internalID: -2298062872608864314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Yolhar\u0131tas\u0131_suzulensunak_4"
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 535
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 058074100906d4240800000000000000
+      internalID: 4777580951322953808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Yolhar\u0131tas\u0131_suzulensunak_5"
+      rect:
+        serializedVersion: 2
+        x: 1705
+        y: 497
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c7dde174b8af3560800000000000000
+      internalID: 7295735414322485193
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Yolhar\u0131tas\u0131_suzulensunak_6"
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 446
+        width: 40
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c4d2d7e69514eed90800000000000000
+      internalID: -7066638912936137396
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Yolhar\u0131tas\u0131_suzulensunak_7"
+      rect:
+        serializedVersion: 2
+        x: 380
+        y: 460
+        width: 7
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: efbcb5778118da320800000000000000
+      internalID: 2570852904380124158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Yolhar\u0131tas\u0131_suzulensunak_8"
+      rect:
+        serializedVersion: 2
+        x: 367
+        y: 432
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d554b8bcdb02a8e0800000000000000
+      internalID: -1683770268063607341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Yolhar\u0131tas\u0131_suzulensunak_9"
+      rect:
+        serializedVersion: 2
+        x: 413
+        y: 397
+        width: 6
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 53913724fa3174660800000000000000
+      internalID: 7369880958670149941
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Yolhar\u0131tas\u0131_suzulensunak_10"
+      rect:
+        serializedVersion: 2
+        x: 1726
+        y: 416
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d534ae35acfbd9240800000000000000
+      internalID: 4800203653558977373
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "Yolhar\u0131tas\u0131_suzulensunak_11"
+      rect:
+        serializedVersion: 2
+        x: 1695
+        y: 397
+        width: 7
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14a063c4daa4e9d70800000000000000
+      internalID: 9051754409229683265
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      "Yolhar\u0131tas\u0131_suzulensunak_0": 8132483371885850802
+      "Yolhar\u0131tas\u0131_suzulensunak_1": 3833887462412284795
+      "Yolhar\u0131tas\u0131_suzulensunak_10": 4800203653558977373
+      "Yolhar\u0131tas\u0131_suzulensunak_11": 9051754409229683265
+      "Yolhar\u0131tas\u0131_suzulensunak_2": 6704556194865866682
+      "Yolhar\u0131tas\u0131_suzulensunak_3": -2298062872608864314
+      "Yolhar\u0131tas\u0131_suzulensunak_4": 4777580951322953808
+      "Yolhar\u0131tas\u0131_suzulensunak_5": 7295735414322485193
+      "Yolhar\u0131tas\u0131_suzulensunak_6": -7066638912936137396
+      "Yolhar\u0131tas\u0131_suzulensunak_7": 2570852904380124158
+      "Yolhar\u0131tas\u0131_suzulensunak_8": -1683770268063607341
+      "Yolhar\u0131tas\u0131_suzulensunak_9": 7369880958670149941
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

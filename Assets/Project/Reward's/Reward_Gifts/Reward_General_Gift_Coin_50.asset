@@ -20,4 +20,4 @@ MonoBehaviour:
     amount: 50
     rewardId: "Genel \xD6d\xFCl"
     displayName: 50 Coins
-    icon: {fileID: 0}
+    icon: {fileID: -308007156058307332, guid: cef0e485f6c59a047936c9a1832599fb, type: 3}

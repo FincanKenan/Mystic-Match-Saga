@@ -15,7 +15,7 @@ MonoBehaviour:
   itemId: ShopItem_Slot_1
   displayName: +1 Slot
   icon: {fileID: 7171053427425468096, guid: ad0a43352096a004ea01da6ce3c04ce7, type: 3}
-  coinPrice: 175
+  coinPrice: 400
   rewardType: 1
   rewardAmount: 1
   boosterType: 3

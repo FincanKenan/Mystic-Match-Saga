@@ -15,7 +15,7 @@ MonoBehaviour:
   itemId: ShopItem_Undo_1
   displayName: Geri Al
   icon: {fileID: 2674440167112703428, guid: 3c60648cfb839bd43b6ba0fb6a63edda, type: 3}
-  coinPrice: 150
+  coinPrice: 400
   rewardType: 1
   rewardAmount: 1
   boosterType: 0

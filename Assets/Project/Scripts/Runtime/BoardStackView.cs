@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using ZenMatch.Data;
+using UnityEngine.Rendering;
 
 namespace ZenMatch.Runtime
 {
@@ -79,6 +80,66 @@ namespace ZenMatch.Runtime
         [SerializeField] private int selectableGlowSortingOffset = 1;
         [SerializeField] private bool showGlowOnExposedLine = true;
 
+        [Header("Tray Slot Unlock Inner Glow")]
+        [SerializeField] private bool traySlotUnlockGlowEnabled = false;
+        [SerializeField] private Sprite traySlotUnlockGlowSprite;
+        [SerializeField]
+        private Color traySlotUnlockGlowColor =
+            new Color(0.15f, 1f, 0.25f, 0.85f);
+
+        [SerializeField] private float traySlotUnlockGlowScale = 0.94f;
+        [SerializeField] private int traySlotUnlockGlowSortingOffset = 2;
+
+        [SerializeField] private bool enableTraySlotUnlockGlowPulse = true;
+        [SerializeField] private float traySlotUnlockGlowPulseSpeed = 1.5f;
+        [SerializeField] private float traySlotUnlockGlowPulseAmount = 0.015f;
+
+        [Header("Reward Gift Required Point Inner Glow")]
+        [SerializeField] private bool rewardGiftRequiredGlowEnabled = false;
+        [SerializeField] private Sprite rewardGiftRequiredGlowSprite;
+
+        [SerializeField]
+        private Color rewardGiftRequiredGlowColor =
+            new Color(1f, 0.75f, 0.15f, 0.90f);
+
+        [SerializeField] private float rewardGiftRequiredGlowScale = 0.94f;
+        [SerializeField] private Vector3 rewardGiftRequiredGlowOffset = Vector3.zero;
+        [SerializeField] private int rewardGiftRequiredGlowSortingOffset = 2;
+
+        [SerializeField] private bool enableRewardGiftRequiredGlowPulse = true;
+        [SerializeField] private float rewardGiftRequiredGlowPulseSpeed = 1.5f;
+        [SerializeField] private float rewardGiftRequiredGlowPulseAmount = 0.015f;
+
+        [Header("Tray Slot Risk Visual")]
+        [SerializeField] private bool traySlotRiskEnabled = false;
+        [SerializeField] private Sprite traySlotRiskSprite;
+        [SerializeField] private Color traySlotRiskColor = Color.white;
+
+        [Tooltip("Anahtar görselinin taş boyutuna göre ölçek oranı. Örn: 0.35 = taşın yaklaşık %35'i.")]
+        [SerializeField] private float traySlotRiskScale = 0.35f;
+
+        [SerializeField] private Vector3 traySlotRiskOffset = Vector3.zero;
+        [SerializeField] private int traySlotRiskSortingOffset = 4;
+
+        [Range(0f, 1f)]
+        [SerializeField] private float traySlotRiskAlpha = 1f;
+
+        [Header("Tray Slot Risk Inner Glow")]
+        [SerializeField] private Sprite traySlotRiskGlowSprite;
+        [SerializeField]
+        private Color traySlotRiskGlowColor =
+            new Color(1f, 0.55f, 0.10f, 0.90f);
+
+        [SerializeField] private float traySlotRiskGlowScale = 0.94f;
+        [SerializeField] private int traySlotRiskGlowSortingOffset = 2;
+
+        [SerializeField] private bool enableTraySlotRiskGlowPulse = true;
+        [SerializeField] private float traySlotRiskGlowPulseSpeed = 1.5f;
+        [SerializeField] private float traySlotRiskGlowPulseAmount = 0.015f;
+
+        private bool _traySlotRiskPulseActive = false;
+        private float _traySlotRiskRuntimePulseSpeed = 1.5f;
+
         [Header("Special Reward Visuals")]
         [SerializeField] private Sprite specialCornerSparkSprite;
         [SerializeField] private Sprite specialRuneSprite;
@@ -147,6 +208,127 @@ namespace ZenMatch.Runtime
             showGlowOnExposedLine = glowOnExposed;
         }
 
+        public void ConfigureTraySlotUnlockGlow(
+            bool enabled,
+            Sprite glowSprite,
+            Color glowColor,
+            float glowScale,
+            int sortingOffset,
+            bool enablePulse,
+            float glowPulseSpeed,
+            float glowPulseAmount)
+        {
+            traySlotUnlockGlowEnabled = enabled;
+            traySlotUnlockGlowSprite = glowSprite;
+            traySlotUnlockGlowColor = glowColor;
+            traySlotUnlockGlowScale = Mathf.Max(0.01f, glowScale);
+            traySlotUnlockGlowSortingOffset = sortingOffset;
+
+            enableTraySlotUnlockGlowPulse = enablePulse;
+            traySlotUnlockGlowPulseSpeed = Mathf.Max(0.01f, glowPulseSpeed);
+            traySlotUnlockGlowPulseAmount = Mathf.Max(0f, glowPulseAmount);
+        }
+
+        public void ConfigureRewardGiftRequiredGlow(
+            bool enabled,
+            Sprite glowSprite,
+            Color glowColor,
+            float glowScale,
+            Vector3 glowOffset,
+            int sortingOffset,
+            bool enablePulse,
+            float glowPulseSpeed,
+            float glowPulseAmount)
+        {
+            rewardGiftRequiredGlowEnabled = enabled;
+            rewardGiftRequiredGlowSprite = glowSprite;
+            rewardGiftRequiredGlowColor = glowColor;
+            rewardGiftRequiredGlowScale = Mathf.Max(0.01f, glowScale);
+            rewardGiftRequiredGlowOffset = glowOffset;
+            rewardGiftRequiredGlowSortingOffset = sortingOffset;
+
+            enableRewardGiftRequiredGlowPulse = enablePulse;
+            rewardGiftRequiredGlowPulseSpeed = Mathf.Max(0.01f, glowPulseSpeed);
+            rewardGiftRequiredGlowPulseAmount = Mathf.Max(0f, glowPulseAmount);
+        }
+
+        public void ConfigureTraySlotRiskVisual(
+            bool enabled,
+            Sprite riskSprite,
+            Color riskColor,
+            float riskScale,
+            Vector3 riskOffset,
+            int riskSortingOffset,
+            Sprite glowSprite,
+            Color glowColor,
+            float glowScale,
+            int glowSortingOffset,
+            bool enableGlowPulse,
+            float glowPulseSpeed,
+            float glowPulseAmount,
+            float alpha = 1f)
+        {
+            traySlotRiskEnabled = enabled;
+            traySlotRiskSprite = riskSprite;
+            traySlotRiskColor = riskColor;
+            traySlotRiskScale = Mathf.Max(0.01f, riskScale);
+            traySlotRiskOffset = riskOffset;
+            traySlotRiskSortingOffset = riskSortingOffset;
+
+            traySlotRiskGlowSprite = glowSprite;
+            traySlotRiskGlowColor = glowColor;
+            traySlotRiskGlowScale = Mathf.Max(0.01f, glowScale);
+            traySlotRiskGlowSortingOffset = glowSortingOffset;
+
+            enableTraySlotRiskGlowPulse = enableGlowPulse;
+            traySlotRiskGlowPulseSpeed = glowPulseSpeed;
+            traySlotRiskGlowPulseAmount = glowPulseAmount;
+
+            traySlotRiskAlpha = Mathf.Clamp01(alpha);
+            _traySlotRiskPulseActive = false;
+            _traySlotRiskRuntimePulseSpeed = Mathf.Max(0.01f, glowPulseSpeed);
+        }
+
+        public void SetTraySlotRiskAlpha(float alpha)
+        {
+            SetTraySlotRiskVisualState(
+                alpha,
+                _traySlotRiskPulseActive,
+                _traySlotRiskRuntimePulseSpeed);
+        }
+
+        public void SetTraySlotRiskVisualState(
+            float alpha,
+            bool pulseActive,
+            float pulseSpeed)
+        {
+            float clampedAlpha = Mathf.Clamp01(alpha);
+            float clampedPulseSpeed = Mathf.Max(0.01f, pulseSpeed);
+
+            bool changed =
+                !Mathf.Approximately(traySlotRiskAlpha, clampedAlpha) ||
+                _traySlotRiskPulseActive != pulseActive ||
+                !Mathf.Approximately(_traySlotRiskRuntimePulseSpeed, clampedPulseSpeed);
+
+            if (!changed)
+                return;
+
+            traySlotRiskAlpha = clampedAlpha;
+            _traySlotRiskPulseActive = pulseActive;
+            _traySlotRiskRuntimePulseSpeed = clampedPulseSpeed;
+
+            Rebuild();
+        }
+
+        public void SetTraySlotRiskEnabled(bool enabled)
+        {
+            if (traySlotRiskEnabled == enabled)
+                return;
+
+            traySlotRiskEnabled = enabled;
+            Rebuild();
+        }
+
         public void ConfigureSpecialRewardVisuals(
     Sprite cornerSparkSprite,
     Sprite runeSprite,
@@ -208,14 +390,33 @@ namespace ZenMatch.Runtime
                 visual.transform.SetParent(visualsRoot, false);
                 visual.transform.localPosition = localPositions[i];
 
+                // Bu taş ve ona ait bütün efektleri tek bir sorting grubu yapıyoruz.
+                // Böylece alt taşın glow'u üstteki taşların üzerine çıkamaz.
+                SortingGroup sortingGroup = visual.AddComponent<SortingGroup>();
+                sortingGroup.sortingLayerName = sortingLayerName;
+                sortingGroup.sortingOrder =
+                    baseSortingOrder + (sortingStepPerTile * i);
+
                 SpriteRenderer sr = visual.AddComponent<SpriteRenderer>();
                 sr.sprite = sprites[i];
                 sr.sortingLayerName = sortingLayerName;
-                sr.sortingOrder = baseSortingOrder + (sortingStepPerTile * i);
-                
+
+                // Artık global sıralamayı SortingGroup yönetiyor.
+                // Taşın kendi grup içindeki sırası 0.
+                sr.sortingOrder = 0;
+
 
                 bool isCovered = ResolveCoveredState(i, localPositions, sprites);
                 sr.color = ResolveColorForIndex(i, topIndex, isCovered);
+
+                if (CanShowTraySlotUnlockGlow(i, topIndex, isCovered))
+                    CreateTraySlotUnlockGlow(visual.transform, sr.sortingOrder);
+
+                if (CanShowRewardGiftRequiredGlow(i))
+                    CreateRewardGiftRequiredGlow(visual.transform, sr.sortingOrder);
+
+                if (CanShowTraySlotRiskVisual(i))
+                    CreateTraySlotRiskVisuals(visual.transform, sr.sortingOrder);
 
                 if (CanShowSelectableGlow(i, topIndex, isCovered))
                     CreateSelectableGlow(visual.transform, sr.sortingOrder);
@@ -305,7 +506,10 @@ namespace ZenMatch.Runtime
                    direction == StackDirection.ArcDown;
         }
 
-        private bool ShouldAddColliderForIndex(int index, int topIndex, bool isCovered)
+        private bool ShouldAddColliderForIndex(
+    int index,
+    int topIndex,
+    bool isCovered)
         {
             if (_stack == null)
                 return false;
@@ -316,13 +520,23 @@ namespace ZenMatch.Runtime
             if (isCovered)
                 return false;
 
+            // Hidden stacklerde layout tipi ne olursa olsun
+            // sadece sıradaki/en üstteki taş seçilebilir.
+            if (_stack.VisibilityMode == StackVisibilityMode.Hidden)
+                return index == topIndex;
+
+            // Normal ExposedLine davranışı:
+            // görünen ve kapalı olmayan tüm taşlar seçilebilir.
             if (_stack.LayoutMode == StackLayoutMode.ExposedLine)
                 return true;
 
             return index == topIndex;
         }
 
-        private bool CanShowSelectableGlow(int index, int topIndex, bool isCovered)
+        private bool CanShowSelectableGlow(
+    int index,
+    int topIndex,
+    bool isCovered)
         {
             if (isCovered)
                 return false;
@@ -336,6 +550,11 @@ namespace ZenMatch.Runtime
             if (_stack.IsLocked)
                 return false;
 
+            // Hidden stacklerde sadece sıradaki/en üstteki taş glow alır.
+            if (_stack.VisibilityMode == StackVisibilityMode.Hidden)
+                return index == topIndex;
+
+            // Normal ExposedLine davranışı değişmiyor.
             if (_stack.LayoutMode == StackLayoutMode.ExposedLine)
                 return true;
 
@@ -363,6 +582,288 @@ namespace ZenMatch.Runtime
                 GlowPulse pulse = glow.AddComponent<GlowPulse>();
                 pulse.Init(pulseSpeed, pulseAmount);
             }
+        }
+
+        private bool CanShowTraySlotUnlockGlow(
+    int index,
+    int topIndex,
+    bool isCovered)
+        {
+            if (!traySlotUnlockGlowEnabled)
+                return false;
+
+            if (traySlotUnlockGlowSprite == null)
+                return false;
+
+            if (_stack == null)
+                return false;
+
+            if (index < 0 || index >= _stack.Count)
+                return false;
+
+            BoardTileInstance tile = _stack.Tiles[index];
+
+            if (tile == null)
+                return false;
+
+            int stableSlotIndex = _stack.GetStableSlotIndex(tile);
+
+            if (stableSlotIndex < 0)
+                stableSlotIndex = index;
+
+            // Bu stack'in EN SON kaldırılacak taşı.
+            // Stack direction / görsel yerleşim ne olursa olsun
+            // stable slot 0 final taşı temsil eder.
+            return stableSlotIndex == 0;
+        }
+
+        private void CreateTraySlotUnlockGlow(
+    Transform parent,
+    int tileSortingOrder)
+        {
+            if (traySlotUnlockGlowSprite == null)
+                return;
+
+            GameObject glow =
+                new GameObject("TraySlotUnlockInnerGlow");
+
+            glow.transform.SetParent(parent, false);
+            glow.transform.localPosition = Vector3.zero;
+
+            // 1'den küçük olduğu için efekt taşın içine oturur.
+            glow.transform.localScale =
+                Vector3.one * traySlotUnlockGlowScale;
+
+            SpriteRenderer sr =
+                glow.AddComponent<SpriteRenderer>();
+
+            sr.sprite = traySlotUnlockGlowSprite;
+            sr.color = traySlotUnlockGlowColor;
+            sr.sortingLayerName = sortingLayerName;
+
+            // Taşın üstünde görünmeli.
+            sr.sortingOrder =
+                tileSortingOrder +
+                traySlotUnlockGlowSortingOffset;
+
+            if (enableTraySlotUnlockGlowPulse)
+            {
+                GlowPulse pulse =
+                    glow.AddComponent<GlowPulse>();
+
+                pulse.Init(
+                    traySlotUnlockGlowPulseSpeed,
+                    traySlotUnlockGlowPulseAmount);
+            }
+        }
+
+        private bool CanShowRewardGiftRequiredGlow(int index)
+        {
+            if (!rewardGiftRequiredGlowEnabled)
+                return false;
+
+            if (rewardGiftRequiredGlowSprite == null)
+                return false;
+
+            if (_stack == null)
+                return false;
+
+            if (index < 0 || index >= _stack.Count)
+                return false;
+
+            BoardTileInstance tile = _stack.Tiles[index];
+
+            if (tile == null)
+                return false;
+
+            int stableSlotIndex = _stack.GetStableSlotIndex(tile);
+
+            if (stableSlotIndex < 0)
+                stableSlotIndex = index;
+
+            // Gift için temizlenmesi gereken stack'i işaretleyen glow
+            // stack'in EN SON kaldırılacak taşında görünür.
+            return stableSlotIndex == 0;
+        }
+
+        private void CreateRewardGiftRequiredGlow(
+            Transform parent,
+            int tileSortingOrder)
+        {
+            if (rewardGiftRequiredGlowSprite == null)
+                return;
+
+            GameObject glow =
+                new GameObject("RewardGiftRequiredInnerGlow");
+
+            glow.transform.SetParent(parent, false);
+            glow.transform.localPosition = rewardGiftRequiredGlowOffset;
+            glow.transform.localScale =
+                Vector3.one * rewardGiftRequiredGlowScale;
+
+            SpriteRenderer sr =
+                glow.AddComponent<SpriteRenderer>();
+
+            sr.sprite = rewardGiftRequiredGlowSprite;
+            sr.color = rewardGiftRequiredGlowColor;
+            sr.sortingLayerName = sortingLayerName;
+            sr.sortingOrder =
+                tileSortingOrder +
+                rewardGiftRequiredGlowSortingOffset;
+
+            if (enableRewardGiftRequiredGlowPulse)
+            {
+                GlowPulse pulse =
+                    glow.AddComponent<GlowPulse>();
+
+                pulse.Init(
+                    rewardGiftRequiredGlowPulseSpeed,
+                    rewardGiftRequiredGlowPulseAmount);
+            }
+        }
+
+        private bool CanShowTraySlotRiskVisual(int index)
+        {
+            if (!traySlotRiskEnabled)
+                return false;
+
+            if (_stack == null)
+                return false;
+
+            if (index < 0 || index >= _stack.Count)
+                return false;
+
+            BoardTileInstance tile = _stack.Tiles[index];
+
+            if (tile == null)
+                return false;
+
+            int stableSlotIndex = _stack.GetStableSlotIndex(tile);
+
+            if (stableSlotIndex < 0)
+                stableSlotIndex = index;
+
+            // Unlock sistemindekiyle aynı kural:
+            // Risk anahtarı stack'in EN SON kaldırılacak taşına aittir.
+            return stableSlotIndex == 0;
+        }
+
+        private void CreateTraySlotRiskVisuals(
+            Transform parent,
+            int tileSortingOrder)
+        {
+            if (parent == null)
+                return;
+
+            float alpha = Mathf.Clamp01(traySlotRiskAlpha);
+
+            // İç glow, anahtar görselinden ayrı ayarlanabilir.
+            if (traySlotRiskGlowSprite != null)
+            {
+                GameObject glow =
+                    new GameObject("TraySlotRiskInnerGlow");
+
+                glow.transform.SetParent(parent, false);
+                glow.transform.localPosition = Vector3.zero;
+                glow.transform.localScale =
+                    Vector3.one * traySlotRiskGlowScale;
+
+                SpriteRenderer glowRenderer =
+                    glow.AddComponent<SpriteRenderer>();
+
+                glowRenderer.sprite = traySlotRiskGlowSprite;
+
+                Color glowColor = traySlotRiskGlowColor;
+                glowColor.a *= alpha;
+                glowRenderer.color = glowColor;
+
+                glowRenderer.sortingLayerName = sortingLayerName;
+                glowRenderer.sortingOrder =
+                    tileSortingOrder +
+                    traySlotRiskGlowSortingOffset;
+
+                if (enableTraySlotRiskGlowPulse &&
+                    _traySlotRiskPulseActive)
+                {
+                    GlowPulse pulse =
+                        glow.AddComponent<GlowPulse>();
+
+                    pulse.Init(
+                        _traySlotRiskRuntimePulseSpeed,
+                        traySlotRiskGlowPulseAmount);
+                }
+            }
+
+            if (traySlotRiskSprite == null)
+                return;
+
+            GameObject icon =
+                new GameObject("TraySlotRiskIcon");
+
+            icon.transform.SetParent(parent, false);
+            icon.transform.localPosition = traySlotRiskOffset;
+
+            float finalScale =
+                CalculateTraySlotRiskIconScale(
+                    parent,
+                    traySlotRiskSprite);
+
+            icon.transform.localScale =
+                Vector3.one * finalScale;
+
+            SpriteRenderer iconRenderer =
+                icon.AddComponent<SpriteRenderer>();
+
+            iconRenderer.sprite = traySlotRiskSprite;
+
+            Color iconColor = traySlotRiskColor;
+            iconColor.a *= alpha;
+            iconRenderer.color = iconColor;
+
+            iconRenderer.sortingLayerName = sortingLayerName;
+            iconRenderer.sortingOrder =
+                tileSortingOrder +
+                traySlotRiskSortingOffset;
+        }
+
+        private float CalculateTraySlotRiskIconScale(
+            Transform tileTransform,
+            Sprite riskSprite)
+        {
+            if (riskSprite == null)
+                return Mathf.Max(0.01f, traySlotRiskScale);
+
+            SpriteRenderer tileRenderer =
+                tileTransform != null
+                    ? tileTransform.GetComponent<SpriteRenderer>()
+                    : null;
+
+            if (tileRenderer == null ||
+                tileRenderer.sprite == null)
+            {
+                return Mathf.Max(0.01f, traySlotRiskScale);
+            }
+
+            Vector2 tileSize =
+                tileRenderer.sprite.bounds.size;
+
+            Vector2 riskSize =
+                riskSprite.bounds.size;
+
+            if (riskSize.x <= 0.0001f ||
+                riskSize.y <= 0.0001f)
+            {
+                return Mathf.Max(0.01f, traySlotRiskScale);
+            }
+
+            float fitScale =
+                Mathf.Min(
+                    tileSize.x / riskSize.x,
+                    tileSize.y / riskSize.y);
+
+            return
+                fitScale *
+                Mathf.Max(0.01f, traySlotRiskScale);
         }
 
         private bool CanShowSpecialRewardVisuals(BoardTileInstance tile, int index, int topIndex, bool isCovered)
@@ -738,16 +1239,26 @@ namespace ZenMatch.Runtime
             return tile.TileType.Icon;
         }
 
-        private Sprite ResolveSpriteForIndex(TileTypeSO tileType, int index, int topIndex)
+        private Sprite ResolveSpriteForIndex(
+    TileTypeSO tileType,
+    int index,
+    int topIndex)
         {
             if (_stack == null || tileType == null)
                 return null;
 
+            // Hidden görünümü kilit durumundan önce kontrol et.
+            // Böylece StartsLocked + Hidden birlikte düzgün çalışır.
+            if (_stack.VisibilityMode == StackVisibilityMode.Hidden &&
+                index != topIndex)
+            {
+                return hiddenBackSprite != null
+                    ? hiddenBackSprite
+                    : tileType.Icon;
+            }
+
             if (_stack.IsLocked)
                 return tileType.Icon;
-
-            if (_stack.VisibilityMode == StackVisibilityMode.Hidden && index != topIndex)
-                return hiddenBackSprite != null ? hiddenBackSprite : tileType.Icon;
 
             return tileType.Icon;
         }

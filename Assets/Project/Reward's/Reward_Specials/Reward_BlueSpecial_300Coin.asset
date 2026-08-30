@@ -20,4 +20,4 @@ MonoBehaviour:
     amount: 300
     rewardId: Special_Blue
     displayName: 300Coin
-    icon: {fileID: 0}
+    icon: {fileID: 3837146218604516475, guid: 81bb9bff82c7db74f98d0338583a76af, type: 3}

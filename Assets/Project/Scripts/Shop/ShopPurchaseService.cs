@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using ZenMatch.Runtime.Audio;
 using ZenMatch.Runtime.PlayerProgress;
 
 namespace ZenMatch.Runtime.Shop
@@ -51,36 +52,65 @@ namespace ZenMatch.Runtime.Shop
             ResolveReferences();
 
             if (item == null)
-                return Fail(item, ShopPurchaseFailReason.InvalidItem);
+                return Fail(
+                    item,
+                    ShopPurchaseFailReason.InvalidItem);
 
             if (walletService == null)
-                return Fail(item, ShopPurchaseFailReason.MissingWalletService);
+                return Fail(
+                    item,
+                    ShopPurchaseFailReason.MissingWalletService);
 
             if (!IsRewardValid(item))
-                return Fail(item, ShopPurchaseFailReason.InvalidReward);
+                return Fail(
+                    item,
+                    ShopPurchaseFailReason.InvalidReward);
 
             if (walletService.Coins < item.CoinPrice)
-                return Fail(item, ShopPurchaseFailReason.NotEnoughCoins);
+                return Fail(
+                    item,
+                    ShopPurchaseFailReason.NotEnoughCoins);
 
+            // Coin harca.
             if (item.CoinPrice > 0)
             {
-                bool spent = walletService.TrySpendCoins(item.CoinPrice);
+                bool spent =
+                    walletService.TrySpendCoins(
+                        item.CoinPrice);
 
                 if (!spent)
-                    return Fail(item, ShopPurchaseFailReason.NotEnoughCoins);
+                {
+                    return Fail(
+                        item,
+                        ShopPurchaseFailReason.NotEnoughCoins);
+                }
             }
 
+            // Satýn alýnan ürünü oyuncuya ver.
             ApplyReward(item);
+
+            // =====================================================
+            // PURCHASE SOUND
+            // =====================================================
+
+            // Buraya yalnýzca baþarýlý satýn alma ulaþabilir.
+            GameAudioService.Instance?.PlaySfx(
+                GameSoundEvent.ShopPurchase);
+
+            // =====================================================
 
             if (logDebug)
             {
                 Debug.Log(
-                    $"[ShopPurchaseService] Purchase succeeded. Item: {item.DisplayName}, Price: {item.CoinPrice}, Reward: {item.RewardType} x{item.RewardAmount}",
-                    this
-                );
+                    $"[ShopPurchaseService] Purchase succeeded. " +
+                    $"Item: {item.DisplayName}, " +
+                    $"Price: {item.CoinPrice}, " +
+                    $"Reward: {item.RewardType} x{item.RewardAmount}",
+                    this);
             }
 
             OnPurchaseSucceeded?.Invoke(item);
+
             return true;
         }
 
@@ -98,7 +128,8 @@ namespace ZenMatch.Runtime.Shop
                     return true;
 
                 case ShopRewardType.Booster:
-                    return !string.IsNullOrWhiteSpace(item.BoosterId);
+                    return !string.IsNullOrWhiteSpace(
+                        item.BoosterId);
 
                 default:
                     return false;
@@ -110,24 +141,44 @@ namespace ZenMatch.Runtime.Shop
             switch (item.RewardType)
             {
                 case ShopRewardType.Life:
-                    walletService.AddLives(item.RewardAmount);
+
+                    walletService.AddLives(
+                        item.RewardAmount);
+
                     break;
 
                 case ShopRewardType.Booster:
-                    walletService.AddBooster(item.BoosterId, item.RewardAmount);
+
+                    walletService.AddBooster(
+                        item.BoosterId,
+                        item.RewardAmount);
+
                     break;
             }
         }
 
-        private bool Fail(ShopItemSO item, ShopPurchaseFailReason reason)
+        private bool Fail(
+            ShopItemSO item,
+            ShopPurchaseFailReason reason)
         {
             if (logDebug)
             {
-                string itemName = item != null ? item.name : "NULL";
-                Debug.Log($"[ShopPurchaseService] Purchase failed. Item: {itemName}, Reason: {reason}", this);
+                string itemName =
+                    item != null
+                        ? item.name
+                        : "NULL";
+
+                Debug.Log(
+                    $"[ShopPurchaseService] Purchase failed. " +
+                    $"Item: {itemName}, " +
+                    $"Reason: {reason}",
+                    this);
             }
 
-            OnPurchaseFailed?.Invoke(item, reason);
+            OnPurchaseFailed?.Invoke(
+                item,
+                reason);
+
             return false;
         }
     }

@@ -20,4 +20,4 @@ MonoBehaviour:
     amount: 175
     rewardId: Gift_Yellow
     displayName: 175Coin
-    icon: {fileID: 0}
+    icon: {fileID: 7646531141782066437, guid: 8f6151d563f39c2489a92f9a28a08c15, type: 3}

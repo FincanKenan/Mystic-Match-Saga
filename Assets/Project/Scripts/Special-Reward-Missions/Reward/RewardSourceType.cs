@@ -15,6 +15,9 @@ namespace ZenMatch.Runtime.Rewards
 
         LevelComplete = 200,
 
+        // Hýzlý üçlü eþleþtirme / combo ödülleri.
+        FastMatchCombo = 210,
+
         Other = 1000
     }
 }

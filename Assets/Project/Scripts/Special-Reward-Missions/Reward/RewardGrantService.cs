@@ -44,43 +44,124 @@ namespace ZenMatch.Runtime.Rewards
                 walletService = PlayerWalletService.Instance;
 
             if (walletService == null)
-                walletService = FindFirstObjectByType<PlayerWalletService>();
+            {
+                walletService =
+                    FindFirstObjectByType<PlayerWalletService>();
+            }
         }
 
-        public void GrantReward(RewardPackSO rewardPack, RewardContext context)
+        // =========================================================
+        // REWARD PACK
+        // =========================================================
+
+        public void GrantReward(
+            RewardPackSO rewardPack,
+            RewardContext context)
         {
             if (rewardPack == null)
                 return;
 
             ResolveReferences();
 
-            if (rewardPack.Rewards == null || rewardPack.Rewards.Count == 0)
+            if (rewardPack.Rewards == null ||
+                rewardPack.Rewards.Count == 0)
             {
                 if (logGrantedRewards)
-                    Debug.Log($"[RewardGrantService] RewardPack has no rewards: {rewardPack.name}", this);
+                {
+                    Debug.Log(
+                        $"[RewardGrantService] " +
+                        $"RewardPack has no rewards: " +
+                        $"{rewardPack.name}",
+                        this);
+                }
 
-                RewardEvents.RaiseRewardGranted(rewardPack, context);
+                RewardEvents.RaiseRewardGranted(
+                    rewardPack,
+                    context);
+
                 return;
             }
 
-            for (int i = 0; i < rewardPack.Rewards.Count; i++)
+            for (int i = 0;
+                 i < rewardPack.Rewards.Count;
+                 i++)
             {
-                RewardEntry rewardEntry = rewardPack.Rewards[i];
+                RewardEntry rewardEntry =
+                    rewardPack.Rewards[i];
 
-                if (rewardEntry == null || !rewardEntry.IsValid())
+                if (rewardEntry == null ||
+                    !rewardEntry.IsValid())
+                {
                     continue;
+                }
 
-                GrantRewardEntry(rewardEntry, context);
-                RewardEvents.RaiseRewardEntryGranted(rewardEntry, context);
+                GrantRewardEntry(
+                    rewardEntry,
+                    context);
+
+                RewardEvents.RaiseRewardEntryGranted(
+                    rewardEntry,
+                    context);
             }
 
-            RewardEvents.RaiseRewardGranted(rewardPack, context);
+            RewardEvents.RaiseRewardGranted(
+                rewardPack,
+                context);
 
             if (logGrantedRewards)
-                Debug.Log($"[RewardGrantService] Granted RewardPack: {rewardPack.name} | Context: {context}", this);
+            {
+                Debug.Log(
+                    $"[RewardGrantService] " +
+                    $"Granted RewardPack: " +
+                    $"{rewardPack.name} | " +
+                    $"Context: {context}",
+                    this);
+            }
         }
 
-        private void GrantRewardEntry(RewardEntry rewardEntry, RewardContext context)
+        // =========================================================
+        // SINGLE REWARD ENTRY
+        // =========================================================
+
+        public void GrantReward(
+            RewardEntry rewardEntry,
+            RewardContext context)
+        {
+            if (rewardEntry == null ||
+                !rewardEntry.IsValid())
+            {
+                return;
+            }
+
+            ResolveReferences();
+
+            GrantRewardEntry(
+                rewardEntry,
+                context);
+
+            RewardEvents.RaiseRewardEntryGranted(
+                rewardEntry,
+                context);
+
+            if (logGrantedRewards)
+            {
+                Debug.Log(
+                    $"[RewardGrantService] " +
+                    $"Granted single RewardEntry | " +
+                    $"Type: {rewardEntry.RewardType} | " +
+                    $"Amount: {rewardEntry.Amount} | " +
+                    $"Context: {context}",
+                    this);
+            }
+        }
+
+        // =========================================================
+        // ENTRY ROUTING
+        // =========================================================
+
+        private void GrantRewardEntry(
+            RewardEntry rewardEntry,
+            RewardContext context)
         {
             if (rewardEntry == null)
                 return;
@@ -91,36 +172,61 @@ namespace ZenMatch.Runtime.Rewards
                     break;
 
                 case RewardType.Coins:
-                    GrantCoins(rewardEntry.Amount, context);
+                    GrantCoins(
+                        rewardEntry.Amount,
+                        context);
                     break;
 
                 case RewardType.Lives:
-                    GrantLives(rewardEntry.Amount, context);
+                    GrantLives(
+                        rewardEntry.Amount,
+                        context);
                     break;
 
                 case RewardType.Score:
-                    GrantScore(rewardEntry.Amount, context);
+                    GrantScore(
+                        rewardEntry.Amount,
+                        context);
                     break;
 
                 case RewardType.Booster:
-                    GrantBooster(rewardEntry.RewardId, rewardEntry.Amount, context);
+                    GrantBooster(
+                        rewardEntry.RewardId,
+                        rewardEntry.Amount,
+                        context);
                     break;
 
                 case RewardType.PowerUp:
-                    GrantPowerUp(rewardEntry.RewardId, rewardEntry.Amount, context);
+                    GrantPowerUp(
+                        rewardEntry.RewardId,
+                        rewardEntry.Amount,
+                        context);
                     break;
 
                 case RewardType.Custom:
-                    GrantCustomReward(rewardEntry.RewardId, rewardEntry.Amount, context);
+                    GrantCustomReward(
+                        rewardEntry.RewardId,
+                        rewardEntry.Amount,
+                        context);
                     break;
 
                 default:
-                    Debug.LogWarning($"[RewardGrantService] Unsupported reward type: {rewardEntry.RewardType}", this);
+                    Debug.LogWarning(
+                        $"[RewardGrantService] " +
+                        $"Unsupported reward type: " +
+                        $"{rewardEntry.RewardType}",
+                        this);
                     break;
             }
         }
 
-        private void GrantCoins(int amount, RewardContext context)
+        // =========================================================
+        // COINS
+        // =========================================================
+
+        private void GrantCoins(
+            int amount,
+            RewardContext context)
         {
             if (amount <= 0)
                 return;
@@ -129,17 +235,38 @@ namespace ZenMatch.Runtime.Rewards
 
             if (walletService == null)
             {
-                Debug.LogWarning("[RewardGrantService] Coin verilemedi. PlayerWalletService bulunamadý.", this);
+                Debug.LogWarning(
+                    "[RewardGrantService] " +
+                    "Coin verilemedi. " +
+                    "PlayerWalletService bulunamadý.",
+                    this);
+
                 return;
             }
 
-            walletService.AddCoins(amount);
+            // Context wallet'a kadar gider.
+            // Eðer level-attempt reward ise
+            // wallet ayný Save içinde transaction'a da yazar.
+            walletService.AddCoins(
+                amount,
+                context);
 
             if (logGrantedRewards)
-                Debug.Log($"[RewardGrantService] Coins granted: +{amount}", this);
+            {
+                Debug.Log(
+                    $"[RewardGrantService] " +
+                    $"Coins granted: +{amount}",
+                    this);
+            }
         }
 
-        private void GrantLives(int amount, RewardContext context)
+        // =========================================================
+        // LIVES
+        // =========================================================
+
+        private void GrantLives(
+            int amount,
+            RewardContext context)
         {
             if (amount <= 0)
                 return;
@@ -148,20 +275,36 @@ namespace ZenMatch.Runtime.Rewards
 
             if (walletService == null)
             {
-                Debug.LogWarning("[RewardGrantService] Can verilemedi. PlayerWalletService bulunamadý.", this);
+                Debug.LogWarning(
+                    "[RewardGrantService] " +
+                    "Can verilemedi. " +
+                    "PlayerWalletService bulunamadý.",
+                    this);
+
                 return;
             }
 
-            walletService.AddLives(amount);
+            walletService.AddLives(
+                amount,
+                context);
 
             if (logGrantedRewards)
-                Debug.Log($"[RewardGrantService] Lives granted: +{amount}", this);
+            {
+                Debug.Log(
+                    $"[RewardGrantService] " +
+                    $"Lives granted: +{amount}",
+                    this);
+            }
         }
 
-        private void GrantScore(int amount, RewardContext context)
+        // =========================================================
+        // SCORE
+        // =========================================================
+
+        private void GrantScore(
+            int amount,
+            RewardContext context)
         {
-            // Þimdilik aktif ekonomiye baðlý deðil.
-            // Ýleride leaderboard, profil puaný veya etkinlik puaný için kullanýlabilir.
             if (amount <= 0)
                 return;
 
@@ -169,24 +312,50 @@ namespace ZenMatch.Runtime.Rewards
 
             if (walletService == null)
             {
-                Debug.LogWarning("[RewardGrantService] Score verilemedi. PlayerWalletService bulunamadý.", this);
+                Debug.LogWarning(
+                    "[RewardGrantService] " +
+                    "Score verilemedi. " +
+                    "PlayerWalletService bulunamadý.",
+                    this);
+
                 return;
             }
 
-            walletService.AddScorePlaceholder(amount);
+            walletService.AddScorePlaceholder(
+                amount,
+                context);
 
             if (logGrantedRewards)
-                Debug.Log($"[RewardGrantService] Score placeholder granted: +{amount}", this);
+            {
+                Debug.Log(
+                    $"[RewardGrantService] " +
+                    $"Score placeholder granted: " +
+                    $"+{amount}",
+                    this);
+            }
         }
 
-        private void GrantBooster(string boosterId, int amount, RewardContext context)
+        // =========================================================
+        // BOOSTER
+        // =========================================================
+
+        private void GrantBooster(
+            string boosterId,
+            int amount,
+            RewardContext context)
         {
             if (amount <= 0)
                 return;
 
-            if (string.IsNullOrWhiteSpace(boosterId))
+            if (string.IsNullOrWhiteSpace(
+                    boosterId))
             {
-                Debug.LogWarning("[RewardGrantService] Booster verilemedi. RewardId / BoosterId boþ.", this);
+                Debug.LogWarning(
+                    "[RewardGrantService] " +
+                    "Booster verilemedi. " +
+                    "RewardId / BoosterId boþ.",
+                    this);
+
                 return;
             }
 
@@ -194,29 +363,68 @@ namespace ZenMatch.Runtime.Rewards
 
             if (walletService == null)
             {
-                Debug.LogWarning("[RewardGrantService] Booster verilemedi. PlayerWalletService bulunamadý.", this);
+                Debug.LogWarning(
+                    "[RewardGrantService] " +
+                    "Booster verilemedi. " +
+                    "PlayerWalletService bulunamadý.",
+                    this);
+
                 return;
             }
 
-            walletService.AddBooster(boosterId, amount);
+            walletService.AddBooster(
+                boosterId,
+                amount,
+                context);
 
             if (logGrantedRewards)
-                Debug.Log($"[RewardGrantService] Booster granted: {boosterId} +{amount}", this);
+            {
+                Debug.Log(
+                    $"[RewardGrantService] " +
+                    $"Booster granted: " +
+                    $"{boosterId} +{amount}",
+                    this);
+            }
         }
 
-        private void GrantPowerUp(string powerUpId, int amount, RewardContext context)
+        // =========================================================
+        // POWER UP
+        // =========================================================
+
+        private void GrantPowerUp(
+            string powerUpId,
+            int amount,
+            RewardContext context)
         {
-            // Þimdilik PowerUp'ý booster envanterine ekliyoruz.
-            // Ýleride PowerUp ayrý sistem olursa burayý ayýrýrýz.
-            GrantBooster(powerUpId, amount, context);
+            // Þimdilik PowerUp booster
+            // envanterinde tutuluyor.
+            GrantBooster(
+                powerUpId,
+                amount,
+                context);
         }
 
-        private void GrantCustomReward(string rewardId, int amount, RewardContext context)
+        // =========================================================
+        // CUSTOM
+        // =========================================================
+
+        private void GrantCustomReward(
+            string rewardId,
+            int amount,
+            RewardContext context)
         {
-            // Þimdilik boþ.
-            // Ýleride özel skin, tema, etkinlik ödülü gibi þeyler için kullanýlabilir.
+            // Þimdilik gerçek persistent inventory'si yok.
+            // Ýleride skin/tema/event item geldiðinde
+            // transaction desteði ayrýca eklenebilir.
+
             if (logGrantedRewards)
-                Debug.Log($"[RewardGrantService] Custom reward placeholder: {rewardId} +{amount}", this);
+            {
+                Debug.Log(
+                    $"[RewardGrantService] " +
+                    $"Custom reward placeholder: " +
+                    $"{rewardId} +{amount}",
+                    this);
+            }
         }
     }
 }

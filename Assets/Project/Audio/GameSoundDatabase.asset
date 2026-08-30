@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1446858dcc38e2c4c94f1da06bdb7833, type: 3}
+  m_Name: GameSoundDatabase
+  m_EditorClassIdentifier: 
+  sounds:
+  - soundEvent: 30
+    clip: {fileID: 8300000, guid: f6c62b6e52fa0c0459151eef38ef9cd9, type: 3}
+    volume: 1
+    pitch: 0
+    delay: 0.3
+  - soundEvent: 31
+    clip: {fileID: 8300000, guid: 114a7630283e60946b0f6651a631baf6, type: 3}
+    volume: 0.2
+    pitch: 0
+    delay: 0.3
+  - soundEvent: 10
+    clip: {fileID: 8300000, guid: 0a62579b410a9034eb281dd055d8ce0a, type: 3}
+    volume: 0.3
+    pitch: 0
+    delay: 0
+  - soundEvent: 21
+    clip: {fileID: 8300000, guid: 73792e05dd7fdbf4abe42e276de27a39, type: 3}
+    volume: 0.5
+    pitch: 0
+    delay: 0.1
+  - soundEvent: 20
+    clip: {fileID: 8300000, guid: 8efa38a37e11dad439e9785590891100, type: 3}
+    volume: 0.2
+    pitch: 0
+    delay: 0
+  - soundEvent: 41
+    clip: {fileID: 8300000, guid: 7b0563a0c9cd3f041bfdfef3c9e59b6b, type: 3}
+    volume: 0.3
+    pitch: 0
+    delay: 0
+  - soundEvent: 50
+    clip: {fileID: 8300000, guid: 7b9203ff5c125434cab9eb442cdc2a36, type: 3}
+    volume: 0.2
+    pitch: 0
+    delay: 0
+  - soundEvent: 60
+    clip: {fileID: 8300000, guid: 1ac1b764aeab3ba4f8711b6f5d41c6e9, type: 3}
+    volume: 0.4
+    pitch: 0
+    delay: 0
+  - soundEvent: 42
+    clip: {fileID: 8300000, guid: 8fbe42b8c09820d43ba9611537a61c76, type: 3}
+    volume: 0.5
+    pitch: 2
+    delay: 0
+  - soundEvent: 22
+    clip: {fileID: 8300000, guid: 1ab74e0e05ba12341ab21b7755413bb2, type: 3}
+    volume: 1
+    pitch: 0
+    delay: 0
+  - soundEvent: 43
+    clip: {fileID: 8300000, guid: 98987b8d4095bab46932860603ddacae, type: 3}
+    volume: 0.2
+    pitch: 2
+    delay: 0
+  - soundEvent: 23
+    clip: {fileID: 8300000, guid: 24552fa9724bc6e42a837e5080590d94, type: 3}
+    volume: 0.5
+    pitch: 1
+    delay: 0
+  - soundEvent: 24
+    clip: {fileID: 8300000, guid: 1cc0c1bf03554344f846c5f281e2c8ab, type: 3}
+    volume: 1
+    pitch: 1.5
+    delay: 0.2

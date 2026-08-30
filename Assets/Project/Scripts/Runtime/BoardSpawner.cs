@@ -8,6 +8,8 @@ using ZenMatch.Data;
 using ZenMatch.UI;
 using ZenMatch.Runtime.Rewards;
 using ZenMatch.Runtime.PlayerProgress;
+using ZenMatch.Runtime.Audio;
+using ZenMatch.Runtime.RewardMissions;
 
 namespace ZenMatch.Runtime
 {
@@ -23,6 +25,9 @@ namespace ZenMatch.Runtime
             public readonly StackOpenDirection OpenDirection;
             public readonly bool StartsLocked;
             public readonly bool UnlocksTraySlotOnComplete;
+            public readonly bool ProtectsTraySlot;
+            public readonly int TrayProtectionSafeSelectionCount;
+            public readonly int TrayProtectionFadeSelectionCount;
             public readonly List<string> RequiredCompletedPointIds;
             public readonly int MinStackHeight;
             public readonly int MaxStackHeight;
@@ -41,6 +46,9 @@ namespace ZenMatch.Runtime
                 StackOpenDirection openDirection,
                 bool startsLocked,
                 bool unlocksTraySlotOnComplete,
+                bool protectsTraySlot,
+                int trayProtectionSafeSelectionCount,
+                int trayProtectionFadeSelectionCount,
                 List<string> requiredCompletedPointIds,
                 int minStackHeight,
                 int maxStackHeight,
@@ -58,6 +66,9 @@ namespace ZenMatch.Runtime
                 OpenDirection = openDirection;
                 StartsLocked = startsLocked;
                 UnlocksTraySlotOnComplete = unlocksTraySlotOnComplete;
+                ProtectsTraySlot = protectsTraySlot;
+                TrayProtectionSafeSelectionCount = trayProtectionSafeSelectionCount;
+                TrayProtectionFadeSelectionCount = trayProtectionFadeSelectionCount;
                 RequiredCompletedPointIds = requiredCompletedPointIds;
                 MinStackHeight = minStackHeight;
                 MaxStackHeight = maxStackHeight;
@@ -68,6 +79,22 @@ namespace ZenMatch.Runtime
                 SpecialTileGroupId = specialTileGroupId;
                 SpecialRewardTurnLimit = specialRewardTurnLimit;
             }
+        }
+
+        private sealed class TraySlotRiskState
+        {
+            public string PointId;
+            public int SafeSelectionCount;
+            public int FadeSelectionCount;
+            public int AppliedSelectionCount;
+            public bool IsProtected;
+            public bool IsExpired;
+
+            public int TotalSelectionCount =>
+                SafeSelectionCount + FadeSelectionCount;
+
+            public bool IsResolved =>
+                IsProtected || IsExpired;
         }
 
         private sealed class SpecialRewardTileState
@@ -142,6 +169,30 @@ namespace ZenMatch.Runtime
         [SerializeField] private float traySlotShardMaxScale = 0.18f;
         [SerializeField] private float traySlotShardRotationSpeed = 220f;
 
+        [Header("Tray Slot Risk Visual")]
+        [SerializeField] private Sprite traySlotRiskSprite;
+        [SerializeField] private Color traySlotRiskColor = new Color(1f, 1f, 1f, 1f);
+
+        [Tooltip("Anahtar görselinin taş boyutuna göre ölçek oranı. Örn: 0.35 = taşın yaklaşık %35'i.")]
+        [SerializeField] private float traySlotRiskScale = 0.35f;
+
+        [SerializeField] private Vector3 traySlotRiskOffset = Vector3.zero;
+        [SerializeField] private int traySlotRiskSortingOffset = 4;
+
+        [Header("Tray Slot Risk Inner Glow")]
+        [SerializeField] private Sprite traySlotRiskGlowSprite;
+        [SerializeField]
+        private Color traySlotRiskGlowColor =
+            new Color(1f, 0.55f, 0.10f, 0.90f);
+
+        [SerializeField] private float traySlotRiskGlowScale = 0.94f;
+        [SerializeField] private int traySlotRiskGlowSortingOffset = 2;
+
+        [SerializeField] private bool enableTraySlotRiskGlowPulse = true;
+        [SerializeField] private float traySlotRiskGlowPulseSpeed = 1.5f;
+        [SerializeField] private float traySlotRiskGlowPulseMaxSpeed = 5.5f;
+        [SerializeField] private float traySlotRiskGlowPulseAmount = 0.015f;
+
         [Header("Locked Stack Dim Steps")]
         [SerializeField, Range(0f, 0.95f)] private float lockedStackDimRank1 = 0.10f;
         [SerializeField, Range(0f, 0.95f)] private float lockedStackDimRank2 = 0.22f;
@@ -155,11 +206,44 @@ namespace ZenMatch.Runtime
         [SerializeField] private int selectableGlowSortingOffset = -1;
         [SerializeField] private bool showGlowOnExposedLine = false;
 
+        [Header("Tray Slot Unlock Inner Glow")]
+        [SerializeField] private Sprite traySlotUnlockGlowSprite;
+        [SerializeField]
+        private Color traySlotUnlockGlowColor =
+            new Color(0.15f, 1f, 0.25f, 0.85f);
+
+        [SerializeField] private float traySlotUnlockGlowScale = 0.94f;
+        [SerializeField] private int traySlotUnlockGlowSortingOffset = 2;
+
+        [SerializeField] private bool enableTraySlotUnlockGlowPulse = true;
+        [SerializeField] private float traySlotUnlockGlowPulseSpeed = 1.5f;
+        [SerializeField] private float traySlotUnlockGlowPulseAmount = 0.015f;
+
+        [Header("Reward Gift Required Point Inner Glow")]
+        [SerializeField] private Sprite rewardGiftRequiredPointSprite;
+
+        [SerializeField]
+        private Color rewardGiftRequiredPointColor =
+            new Color(1f, 0.75f, 0.15f, 0.90f);
+
+        [Min(0.01f)]
+        [SerializeField] private float rewardGiftRequiredPointScale = 0.94f;
+
+        [SerializeField]
+        private Vector3 rewardGiftRequiredPointOffset =
+            Vector3.zero;
+
+        [SerializeField] private int rewardGiftRequiredPointSortingOffset = 2;
+
+        [SerializeField] private bool enableRewardGiftRequiredPointPulse = true;
+        [SerializeField] private float rewardGiftRequiredPointPulseSpeed = 1.5f;
+        [SerializeField] private float rewardGiftRequiredPointPulseAmount = 0.015f;
+
         [Header("Special Reward Tile Visuals")]
-[SerializeField] private Sprite specialCornerSparkSprite;
-[SerializeField] private Sprite specialRuneSprite;
-[SerializeField] private SpecialRewardVisualDatabaseSO specialRewardVisualDatabase;
-[SerializeField] private int specialRewardVisualSortingOffset = 3;
+        [SerializeField] private Sprite specialCornerSparkSprite;
+        [SerializeField] private Sprite specialRuneSprite;
+        [SerializeField] private SpecialRewardVisualDatabaseSO specialRewardVisualDatabase;
+        [SerializeField] private int specialRewardVisualSortingOffset = 3;
 
         [Header("Special Reward Tray")]
         [SerializeField] private SpecialRewardTrayView specialRewardTrayView;
@@ -186,11 +270,45 @@ namespace ZenMatch.Runtime
         private readonly HashSet<string> _completedPointIds = new();
         private readonly HashSet<string> _traySlotUnlockPointIds = new();
         private readonly Dictionary<string, GameObject> _traySlotRewardVisualByPointId = new();
+        private readonly HashSet<string>
+            _rewardGiftRequiredPointIds = new();
+
+        private readonly Dictionary<string, TraySlotRiskState> _traySlotRiskStateByPointId = new();
         private readonly Dictionary<BoardTileInstance, SpecialRewardMoveSnapshot> _specialRewardUndoSnapshots = new();
 
         public IReadOnlyList<BoardStack> RuntimeStacks => _runtimeStacks;
 
         public int CurrentLevel => currentLevel;
+
+        public bool TryGetLevelCompleteGold(
+    int playerLevel,
+    out int goldAmount)
+        {
+            goldAmount = 0;
+
+            if (!useProgressionDatabase ||
+                progressionDatabase == null)
+            {
+                return false;
+            }
+
+            if (!progressionDatabase.TryResolveLevel(
+                    Mathf.Max(1, playerLevel),
+                    out LevelProgressionResolvedLevel resolved) ||
+                resolved == null ||
+                !resolved.IsValid)
+            {
+                return false;
+            }
+
+            goldAmount =
+                Mathf.Max(
+                    0,
+                    resolved.LevelCompleteGold);
+
+            return true;
+        }
+
 
         public FixedLevelSO LastSpawnedFixedLevel { get; private set; }
         public BoardLayoutSO LastSpawnedLayout { get; private set; }
@@ -199,6 +317,7 @@ namespace ZenMatch.Runtime
 
         public event Action<string> PointCompleted;
         public event Action<string> TraySlotUnlockPointCompleted;
+        public event Action<string> TraySlotProtectionExpired;
 
         private void Start()
         {
@@ -206,7 +325,6 @@ namespace ZenMatch.Runtime
                 SpawnBoard();
         }
 
-        [ContextMenu("Spawn Board")]
         [ContextMenu("Spawn Board")]
         public void SpawnBoard()
         {
@@ -252,11 +370,15 @@ namespace ZenMatch.Runtime
 
         private void ResolveProgressService()
         {
-            if (progressService == null)
+            // Her zaman yaşayan singleton'ı önceliklendir.
+            if (PlayerProgressService.Instance != null)
+            {
                 progressService = PlayerProgressService.Instance;
+                return;
+            }
 
-            if (progressService == null)
-                progressService = FindFirstObjectByType<PlayerProgressService>();
+            progressService =
+                FindFirstObjectByType<PlayerProgressService>();
         }
 
         private void ApplyLevelSourceForPlayMode()
@@ -309,13 +431,239 @@ namespace ZenMatch.Runtime
                     return;
 
                 case LevelProgressionResolvedSourceType.PoolRule:
-                    Debug.LogWarning("[BoardSpawner] PoolRule desteği sonraki adımda bağlanacak. Şimdilik manual level test ediyoruz.", this);
+                    SpawnPoolProgressionLevel(
+                        resolved,
+                        rng);
                     return;
 
                 default:
                     Debug.LogError($"[BoardSpawner] Desteklenmeyen progression source type: {resolved.SourceType}", this);
                     return;
             }
+        }
+
+        private void SpawnPoolProgressionLevel(
+    LevelProgressionResolvedLevel resolved,
+    System.Random fallbackRng)
+        {
+            if (resolved == null)
+            {
+                Debug.LogError(
+                    "[BoardSpawner] Pool progression resolved data null.",
+                    this);
+
+                return;
+            }
+
+            LevelRangeRuleSO rule =
+                resolved.PoolRule;
+
+            if (rule == null)
+            {
+                Debug.LogError(
+                    $"[BoardSpawner] Level {currentLevel} için Pool Rule null.",
+                    this);
+
+                return;
+            }
+
+            if (rule.LayoutSelectionMode !=
+                LayoutSelectionMode.WeightedRandomPool)
+            {
+                Debug.LogError(
+                    $"[BoardSpawner] Pool progression için " +
+                    $"WeightedRandomPool bekleniyor. " +
+                    $"Current: {rule.LayoutSelectionMode}",
+                    this);
+
+                return;
+            }
+
+            BoardLayoutSO selectedLayout;
+
+            if (resolved.DeterministicByLevel)
+            {
+                selectedLayout =
+                    ResolveDeterministicProgressionPoolLayout(
+                        resolved);
+            }
+            else
+            {
+                selectedLayout =
+                    ResolveLayoutForRule(
+                        rule,
+                        fallbackRng);
+            }
+
+            if (selectedLayout == null)
+            {
+                Debug.LogError(
+                    $"[BoardSpawner] Level {currentLevel} için " +
+                    $"pool layout seçilemedi.",
+                    this);
+
+                return;
+            }
+
+            // Aynı level retry edildiğinde sadece layout değil,
+            // tile dağılımı / stack yükseklikleri de aynı kalsın.
+            System.Random spawnRng =
+                resolved.DeterministicByLevel
+                    ? new System.Random(
+                        resolved.DeterministicSeed + 104729)
+                    : fallbackRng;
+
+            SpawnProceduralRule(
+                rule,
+                spawnRng,
+                selectedLayout,
+                "PROGRESSION HAVUZ");
+        }
+
+        private BoardLayoutSO
+    ResolveDeterministicProgressionPoolLayout(
+        LevelProgressionResolvedLevel resolved)
+        {
+            if (resolved == null ||
+                resolved.PoolRule == null ||
+                resolved.PoolRange == null)
+            {
+                return null;
+            }
+
+            LevelRangeRuleSO rule =
+                resolved.PoolRule;
+
+            List<WeightedLayoutReference> allLayouts =
+                rule.GetAllAllowedWeightedLayouts();
+
+            if (allLayouts == null ||
+                allLayouts.Count == 0)
+            {
+                Debug.LogError(
+                    "[BoardSpawner] Pool içinde kullanılabilir layout yok.",
+                    this);
+
+                return null;
+            }
+
+            int repeatGap =
+                Mathf.Max(
+                    0,
+                    rule.MinimumRepeatGap);
+
+            int firstLevel =
+                Mathf.Max(
+                    resolved.PoolRange.MinLevel,
+                    rule.MinLevel);
+
+            int targetLevel =
+                resolved.PlayerLevel;
+
+            if (targetLevel < firstLevel)
+                return null;
+
+            List<BoardLayoutSO> recentLayouts =
+                new();
+
+            BoardLayoutSO selectedLayout =
+                null;
+
+            // Pool'un ilk levelinden mevcut levele kadar
+            // seçimleri deterministik olarak yeniden hesaplarız.
+            //
+            // Böylece save'e "son kullanılan layoutlar"
+            // yazmamıza gerek kalmaz.
+            for (int level = firstLevel;
+                 level <= targetLevel;
+                 level++)
+            {
+                List<WeightedLayoutReference> candidates =
+                    BuildPoolCandidatesWithoutRecentLayouts(
+                        allLayouts,
+                        recentLayouts);
+
+                // Havuz çok küçükse kilitlenmemek için
+                // güvenli fallback.
+                if (candidates.Count == 0)
+                {
+                    candidates =
+                        new List<WeightedLayoutReference>(
+                            allLayouts);
+                }
+
+                System.Random levelRng =
+                    new System.Random(
+                        resolved.PoolRange
+                            .GetSeedForLevel(level));
+
+                selectedLayout =
+                    PickWeightedLayout(
+                        candidates,
+                        levelRng);
+
+                if (selectedLayout == null)
+                    return null;
+
+                if (repeatGap <= 0)
+                    continue;
+
+                recentLayouts.Add(
+                    selectedLayout);
+
+                while (recentLayouts.Count >
+                       repeatGap)
+                {
+                    recentLayouts.RemoveAt(0);
+                }
+            }
+
+            Debug.Log(
+                $"[BoardSpawner] Deterministic pool seçim. " +
+                $"PlayerLevel: {targetLevel} | " +
+                $"SelectedLayout: {selectedLayout?.name} | " +
+                $"RepeatGap: {repeatGap}",
+                this);
+
+            return selectedLayout;
+        }
+
+        private List<WeightedLayoutReference>
+            BuildPoolCandidatesWithoutRecentLayouts(
+                List<WeightedLayoutReference> source,
+                List<BoardLayoutSO> recentLayouts)
+        {
+            List<WeightedLayoutReference> result =
+                new();
+
+            if (source == null)
+                return result;
+
+            for (int i = 0;
+                 i < source.Count;
+                 i++)
+            {
+                WeightedLayoutReference entry =
+                    source[i];
+
+                if (entry == null ||
+                    !entry.IsValid ||
+                    entry.Layout == null)
+                {
+                    continue;
+                }
+
+                if (recentLayouts != null &&
+                    recentLayouts.Contains(
+                        entry.Layout))
+                {
+                    continue;
+                }
+
+                result.Add(entry);
+            }
+
+            return result;
         }
 
         private void SpawnManualBoardLayoutLevel(LevelProgressionResolvedLevel resolved, System.Random rng)
@@ -468,9 +816,7 @@ namespace ZenMatch.Runtime
             InitializeSpecialRewardTray();
             RefreshAllLockStates();
 
-            BoardSpawnIntroAnimator introAnimator = GetComponent<BoardSpawnIntroAnimator>();
-            if (introAnimator != null)
-                introAnimator.PlayIntro(stacksRoot);
+            PlayBoardIntro();
 
             Debug.Log(
                 $"[BoardSpawner] Manual progression spawn tamamlandı. " +
@@ -592,9 +938,7 @@ namespace ZenMatch.Runtime
             InitializeSpecialRewardTray();
             RefreshAllLockStates();
 
-            BoardSpawnIntroAnimator introAnimator = GetComponent<BoardSpawnIntroAnimator>();
-            if (introAnimator != null)
-                introAnimator.PlayIntro(stacksRoot);
+            PlayBoardIntro();
 
             Debug.Log(
                 $"[BoardSpawner] Manual fixed progression spawn tamamlandı. " +
@@ -660,6 +1004,10 @@ namespace ZenMatch.Runtime
 
             _traySlotRewardVisualByPointId.Clear();
 
+            _traySlotRiskStateByPointId.Clear();
+
+            _rewardGiftRequiredPointIds.Clear();
+
             _runtimeViews.Clear();
             _runtimeStacks.Clear();
             _stackByPointId.Clear();
@@ -702,6 +1050,14 @@ namespace ZenMatch.Runtime
                 if (tileIndex < 0 || tileIndex >= stack.Count)
                     return false;
 
+                // Hidden ExposedLine stacklerde yalnızca
+                // sıradaki/en üstteki taş alınabilir.
+                if (stack.VisibilityMode == StackVisibilityMode.Hidden &&
+                    tileIndex != stack.Count - 1)
+                {
+                    return false;
+                }
+
                 removedIndex = tileIndex;
                 removedTile = stack.RemoveAt(tileIndex);
             }
@@ -741,6 +1097,22 @@ namespace ZenMatch.Runtime
             RestoreSpecialRewardUndoForTile(tile);
 
             _completedPointIds.Remove(pointId);
+
+            if (_rewardGiftRequiredPointIds.Contains(pointId) &&
+                _viewByPointId.TryGetValue(pointId, out BoardStackView giftRequiredView) &&
+                giftRequiredView != null)
+            {
+                giftRequiredView.ConfigureRewardGiftRequiredGlow(
+                    true,
+                    rewardGiftRequiredPointSprite,
+                    rewardGiftRequiredPointColor,
+                    rewardGiftRequiredPointScale,
+                    rewardGiftRequiredPointOffset,
+                    rewardGiftRequiredPointSortingOffset,
+                    enableRewardGiftRequiredPointPulse,
+                    rewardGiftRequiredPointPulseSpeed,
+                    rewardGiftRequiredPointPulseAmount);
+            }
 
             RefreshStackView(pointId);
             RefreshAllSpecialRewardViews();
@@ -1069,11 +1441,39 @@ namespace ZenMatch.Runtime
             if (!newlyCompleted)
                 return;
 
+            bool isTraySlotUnlockPoint =
+                _traySlotUnlockPointIds.Contains(pointId);
+
+            // Risk point zamanında tamamlandıysa tray slotu korunur.
+            if (_traySlotRiskStateByPointId.TryGetValue(
+                    pointId,
+                    out TraySlotRiskState riskState) &&
+                riskState != null &&
+                !riskState.IsExpired &&
+                !riskState.IsProtected)
+            {
+                riskState.IsProtected = true;
+                SetTraySlotRiskViewEnabled(pointId, false);
+
+                Debug.Log(
+                    $"[BoardSpawner] Tray protection saved. Point: {pointId}",
+                    this);
+            }
+
             RemoveTraySlotRewardVisual(pointId);
+
+            if (isTraySlotUnlockPoint)
+            {
+                if (GameAudioService.Instance != null)
+                {
+                    GameAudioService.Instance.PlaySfx(
+                        GameSoundEvent.TraySlotUnlock);
+                }
+            }
 
             PointCompleted?.Invoke(pointId);
 
-            if (_traySlotUnlockPointIds.Contains(pointId))
+            if (isTraySlotUnlockPoint)
                 TraySlotUnlockPointCompleted?.Invoke(pointId);
 
             RefreshAllLockStates();
@@ -1192,9 +1592,7 @@ namespace ZenMatch.Runtime
             InitializeSpecialRewardTray();
             RefreshAllLockStates();
 
-            BoardSpawnIntroAnimator introAnimator = GetComponent<BoardSpawnIntroAnimator>();
-            if (introAnimator != null)
-                introAnimator.PlayIntro(stacksRoot);
+            PlayBoardIntro();
 
             Debug.Log(
                 $"[BoardSpawner] Fixed level spawn tamamlandı. " +
@@ -1204,168 +1602,300 @@ namespace ZenMatch.Runtime
             return true;
         }
 
-        private void SpawnProceduralFromRange(System.Random rng)
+        private void SpawnProceduralFromRange(
+    System.Random rng)
         {
             if (generationDatabase == null)
             {
-                Debug.LogError("[BoardSpawner] LevelGenerationDatabaseSO atanmadı.", this);
+                Debug.LogError(
+                    "[BoardSpawner] LevelGenerationDatabaseSO atanmadı.",
+                    this);
+
                 return;
             }
 
-            if (!generationDatabase.TryGetRuleForLevel(currentLevel, out LevelRangeRuleSO rule) || rule == null)
+            if (!generationDatabase.TryGetRuleForLevel(
+                    currentLevel,
+                    out LevelRangeRuleSO rule) ||
+                rule == null)
             {
-                Debug.LogError($"[BoardSpawner] Level {currentLevel} için uygun LevelRangeRule bulunamadı.", this);
+                Debug.LogError(
+                    $"[BoardSpawner] Level {currentLevel} için " +
+                    $"uygun LevelRangeRule bulunamadı.",
+                    this);
+
+                return;
+            }
+
+            BoardLayoutSO selectedLayout =
+                ResolveLayoutForRule(
+                    rule,
+                    rng);
+
+            if (selectedLayout == null)
+                return;
+
+            SpawnProceduralRule(
+                rule,
+                rng,
+                selectedLayout,
+                null);
+        }
+
+        private void SpawnProceduralRule(
+    LevelRangeRuleSO rule,
+    System.Random rng,
+    BoardLayoutSO selectedLayout,
+    string spawnModeOverride)
+        {
+            if (rule == null)
+                return;
+
+            if (rng == null)
+                rng = new System.Random();
+
+            if (selectedLayout == null)
+            {
+                Debug.LogError(
+                    "[BoardSpawner] Procedural selected layout null.",
+                    this);
+
                 return;
             }
 
             ApplyBackgroundFromRule(rule);
 
-            TileBagSO tileBag = rule.TileBag;
+            TileBagSO tileBag =
+                rule.TileBag;
+
             if (tileBag == null)
             {
-                Debug.LogError("[BoardSpawner] Rule içinde TileBagSO atanmadı.", this);
+                Debug.LogError(
+                    "[BoardSpawner] Rule içinde TileBagSO atanmadı.",
+                    this);
+
                 return;
             }
 
             if (!tileBag.HasValidEntries())
             {
-                Debug.LogError("[BoardSpawner] Rule TileBag içinde geçerli entry yok.", this);
+                Debug.LogError(
+                    "[BoardSpawner] Rule TileBag içinde geçerli entry yok.",
+                    this);
+
                 return;
             }
-
-            BoardLayoutSO selectedLayout = ResolveLayoutForRule(rule, rng);
-            if (selectedLayout == null)
-                return;
 
             EnsureStacksRoot();
 
-            Dictionary<string, BoardPointAnchor> anchorMap = BuildAnchorMap(
-    FindAnchorsForLayout(selectedLayout, null));
+            Dictionary<string, BoardPointAnchor> anchorMap =
+                BuildAnchorMap(
+                    FindAnchorsForLayout(
+                        selectedLayout,
+                        null));
 
-            List<ResolvedSpawnPoint> resolvedPoints = ResolveLayoutSpawnPoints(selectedLayout, anchorMap);
-            LogResolvedPoints(selectedLayout, resolvedPoints);
+            List<ResolvedSpawnPoint> resolvedPoints =
+                ResolveLayoutSpawnPoints(
+                    selectedLayout,
+                    anchorMap);
+
+            LogResolvedPoints(
+                selectedLayout,
+                resolvedPoints);
 
             if (resolvedPoints.Count == 0)
             {
-                Debug.LogError($"[BoardSpawner] Layout için scene anchor bulunamadı. Layout: {selectedLayout.LayoutId}", this);
+                Debug.LogError(
+                    $"[BoardSpawner] Layout için scene anchor bulunamadı. " +
+                    $"Layout: {selectedLayout.LayoutId}",
+                    this);
+
                 return;
             }
 
-            int requestedTotalTiles = rng.Next(rule.MinTotalTiles, rule.MaxTotalTiles + 1);
-            int normalizedTotalTiles = BoardGenerationMath.RoundUpToMultipleOfThree(requestedTotalTiles);
+            int requestedTotalTiles =
+                rng.Next(
+                    rule.MinTotalTiles,
+                    rule.MaxTotalTiles + 1);
 
-            int minPossibleTiles = ComputeMinPossibleTiles(resolvedPoints);
-            int maxPossibleTiles = ComputeMaxPossibleTiles(resolvedPoints);
+            int normalizedTotalTiles =
+                BoardGenerationMath
+                    .RoundUpToMultipleOfThree(
+                        requestedTotalTiles);
 
-            if (normalizedTotalTiles > maxPossibleTiles)
+            int minPossibleTiles =
+                ComputeMinPossibleTiles(
+                    resolvedPoints);
+
+            int maxPossibleTiles =
+                ComputeMaxPossibleTiles(
+                    resolvedPoints);
+
+            if (normalizedTotalTiles >
+                maxPossibleTiles)
             {
                 Debug.LogWarning(
-                    $"[BoardSpawner] Normalize tile sayısı point bazlı maksimum kapasiteyi aşıyor. " +
-                    $"Requested: {requestedTotalTiles}, Normalized: {normalizedTotalTiles}, MaxPossible: {maxPossibleTiles}. " +
-                    $"Tile sayısı kapasiteye göre düşürülecek.",
+                    $"[BoardSpawner] Normalize tile sayısı " +
+                    $"point maksimum kapasitesini aşıyor. " +
+                    $"Requested: {requestedTotalTiles}, " +
+                    $"Normalized: {normalizedTotalTiles}, " +
+                    $"MaxPossible: {maxPossibleTiles}.",
                     this);
 
-                normalizedTotalTiles = maxPossibleTiles;
+                normalizedTotalTiles =
+                    maxPossibleTiles;
             }
 
-            normalizedTotalTiles = BoardGenerationMath.RoundDownToMultipleOfThree(normalizedTotalTiles);
+            normalizedTotalTiles =
+                BoardGenerationMath
+                    .RoundDownToMultipleOfThree(
+                        normalizedTotalTiles);
 
-            if (normalizedTotalTiles < minPossibleTiles)
+            if (normalizedTotalTiles <
+                minPossibleTiles)
             {
-                int raised = BoardGenerationMath.RoundUpToMultipleOfThree(minPossibleTiles);
+                int raised =
+                    BoardGenerationMath
+                        .RoundUpToMultipleOfThree(
+                            minPossibleTiles);
 
                 if (raised <= maxPossibleTiles)
                 {
-                    normalizedTotalTiles = raised;
+                    normalizedTotalTiles =
+                        raised;
                 }
                 else
                 {
                     Debug.LogError(
-                        $"[BoardSpawner] Point bazlı min/max stack kuralları ile geçerli 3'ün katı tile sayısı üretilemedi. " +
-                        $"MinPossible: {minPossibleTiles}, MaxPossible: {maxPossibleTiles}",
+                        $"[BoardSpawner] Geçerli tile sayısı üretilemedi. " +
+                        $"MinPossible: {minPossibleTiles}, " +
+                        $"MaxPossible: {maxPossibleTiles}",
                         this);
+
                     return;
                 }
             }
 
             if (normalizedTotalTiles < 3)
             {
-                Debug.LogError("[BoardSpawner] Final total tile sayısı 3'ten küçük kaldı. Rule/layout ayarlarını kontrol et.", this);
+                Debug.LogError(
+                    "[BoardSpawner] Final tile sayısı 3'ten küçük.",
+                    this);
+
                 return;
             }
 
-            List<int> stackHeights = BuildStackHeights(
-                resolvedPoints,
-                normalizedTotalTiles,
-                rng);
+            List<int> stackHeights =
+                BuildStackHeights(
+                    resolvedPoints,
+                    normalizedTotalTiles,
+                    rng);
 
-            if (stackHeights == null || stackHeights.Count != resolvedPoints.Count)
+            if (stackHeights == null ||
+                stackHeights.Count !=
+                resolvedPoints.Count)
             {
-                Debug.LogError("[BoardSpawner] Point bazlı stack height planı oluşturulamadı.", this);
+                Debug.LogError(
+                    "[BoardSpawner] Stack height planı oluşturulamadı.",
+                    this);
+
                 return;
             }
 
-            int normalTileCount = ComputeNormalTileCountForTileBag(resolvedPoints, stackHeights);
+            int normalTileCount =
+                ComputeNormalTileCountForTileBag(
+                    resolvedPoints,
+                    stackHeights);
+
             if (normalTileCount < 0)
-            {
-                Debug.LogError("[BoardSpawner] Normal tile sayısı hesaplanamadı.", this);
                 return;
-            }
 
             if (normalTileCount % 3 != 0)
             {
                 Debug.LogError(
-                    $"[BoardSpawner] Normal tile sayısı 3'ün katı olmalı. " +
-                    $"NormalTileCount: {normalTileCount}. Special tile sayısını 3'ün katı yap.",
+                    $"[BoardSpawner] Normal tile sayısı 3'ün katı değil. " +
+                    $"Count: {normalTileCount}",
                     this);
+
                 return;
             }
 
-            List<TileTypeSO> generatedTiles = normalTileCount > 0
-                ? TileTripleDistributionBuilder.BuildTripleDistributedTiles(tileBag, normalTileCount, rng)
-                : new List<TileTypeSO>();
+            List<TileTypeSO> generatedTiles =
+                normalTileCount > 0
+                    ? TileTripleDistributionBuilder
+                        .BuildTripleDistributedTiles(
+                            tileBag,
+                            normalTileCount,
+                            rng)
+                    : new List<TileTypeSO>();
 
-            if (generatedTiles == null || generatedTiles.Count != normalTileCount)
+            if (generatedTiles == null ||
+                generatedTiles.Count !=
+                normalTileCount)
             {
                 Debug.LogError(
-                    $"[BoardSpawner] Triple tile distribution oluşturulamadı veya yanlış sayıda tile üretti. " +
-                    $"Expected: {normalTileCount}, Actual: {(generatedTiles == null ? 0 : generatedTiles.Count)}",
+                    $"[BoardSpawner] Tile distribution oluşturulamadı. " +
+                    $"Expected: {normalTileCount}, " +
+                    $"Actual: {(generatedTiles == null ? 0 : generatedTiles.Count)}",
                     this);
+
                 return;
             }
 
-            if (generatedTiles.Count > 0 && !AreAllTileCountsMultipleOfThree(generatedTiles))
+            if (generatedTiles.Count > 0 &&
+                !AreAllTileCountsMultipleOfThree(
+                    generatedTiles))
             {
-                LogInvalidTileCounts(generatedTiles);
-                Debug.LogError("[BoardSpawner] Üretilen tile dağılımında 3'ün katı olmayan type bulundu.", this);
+                LogInvalidTileCounts(
+                    generatedTiles);
+
+                Debug.LogError(
+                    "[BoardSpawner] Tile dağılımında " +
+                    "3'ün katı olmayan type bulundu.",
+                    this);
+
                 return;
             }
 
             if (logTileDistribution)
-                LogTileDistribution(generatedTiles);
+            {
+                LogTileDistribution(
+                    generatedTiles);
+            }
 
-            BuildRuntimeStacksFromPlan(resolvedPoints, stackHeights, generatedTiles);
+            BuildRuntimeStacksFromPlan(
+                resolvedPoints,
+                stackHeights,
+                generatedTiles);
 
-            LastSpawnedLayout = selectedLayout;
+            LastSpawnedFixedLevel =
+                null;
+
+            LastSpawnedLayout =
+                selectedLayout;
 
             InitializeSpecialRewardTray();
             RefreshAllLockStates();
 
-            BoardSpawnIntroAnimator introAnimator = GetComponent<BoardSpawnIntroAnimator>();
-            if (introAnimator != null)
-                introAnimator.PlayIntro(stacksRoot);
+            PlayBoardIntro();
 
-            string spawnModeText = rule.LayoutSelectionMode == LayoutSelectionMode.SequentialByLevelNumber
-    ? "SIRALI"
-    : "HAVUZ";
+            string spawnModeText =
+                !string.IsNullOrWhiteSpace(
+                    spawnModeOverride)
+                    ? spawnModeOverride
+                    : rule.LayoutSelectionMode ==
+                      LayoutSelectionMode.SequentialByLevelNumber
+                        ? "SIRALI"
+                        : "HAVUZ";
 
             Debug.Log(
                 $"[BoardSpawner] {spawnModeText} spawn tamamlandı. " +
                 $"CurrentLevel: {currentLevel}, " +
-                $"SelectionMode: {rule.LayoutSelectionMode}, " +
                 $"SelectedLayoutAsset: {selectedLayout.name}, " +
                 $"SelectedLayoutId: {selectedLayout.LayoutId}, " +
-                $"RequestedTiles: {requestedTotalTiles}, FinalTiles: {generatedTiles.Count}, StackCount: {_runtimeStacks.Count}",
+                $"RequestedTiles: {requestedTotalTiles}, " +
+                $"FinalTiles: {generatedTiles.Count}, " +
+                $"StackCount: {_runtimeStacks.Count}",
                 this);
         }
 
@@ -1947,6 +2477,8 @@ namespace ZenMatch.Runtime
                 return new BoardPointAnchor[0];
             }
 
+
+
             BoardPointAnchor[] anchors =
                 levelRoot.GetComponentsInChildren<BoardPointAnchor>(true);
 
@@ -2084,6 +2616,9 @@ namespace ZenMatch.Runtime
                             pointRef.stackOpenDirection,
                             pointRef.startsLocked,
                             pointRef.unlocksTraySlotOnComplete,
+                            pointRef.protectsTraySlot,
+                            pointRef.trayProtectionSafeSelectionCount,
+                            pointRef.trayProtectionFadeSelectionCount,
                             requiredIds,
                             minHeight,
                             maxHeight,
@@ -2317,10 +2852,37 @@ namespace ZenMatch.Runtime
                     CreateTraySlotRewardVisual(stack, point.RenderPriority);
                 }
 
+                if (point.ProtectsTraySlot &&
+                    !point.UnlocksTraySlotOnComplete)
+                {
+                    int safeSelectionCount =
+                        Mathf.Max(0, point.TrayProtectionSafeSelectionCount);
+
+                    int fadeSelectionCount =
+                        Mathf.Max(1, point.TrayProtectionFadeSelectionCount);
+
+                    TraySlotRiskState riskState = new TraySlotRiskState
+                    {
+                        PointId = stack.PointId,
+                        SafeSelectionCount = safeSelectionCount,
+                        FadeSelectionCount = fadeSelectionCount,
+                        AppliedSelectionCount = 0,
+                        IsProtected = false,
+                        IsExpired = false
+                    };
+
+                    _traySlotRiskStateByPointId[stack.PointId] = riskState;
+                }
+
                 _runtimeStacks.Add(stack);
                 _stackByPointId[stack.PointId] = stack;
 
-                BoardStackView view = CreateStackView(stack, point.RenderPriority);
+                BoardStackView view = CreateStackView(
+                    stack,
+                    point.RenderPriority,
+                    point.UnlocksTraySlotOnComplete,
+                    point.ProtectsTraySlot &&
+                    !point.UnlocksTraySlotOnComplete);
                 _viewByPointId[stack.PointId] = view;
             }
 
@@ -2444,7 +3006,277 @@ namespace ZenMatch.Runtime
             _traySlotRewardVisualByPointId.Remove(pointId);
         }
 
-        private BoardStackView CreateStackView(BoardStack stack, int renderPriority)
+        private void SetTraySlotRiskVisualState(
+            string pointId,
+            float alpha,
+            bool pulseActive,
+            float pulseSpeed)
+        {
+            if (string.IsNullOrWhiteSpace(pointId))
+                return;
+
+            if (!_viewByPointId.TryGetValue(
+                    pointId,
+                    out BoardStackView view) ||
+                view == null)
+            {
+                return;
+            }
+
+            view.SetTraySlotRiskVisualState(
+                Mathf.Clamp01(alpha),
+                pulseActive,
+                Mathf.Max(0.01f, pulseSpeed));
+        }
+
+        private void SetTraySlotRiskViewEnabled(
+            string pointId,
+            bool enabled)
+        {
+            if (string.IsNullOrWhiteSpace(pointId))
+                return;
+
+            if (!_viewByPointId.TryGetValue(
+                    pointId,
+                    out BoardStackView view) ||
+                view == null)
+            {
+                return;
+            }
+
+            view.SetTraySlotRiskEnabled(enabled);
+        }
+
+        private float CalculateTraySlotRiskAlpha(
+            TraySlotRiskState state)
+        {
+            if (state == null || state.IsResolved)
+                return 0f;
+
+            int safeCount =
+                Mathf.Max(0, state.SafeSelectionCount);
+
+            int fadeCount =
+                Mathf.Max(1, state.FadeSelectionCount);
+
+            // Safe aşamasında erişilebilirlikten bağımsız olarak
+            // görsel tamamen görünür kalır.
+            if (state.AppliedSelectionCount <= safeCount)
+                return 1f;
+
+            int fadeApplied =
+                state.AppliedSelectionCount - safeCount;
+
+            if (fadeApplied >= fadeCount)
+                return 0f;
+
+            // Fade'in ilk hamlesinde belirginlik azalmaya başlar.
+            // Son fade hamlesinde Expire çalışacağı için 0 alpha
+            // yalnızca gerçekten süre bittiğinde uygulanır.
+            float fadeT =
+                fadeApplied / (float)fadeCount;
+
+            return Mathf.Lerp(
+                1f,
+                0.20f,
+                Mathf.Clamp01(fadeT));
+        }
+
+        private float CalculateTraySlotRiskPulseSpeed(
+            TraySlotRiskState state)
+        {
+            if (state == null)
+                return traySlotRiskGlowPulseSpeed;
+
+            int safeCount =
+                Mathf.Max(0, state.SafeSelectionCount);
+
+            int fadeCount =
+                Mathf.Max(1, state.FadeSelectionCount);
+
+            int fadeApplied =
+                Mathf.Max(
+                    0,
+                    state.AppliedSelectionCount - safeCount);
+
+            if (fadeApplied <= 0)
+                return traySlotRiskGlowPulseSpeed;
+
+            float fadeT =
+                Mathf.Clamp01(
+                    fadeApplied / (float)fadeCount);
+
+            return Mathf.Lerp(
+                traySlotRiskGlowPulseSpeed,
+                Mathf.Max(
+                    traySlotRiskGlowPulseSpeed,
+                    traySlotRiskGlowPulseMaxSpeed),
+                fadeT);
+        }
+
+        private void ExpireTraySlotRisk(
+            TraySlotRiskState state)
+        {
+            if (state == null)
+                return;
+
+            if (state.IsResolved)
+                return;
+
+            state.AppliedSelectionCount =
+                state.TotalSelectionCount;
+
+            state.IsExpired = true;
+
+            // Sadece risk icon + inner glow kaybolur.
+            // Normal board taşı olduğu yerde kalmaya devam eder.
+            SetTraySlotRiskVisualState(
+                state.PointId,
+                0f,
+                false,
+                traySlotRiskGlowPulseSpeed);
+
+            SetTraySlotRiskViewEnabled(
+                state.PointId,
+                false);
+
+            TraySlotProtectionExpired?.Invoke(
+                state.PointId);
+
+            Debug.Log(
+                $"[BoardSpawner] Tray protection expired. " +
+                $"Point: {state.PointId} | " +
+                $"Safe: {state.SafeSelectionCount} | " +
+                $"Fade: {state.FadeSelectionCount} | " +
+                $"Applied: {state.AppliedSelectionCount}",
+                this);
+        }
+
+        public void NotifySuccessfulTileSelectionForTrayRisk(
+    string selectedPointId)
+        {
+            if (_traySlotRiskStateByPointId.Count == 0)
+                return;
+
+            List<TraySlotRiskState> states =
+                new List<TraySlotRiskState>(
+                    _traySlotRiskStateByPointId.Values);
+
+            for (int i = 0; i < states.Count; i++)
+            {
+                TraySlotRiskState state =
+                    states[i];
+
+                if (state == null ||
+                    state.IsResolved)
+                {
+                    continue;
+                }
+
+                // ---------------------------------------------------------
+                // ÖNEMLİ:
+                // Oyuncu risk/anahtar taşının kendisini seçtiyse,
+                // o taşın kendi sayacını bu hamlede azaltma.
+                //
+                // Böylece son 1 hakkı kalmışken anahtarı alan oyuncu
+                // başarılı sayılır ve slot kilitlenmez.
+                //
+                // Fakat diğer aktif risk pointleri bu seçimden etkilenmeye
+                // devam eder.
+                // ---------------------------------------------------------
+                if (!string.IsNullOrWhiteSpace(selectedPointId) &&
+                    state.PointId == selectedPointId)
+                {
+                    Debug.Log(
+                        $"[BoardSpawner] Tray risk KEY SELECTED. " +
+                        $"Sayaç azaltılmadı. Point: {state.PointId}",
+                        this);
+
+                    continue;
+                }
+
+                // Leveldeki diğer başarılı oyuncu seçimleri
+                // aktif risk pointlerinin süresini ilerletir.
+                state.AppliedSelectionCount++;
+
+                int safeCount =
+                    Mathf.Max(
+                        0,
+                        state.SafeSelectionCount);
+
+                int fadeCount =
+                    Mathf.Max(
+                        1,
+                        state.FadeSelectionCount);
+
+                int expireAt =
+                    safeCount + fadeCount;
+
+                // ---------------------------------------------------------
+                // SAFE
+                // ---------------------------------------------------------
+
+                if (state.AppliedSelectionCount <= safeCount)
+                {
+                    SetTraySlotRiskVisualState(
+                        state.PointId,
+                        1f,
+                        false,
+                        traySlotRiskGlowPulseSpeed);
+
+                    Debug.Log(
+                        $"[BoardSpawner] Tray risk SAFE. " +
+                        $"Point: {state.PointId} | " +
+                        $"Applied: {state.AppliedSelectionCount}/{safeCount}",
+                        this);
+
+                    continue;
+                }
+
+                // ---------------------------------------------------------
+                // EXPIRE
+                // ---------------------------------------------------------
+
+                if (state.AppliedSelectionCount >= expireAt)
+                {
+                    ExpireTraySlotRisk(state);
+                    continue;
+                }
+
+                // ---------------------------------------------------------
+                // FADE
+                // ---------------------------------------------------------
+
+                float alpha =
+                    CalculateTraySlotRiskAlpha(state);
+
+                float pulseSpeed =
+                    CalculateTraySlotRiskPulseSpeed(state);
+
+                SetTraySlotRiskVisualState(
+                    state.PointId,
+                    alpha,
+                    true,
+                    pulseSpeed);
+
+                int fadeApplied =
+                    state.AppliedSelectionCount - safeCount;
+
+                Debug.Log(
+                    $"[BoardSpawner] Tray risk FADE. " +
+                    $"Point: {state.PointId} | " +
+                    $"FadeStep: {fadeApplied}/{fadeCount} | " +
+                    $"Alpha: {alpha:F2} | " +
+                    $"PulseSpeed: {pulseSpeed:F2}",
+                    this);
+            }
+        }
+
+        private BoardStackView CreateStackView(
+            BoardStack stack,
+            int renderPriority,
+            bool unlocksTraySlotOnComplete,
+            bool protectsTraySlot)
         {
             GameObject stackGo = new GameObject($"Stack_{stack.PointId}");
             stackGo.transform.SetParent(stacksRoot, false);
@@ -2471,11 +3303,48 @@ namespace ZenMatch.Runtime
                 selectableGlowSortingOffset,
                 showGlowOnExposedLine);
 
+            view.ConfigureTraySlotUnlockGlow(
+                unlocksTraySlotOnComplete,
+                traySlotUnlockGlowSprite,
+                traySlotUnlockGlowColor,
+                traySlotUnlockGlowScale,
+                traySlotUnlockGlowSortingOffset,
+                enableTraySlotUnlockGlowPulse,
+                traySlotUnlockGlowPulseSpeed,
+                traySlotUnlockGlowPulseAmount);
+
+            view.ConfigureRewardGiftRequiredGlow(
+                _rewardGiftRequiredPointIds.Contains(stack.PointId),
+                rewardGiftRequiredPointSprite,
+                rewardGiftRequiredPointColor,
+                rewardGiftRequiredPointScale,
+                rewardGiftRequiredPointOffset,
+                rewardGiftRequiredPointSortingOffset,
+                enableRewardGiftRequiredPointPulse,
+                rewardGiftRequiredPointPulseSpeed,
+                rewardGiftRequiredPointPulseAmount);
+
+            view.ConfigureTraySlotRiskVisual(
+                protectsTraySlot,
+                traySlotRiskSprite,
+                traySlotRiskColor,
+                traySlotRiskScale,
+                traySlotRiskOffset,
+                traySlotRiskSortingOffset,
+                traySlotRiskGlowSprite,
+                traySlotRiskGlowColor,
+                traySlotRiskGlowScale,
+                traySlotRiskGlowSortingOffset,
+                enableTraySlotRiskGlowPulse,
+                traySlotRiskGlowPulseSpeed,
+                traySlotRiskGlowPulseAmount,
+                1f);
+
             view.ConfigureSpecialRewardVisuals(
-    specialCornerSparkSprite,
-    specialRuneSprite,
-    specialRewardVisualDatabase,
-    specialRewardVisualSortingOffset);
+                specialCornerSparkSprite,
+                specialRuneSprite,
+                specialRewardVisualDatabase,
+                specialRewardVisualSortingOffset);
 
             view.Rebuild();
 
@@ -2583,6 +3452,35 @@ namespace ZenMatch.Runtime
             GameObject root = new GameObject("SpawnedStacks");
             root.transform.SetParent(transform, false);
             stacksRoot = root.transform;
+        }
+
+        private void PlayBoardIntro()
+        {
+            StartCoroutine(PlayBoardIntroRoutine());
+        }
+
+        private IEnumerator PlayBoardIntroRoutine()
+        {
+            // SpawnBoard / Start işlemlerinin tamamen bitmesini bekle.
+            yield return null;
+
+            // İlk frame'in ekrana çizilmesini de bekle.
+            yield return new WaitForEndOfFrame();
+
+            BoardSpawnIntroAnimator introAnimator =
+                GetComponent<BoardSpawnIntroAnimator>();
+
+            if (introAnimator == null)
+                yield break;
+
+            // Ses ve taş düşme animasyonu aynı anda başlasın.
+            if (GameAudioService.Instance != null)
+            {
+                GameAudioService.Instance.PlaySfx(
+                    GameSoundEvent.LevelIntro);
+            }
+
+            introAnimator.PlayIntro(stacksRoot);
         }
 
         private void LogTileDistribution(List<TileTypeSO> generatedTiles)
@@ -2844,6 +3742,79 @@ namespace ZenMatch.Runtime
 
             int renderPriority = stack.Anchor != null ? stack.Anchor.RenderPriority : 0;
             CreateTraySlotRewardVisual(stack, renderPriority);
+        }
+
+        public void ConfigureRewardGiftRequiredPointVisuals(
+            IReadOnlyList<RewardGiftReference> giftReferences)
+        {
+            _rewardGiftRequiredPointIds.Clear();
+
+            if (giftReferences != null)
+            {
+                for (int i = 0; i < giftReferences.Count; i++)
+                {
+                    RewardGiftReference gift = giftReferences[i];
+
+                    if (gift == null ||
+                        gift.requiredCompletedPointIds == null)
+                    {
+                        continue;
+                    }
+
+                    for (int p = 0;
+                         p < gift.requiredCompletedPointIds.Count;
+                         p++)
+                    {
+                        string pointId =
+                            gift.requiredCompletedPointIds[p];
+
+                        if (string.IsNullOrWhiteSpace(pointId))
+                            continue;
+
+                        _rewardGiftRequiredPointIds.Add(
+                            pointId.Trim());
+                    }
+                }
+            }
+
+            // Gift controller çoğunlukla board spawn tamamlandıktan sonra
+            // Initialize edildiği için mevcut bütün stack view'ları burada
+            // güncelliyoruz. giftReferences null gelirse bütün gift glow'ları
+            // kapatılmış olur.
+            foreach (KeyValuePair<string, BoardStackView> pair
+                     in _viewByPointId)
+            {
+                string pointId = pair.Key;
+                BoardStackView view = pair.Value;
+
+                if (view == null)
+                    continue;
+
+                bool enabled =
+                    _rewardGiftRequiredPointIds.Contains(pointId) &&
+                    !_completedPointIds.Contains(pointId);
+
+                view.ConfigureRewardGiftRequiredGlow(
+                    enabled,
+                    rewardGiftRequiredPointSprite,
+                    rewardGiftRequiredPointColor,
+                    rewardGiftRequiredPointScale,
+                    rewardGiftRequiredPointOffset,
+                    rewardGiftRequiredPointSortingOffset,
+                    enableRewardGiftRequiredPointPulse,
+                    rewardGiftRequiredPointPulseSpeed,
+                    rewardGiftRequiredPointPulseAmount);
+
+                view.Rebuild();
+            }
+
+            if (logTileDistribution)
+            {
+                Debug.Log(
+                    $"[BoardSpawner] Reward Gift Required Point inner glow güncellendi. " +
+                    $"PointCount: {_rewardGiftRequiredPointIds.Count}",
+                    this);
+            }
         }
     }
 

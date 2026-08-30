@@ -25,4 +25,4 @@ MonoBehaviour:
     requiredCount: 1
     displayName: "Sar\u0131 Hediye Kutusu"
   rewardOnClaim: {fileID: 11400000, guid: 5600c5d16e782e14ba18bb3207e95da7, type: 2}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: a47f0635f2dbf9d4a9afcfb1dbc68437, type: 3}

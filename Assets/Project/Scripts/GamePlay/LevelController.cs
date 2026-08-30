@@ -1,11 +1,15 @@
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ZenMatch.Runtime;
-using ZenMatch.UI;
-using ZenMatch.Gameplay.Boosters;
 using ZenMatch.Data;
+using ZenMatch.Gameplay.Boosters;
+using ZenMatch.Runtime;
+using ZenMatch.Runtime.Audio;
+using ZenMatch.Runtime.PlayerProgress;
 using ZenMatch.Runtime.RewardMissions;
+using ZenMatch.UI;
+using ZenMatch.Runtime.Missions;
 
 namespace ZenMatch.Gameplay
 {
@@ -29,9 +33,15 @@ namespace ZenMatch.Gameplay
             public bool IsValid;
             public bool UnlockedTraySlot;
 
-            public RewardGiftControllerSnapshot RewardGiftSnapshotBefore;
+            public RewardGiftControllerSnapshot
+                RewardGiftSnapshotBefore;
         }
 
+        // =========================================================
+        // REFERENCES
+        // =========================================================
+
+        [Header("References")]
         [SerializeField] private BoardSpawner boardSpawner;
         [SerializeField] private TrayController trayController;
         [SerializeField] private BoardInputController boardInputController;
@@ -40,77 +50,365 @@ namespace ZenMatch.Gameplay
         [SerializeField] private BoosterManager boosterManager;
         [SerializeField] private RewardGiftController rewardGiftController;
 
+        // =========================================================
+        // PLAYER PROGRESS
+        // =========================================================
+
+        [Header("Player Progress")]
+        [SerializeField] private PlayerProgressService progressService;
+        [SerializeField] private PlayerWalletService walletService;
+
+        // =========================================================
+        // MISSION PROGRESS
+        // =========================================================
+
+        [Header("Mission Progress")]
+        [SerializeField] private MissionProgressService missionProgressService;
+
+        // =========================================================
+        // DEBUG
+        // =========================================================
+
         [Header("Debug")]
         [SerializeField] private bool logTrayStateAfterEachMove = true;
         [SerializeField] private bool logBoardStateAfterEachMove = true;
 
+        // =========================================================
+        // RUNTIME
+        // =========================================================
 
-        public TrayController TrayController => trayController;
+        private LevelGameState _gameState =
+            LevelGameState.Playing;
 
-
-
-
-        private LevelGameState _gameState = LevelGameState.Playing;
         private bool _isMoveInProgress = false;
         private bool _inputEnabled = true;
+
+        private bool _levelAttemptStarted;
+
         private LastMoveRecord _lastMove;
 
-        public LevelGameState GameState => _gameState;
-        public bool IsMoveInProgress => _isMoveInProgress;
-        public bool IsInputEnabled => _inputEnabled;
-        public TrayState TrayState => trayController != null ? trayController.State : null;
+        // =========================================================
+        // PUBLIC
+        // =========================================================
+
+        public TrayController TrayController =>
+            trayController;
+
+        public LevelGameState GameState =>
+            _gameState;
+
+        public bool IsMoveInProgress =>
+            _isMoveInProgress;
+
+        public bool IsInputEnabled =>
+            _inputEnabled;
+
+        public TrayState TrayState =>
+            trayController != null
+                ? trayController.State
+                : null;
+
+        public int CurrentLevel =>
+            boardSpawner != null
+                ? boardSpawner.CurrentLevel
+                : 1;
+
+        public event Action LevelWon;
+        public event Action LevelLost;
+
+        // =========================================================
+        // UNITY
+        // =========================================================
 
         private void Awake()
         {
-            if (boardSpawner == null)
-                boardSpawner = FindFirstObjectByType<BoardSpawner>();
-
-            if (trayController == null)
-                trayController = FindFirstObjectByType<TrayController>();
-
-            if (tileFlyAnimator == null)
-                tileFlyAnimator = FindFirstObjectByType<TileFlyToTrayAnimator>();
-
-            if (tileFlyBackAnimator == null)
-                tileFlyBackAnimator = FindFirstObjectByType<TileFlyBackAnimator>();
-
-            if (boosterManager == null)
-                boosterManager = FindFirstObjectByType<BoosterManager>();
-
-            if (rewardGiftController == null)
-                rewardGiftController = FindFirstObjectByType<RewardGiftController>();
+            ResolveReferences();
         }
 
         private IEnumerator Start()
         {
+            // BoardSpawner'ın progression level'i
+            // hazırlaması için bir frame bekliyoruz.
             yield return null;
 
+            ResolveReferences();
+
             if (boardSpawner != null)
-                boardSpawner.TraySlotUnlockPointCompleted += HandleTraySlotUnlockPointCompleted;
+            {
+                boardSpawner
+                    .TraySlotUnlockPointCompleted +=
+                    HandleTraySlotUnlockPointCompleted;
+
+                boardSpawner
+                    .TraySlotProtectionExpired +=
+                    HandleTraySlotProtectionExpired;
+            }
 
             if (trayController == null)
-                yield break;
-
-            FixedLevelSO fixedLevel = boardSpawner != null
-                ? boardSpawner.LastSpawnedFixedLevel
-                : null;
-
-            if (fixedLevel != null && fixedLevel.UseSpecialTraySettings)
             {
-                trayController.InitializeWithActiveCapacity(fixedLevel.StartingActiveTrayCapacity);
+                Debug.LogError(
+                    "[LevelController] " +
+                    "TrayController bulunamadı.",
+                    this);
+
+                _inputEnabled = false;
+                yield break;
+            }
+
+            // =====================================================
+            // NEW LEVEL ATTEMPT
+            // =====================================================
+            //
+            // Her gerçek GameScene attempt'i burada başlar.
+            //
+            // 5 can → GameScene → 4 can.
+            //
+            // Retry yeni GameScene yüklediği için
+            // tekrar burada 1 can harcanacaktır.
+            //
+            // Rewarded Continue aynı sahnede kaldığı için
+            // ikinci kez buraya girmez ve can harcamaz.
+            // =====================================================
+
+            if (!TryBeginLevelAttempt())
+            {
+                _inputEnabled = false;
+
+                Debug.LogWarning(
+                    "[LevelController] " +
+                    "Level attempt başlatılamadı. " +
+                    "Gameplay input kapatıldı.",
+                    this);
+
+                yield break;
+            }
+
+            FixedLevelSO fixedLevel =
+                boardSpawner != null
+                    ? boardSpawner.LastSpawnedFixedLevel
+                    : null;
+
+            BoardLayoutSO layout =
+                boardSpawner != null
+                    ? boardSpawner.LastSpawnedLayout
+                    : null;
+
+            // =====================================================
+            // 1. FIXED LEVEL ÖZEL TRAY AYARI
+            // =====================================================
+
+            if (fixedLevel != null &&
+                fixedLevel.UseSpecialTraySettings)
+            {
+                trayController
+                    .InitializeWithActiveCapacity(
+                        fixedLevel
+                            .StartingActiveTrayCapacity);
 
                 Debug.Log(
-                    $"[LevelController] Special tray settings applied. " +
-                    $"Level: {fixedLevel.LevelNumber}, ActiveCapacity: {fixedLevel.StartingActiveTrayCapacity}",
+                    $"[LevelController] " +
+                    $"FixedLevel special tray applied. " +
+                    $"Level: {fixedLevel.LevelNumber} | " +
+                    $"ActiveCapacity: " +
+                    $"{fixedLevel.StartingActiveTrayCapacity}",
                     this);
             }
+
+            // =====================================================
+            // 2. BOARD LAYOUT ÖZEL TRAY AYARI
+            // =====================================================
+
+            else if (layout != null &&
+                     layout.UseSpecialTraySettings)
+            {
+                trayController
+                    .InitializeWithActiveCapacity(
+                        layout
+                            .StartingActiveTrayCapacity);
+
+                Debug.Log(
+                    $"[LevelController] " +
+                    $"BoardLayout special tray applied. " +
+                    $"Layout: {layout.LayoutId} | " +
+                    $"ActiveCapacity: " +
+                    $"{layout.StartingActiveTrayCapacity}",
+                    this);
+            }
+
+            // =====================================================
+            // 3. NORMAL TRAY
+            // =====================================================
+
             else
             {
                 trayController.Initialize();
+
+                Debug.Log(
+                    "[LevelController] " +
+                    "Normal tray initialized.",
+                    this);
             }
 
             InitializeRewardGiftsForCurrentLayout();
         }
+
+        private void OnDestroy()
+        {
+            if (boardSpawner != null)
+            {
+                boardSpawner
+                    .TraySlotUnlockPointCompleted -=
+                    HandleTraySlotUnlockPointCompleted;
+
+                boardSpawner
+                    .TraySlotProtectionExpired -=
+                    HandleTraySlotProtectionExpired;
+            }
+        }
+
+        // =========================================================
+        // REFERENCES
+        // =========================================================
+
+        private void ResolveReferences()
+        {
+            if (boardSpawner == null)
+            {
+                boardSpawner =
+                    FindFirstObjectByType<BoardSpawner>();
+            }
+
+            if (trayController == null)
+            {
+                trayController =
+                    FindFirstObjectByType<TrayController>();
+            }
+
+            if (tileFlyAnimator == null)
+            {
+                tileFlyAnimator =
+                    FindFirstObjectByType<
+                        TileFlyToTrayAnimator>();
+            }
+
+            if (tileFlyBackAnimator == null)
+            {
+                tileFlyBackAnimator =
+                    FindFirstObjectByType<
+                        TileFlyBackAnimator>();
+            }
+
+            if (boosterManager == null)
+            {
+                boosterManager =
+                    FindFirstObjectByType<BoosterManager>();
+            }
+
+            if (rewardGiftController == null)
+            {
+                rewardGiftController =
+                    FindFirstObjectByType<
+                        RewardGiftController>();
+            }
+
+            if (progressService == null)
+            {
+                progressService =
+                    PlayerProgressService.Instance;
+            }
+
+            if (progressService == null)
+            {
+                progressService =
+                    FindFirstObjectByType<
+                        PlayerProgressService>();
+            }
+
+            if (walletService == null)
+            {
+                walletService =
+                    PlayerWalletService.Instance;
+            }
+
+            if (walletService == null)
+            {
+                walletService =
+                    FindFirstObjectByType<
+                        PlayerWalletService>();
+            }
+
+            if (missionProgressService == null)
+            {
+                missionProgressService =
+                    MissionProgressService.Instance;
+            }
+
+            if (missionProgressService == null)
+            {
+                missionProgressService =
+                    FindFirstObjectByType<
+                        MissionProgressService>();
+            }
+        }
+
+        // =========================================================
+        // LEVEL ATTEMPT
+        // =========================================================
+
+        private bool TryBeginLevelAttempt()
+        {
+            if (_levelAttemptStarted)
+                return true;
+
+            ResolveReferences();
+
+            if (walletService == null)
+            {
+                Debug.LogError(
+                    "[LevelController] " +
+                    "PlayerWalletService bulunamadı. " +
+                    "Attempt başlatılamıyor.",
+                    this);
+
+                return false;
+            }
+
+            int levelNumber =
+                Mathf.Max(
+                    1,
+                    CurrentLevel);
+
+            bool started =
+                walletService
+                    .TryBeginLevelAttempt(
+                        levelNumber);
+
+            if (!started)
+            {
+                Debug.LogWarning(
+                    $"[LevelController] " +
+                    $"Attempt başlatılamadı. " +
+                    $"Level: {levelNumber}",
+                    this);
+
+                return false;
+            }
+
+            _levelAttemptStarted = true;
+
+            Debug.Log(
+                $"[LevelController] " +
+                $"Attempt başladı. " +
+                $"Level: {levelNumber} | " +
+                $"Kalan can: {walletService.Lives}",
+                this);
+
+            return true;
+        }
+
+        // =========================================================
+        // REWARD GIFTS
+        // =========================================================
 
         private void InitializeRewardGiftsForCurrentLayout()
         {
@@ -123,7 +421,8 @@ namespace ZenMatch.Gameplay
                 return;
             }
 
-            BoardLayoutSO layout = boardSpawner.LastSpawnedLayout;
+            BoardLayoutSO layout =
+                boardSpawner.LastSpawnedLayout;
 
             if (layout == null)
             {
@@ -136,6 +435,10 @@ namespace ZenMatch.Gameplay
                 boardSpawner.CurrentLevel);
         }
 
+        // =========================================================
+        // INPUT
+        // =========================================================
+
         public void SetInputEnabled(bool enabled)
         {
             _inputEnabled = enabled;
@@ -146,131 +449,269 @@ namespace ZenMatch.Gameplay
             _lastMove = null;
         }
 
-        private void HandleTraySlotUnlockPointCompleted(string pointId)
+        // =========================================================
+        // TRAY UNLOCK
+        // =========================================================
+
+        private void HandleTraySlotUnlockPointCompleted(
+            string pointId)
         {
             if (trayController == null)
                 return;
 
-            bool unlocked = trayController.UnlockOneLockedSlot(out int unlockedSlotIndex);
+            bool unlocked =
+                trayController.UnlockOneLockedSlot(
+                    out int unlockedSlotIndex);
 
             if (unlocked)
             {
-                if (trayController.View != null && unlockedSlotIndex >= 0)
+                if (trayController.View != null &&
+                    unlockedSlotIndex >= 0)
                 {
                     trayController.View.PlayBurstWithColor(
-                    unlockedSlotIndex,
-                    new Color(0.45f, 1f, 1f, 1f));
+                        unlockedSlotIndex,
+                        new Color(
+                            0.45f,
+                            1f,
+                            1f,
+                            1f));
                 }
 
-                Debug.Log($"[LevelController] Tray slot unlocked by point: {pointId} | SlotIndex: {unlockedSlotIndex}", this);
+                Debug.Log(
+                    $"[LevelController] " +
+                    $"Tray slot unlocked by point: " +
+                    $"{pointId} | " +
+                    $"SlotIndex: {unlockedSlotIndex}",
+                    this);
             }
             else
             {
-                Debug.Log($"[LevelController] Unlock point completed but no locked tray slot exists. Point: {pointId}", this);
+                Debug.Log(
+                    $"[LevelController] " +
+                    $"Unlock point completed but " +
+                    $"no locked tray slot exists. " +
+                    $"Point: {pointId}",
+                    this);
             }
         }
 
+        // =========================================================
+        // TRAY PERMANENT LOCK
+        // =========================================================
 
-        private void OnDestroy()
+        private void HandleTraySlotProtectionExpired(
+            string pointId)
         {
-            if (boardSpawner != null)
-                boardSpawner.TraySlotUnlockPointCompleted -= HandleTraySlotUnlockPointCompleted;
+            if (trayController == null)
+                return;
+
+            bool locked =
+                trayController.LockOnePermanentSlot(
+                    out int lockedSlotIndex);
+
+            if (locked)
+            {
+                GameAudioService.Instance?.PlaySfx(
+                    GameSoundEvent.TraySlotRiskLock);
+
+                Debug.Log(
+                    $"[LevelController] " +
+                    $"Tray slot permanently locked. " +
+                    $"Point: {pointId} | " +
+                    $"SlotIndex: {lockedSlotIndex} | " +
+                    $"CurrentCapacity: " +
+                    $"{trayController.State?.CurrentCapacity}",
+                    this);
+            }
+            else
+            {
+                Debug.LogWarning(
+                    $"[LevelController] " +
+                    $"Tray protection expired but " +
+                    $"no additional tray slot could be locked. " +
+                    $"Point: {pointId}",
+                    this);
+            }
         }
+
+        // =========================================================
+        // UNDO
+        // =========================================================
 
         public bool TryUndoLastMove()
         {
             if (_isMoveInProgress)
                 return false;
 
-            if (_lastMove == null || !_lastMove.IsValid)
+            if (_lastMove == null ||
+                !_lastMove.IsValid)
+            {
                 return false;
+            }
 
-            if (boardSpawner == null || trayController == null)
+            if (boardSpawner == null ||
+                trayController == null)
+            {
                 return false;
+            }
 
-            StartCoroutine(UndoLastMoveRoutine(_lastMove));
+            StartCoroutine(
+                UndoLastMoveRoutine(
+                    _lastMove));
+
             return true;
         }
 
-        private IEnumerator UndoLastMoveRoutine(LastMoveRecord move)
+        private IEnumerator UndoLastMoveRoutine(
+            LastMoveRecord move)
         {
             _isMoveInProgress = true;
 
-            Vector3 trayWorldPos = Vector3.zero;
-            Vector3 boardWorldPos = Vector3.zero;
+            Vector3 trayWorldPos =
+                Vector3.zero;
+
+            Vector3 boardWorldPos =
+                Vector3.zero;
 
             int traySlotIndex = 0;
+
             if (trayController.State != null)
-                traySlotIndex = Mathf.Max(0, trayController.State.Count - 1);
+            {
+                traySlotIndex =
+                    Mathf.Max(
+                        0,
+                        trayController.State.Count - 1);
+            }
 
             if (trayController.View != null)
-                trayWorldPos = trayController.View.GetSlotWorldPosition(traySlotIndex);
+            {
+                trayWorldPos =
+                    trayController.View
+                        .GetSlotWorldPosition(
+                            traySlotIndex);
+            }
 
-            Vector3 worldPos = Vector3.zero;
-            if (boardSpawner != null && boardSpawner.TryGetPointWorldPosition(move.PointId, out worldPos))
-                boardWorldPos = worldPos;
+            Vector3 worldPos =
+                Vector3.zero;
 
-            trayController.RestoreSlots(move.TrayBeforeSlots);
+            if (boardSpawner != null &&
+                boardSpawner
+                    .TryGetPointWorldPosition(
+                        move.PointId,
+                        out worldPos))
+            {
+                boardWorldPos =
+                    worldPos;
+            }
+
+            trayController.RestoreSlots(
+                move.TrayBeforeSlots);
 
             yield return null;
 
-            if (tileFlyBackAnimator != null && move.TileSprite != null)
+            if (tileFlyBackAnimator != null &&
+                move.TileSprite != null)
             {
                 tileFlyBackAnimator.Play(
                     move.TileSprite,
                     trayWorldPos,
                     boardWorldPos);
 
-                yield return new WaitForSeconds(tileFlyBackAnimator.Duration);
+                yield return
+                    new WaitForSeconds(
+                        tileFlyBackAnimator.Duration);
             }
 
-            bool restored = boardSpawner.TryRestoreTile(
-                move.PointId,
-                move.TileIndex,
-                move.RemovedTile);
+            bool restored =
+                boardSpawner.TryRestoreTile(
+                    move.PointId,
+                    move.TileIndex,
+                    move.RemovedTile);
 
-            if (restored && move.UnlockedTraySlot)
+            if (restored &&
+                move.UnlockedTraySlot)
             {
                 trayController.RelockOneSlot();
-                boardSpawner.RestoreTraySlotRewardVisual(move.PointId);
+
+                boardSpawner
+                    .RestoreTraySlotRewardVisual(
+                        move.PointId);
             }
 
-            if (restored && rewardGiftController != null && move.RewardGiftSnapshotBefore != null)
+            if (restored &&
+                rewardGiftController != null &&
+                move.RewardGiftSnapshotBefore != null)
             {
-                rewardGiftController.RestoreSnapshot(move.RewardGiftSnapshotBefore);
+                rewardGiftController.RestoreSnapshot(
+                    move.RewardGiftSnapshotBefore);
             }
 
             if (restored)
             {
-                _gameState = LevelGameState.Playing;
+                _gameState =
+                    LevelGameState.Playing;
 
-                if (logTrayStateAfterEachMove && trayController.State != null)
-                    Debug.Log(trayController.State.GetDebugSummary(), this);
+                if (logTrayStateAfterEachMove &&
+                    trayController.State != null)
+                {
+                    Debug.Log(
+                        trayController.State
+                            .GetDebugSummary(),
+                        this);
+                }
 
-                if (logBoardStateAfterEachMove && boardSpawner != null)
-                    Debug.Log(boardSpawner.GetRemainingStacksSummary(), this);
+                if (logBoardStateAfterEachMove &&
+                    boardSpawner != null)
+                {
+                    Debug.Log(
+                        boardSpawner
+                            .GetRemainingStacksSummary(),
+                        this);
+                }
 
-                Debug.Log("[LevelController] Son hamle geri al�nd�.");
+                Debug.Log(
+                    "[LevelController] " +
+                    "Son hamle geri alındı.",
+                    this);
             }
 
             _lastMove = null;
             _isMoveInProgress = false;
         }
 
-        public bool TryHandleTopTileClick(string pointId)
+        // =========================================================
+        // TILE CLICK
+        // =========================================================
+
+        public bool TryHandleTopTileClick(
+            string pointId)
         {
-            return TryHandleTileClick(pointId, -1, Vector3.zero);
+            return TryHandleTileClick(
+                pointId,
+                -1,
+                Vector3.zero);
         }
 
-        public bool TryHandleTileClick(string pointId, int tileIndex)
+        public bool TryHandleTileClick(
+            string pointId,
+            int tileIndex)
         {
-            return TryHandleTileClick(pointId, tileIndex, Vector3.zero);
+            return TryHandleTileClick(
+                pointId,
+                tileIndex,
+                Vector3.zero);
         }
 
-        public bool TryHandleTileClick(string pointId, int tileIndex, Vector3 sourceWorldPosition)
+        public bool TryHandleTileClick(
+            string pointId,
+            int tileIndex,
+            Vector3 sourceWorldPosition)
         {
-            if (_gameState != LevelGameState.Playing)
+            if (_gameState !=
+                LevelGameState.Playing)
+            {
                 return false;
+            }
 
             if (!_inputEnabled)
                 return false;
@@ -279,62 +720,108 @@ namespace ZenMatch.Gameplay
                 return false;
 
             if (trayController != null &&
-    trayController.View != null &&
-    trayController.View.IsAnimating)
+                trayController.View != null &&
+                trayController.View.IsAnimating)
+            {
                 return false;
+            }
 
-
-            if (boardSpawner == null || trayController == null)
+            if (boardSpawner == null ||
+                trayController == null)
+            {
                 return false;
+            }
 
             if (trayController.State == null)
                 trayController.Initialize();
 
-            List<TileTypeSO> trayBeforeSnapshot = trayController.State != null
-     ? trayController.State.CreateSnapshot()
-     : new List<TileTypeSO>();
+            List<TileTypeSO> trayBeforeSnapshot =
+                trayController.State != null
+                    ? trayController.State
+                        .CreateSnapshot()
+                    : new List<TileTypeSO>();
 
-            RewardGiftControllerSnapshot rewardGiftSnapshotBefore = rewardGiftController != null
-                ? rewardGiftController.CaptureSnapshot()
-                : null;
+            RewardGiftControllerSnapshot
+                rewardGiftSnapshotBefore =
+                    rewardGiftController != null
+                        ? rewardGiftController
+                            .CaptureSnapshot()
+                        : null;
 
-            if (!boardSpawner.TryTakeTile(pointId, tileIndex, out BoardTileInstance removedTile, out int removedIndex))
+            if (!boardSpawner.TryTakeTile(
+                    pointId,
+                    tileIndex,
+                    out BoardTileInstance removedTile,
+                    out int removedIndex))
+            {
                 return false;
+            }
 
-            int targetSlotIndex = trayController.State != null ? trayController.State.Count : 0;
+            GameAudioService.Instance?.PlaySfx(
+                GameSoundEvent.TileSelect);
 
-            Vector3 targetWorldPosition = Vector3.zero;
-            Vector3 startWorldPosition = sourceWorldPosition;
+            int targetSlotIndex =
+                trayController.State != null
+                    ? trayController.State.Count
+                    : 0;
+
+            Vector3 targetWorldPosition =
+                Vector3.zero;
+
+            Vector3 startWorldPosition =
+                sourceWorldPosition;
 
             if (trayController.View != null)
-                targetWorldPosition = trayController.View.GetSlotWorldPosition(targetSlotIndex);
+            {
+                targetWorldPosition =
+                    trayController.View
+                        .GetSlotWorldPosition(
+                            targetSlotIndex);
+            }
 
-            if (startWorldPosition == Vector3.zero)
-                startWorldPosition = targetWorldPosition;
+            if (startWorldPosition ==
+                Vector3.zero)
+            {
+                startWorldPosition =
+                    targetWorldPosition;
+            }
 
-            StartCoroutine(HandleMoveRoutine(
-    removedTile,
-    startWorldPosition,
-    targetWorldPosition,
-    true,
-    pointId,
-    removedIndex,
-    trayBeforeSnapshot,
-    rewardGiftSnapshotBefore));
+            StartCoroutine(
+                HandleMoveRoutine(
+                    removedTile,
+                    startWorldPosition,
+                    targetWorldPosition,
+                    true,
+                    pointId,
+                    removedIndex,
+                    trayBeforeSnapshot,
+                    rewardGiftSnapshotBefore));
 
             return true;
         }
 
-        public void PlayBoosterTileToTray(BoardTileInstance removedTile, Vector3 startWorldPosition)
+        // =========================================================
+        // BOOSTER TILE
+        // =========================================================
+
+        public void PlayBoosterTileToTray(
+            BoardTileInstance removedTile,
+            Vector3 startWorldPosition)
         {
-            if (_gameState != LevelGameState.Playing)
+            if (_gameState !=
+                LevelGameState.Playing)
+            {
                 return;
+            }
 
             if (_isMoveInProgress)
                 return;
 
-            if (removedTile == null || removedTile.TileType == null)
+            if (removedTile == null ||
+                removedTile.TileType == null)
+            {
                 return;
+            }
 
             if (trayController == null)
                 return;
@@ -342,93 +829,194 @@ namespace ZenMatch.Gameplay
             if (trayController.State == null)
                 trayController.Initialize();
 
-            int targetSlotIndex = trayController.State != null ? trayController.State.Count : 0;
+            int targetSlotIndex =
+                trayController.State != null
+                    ? trayController.State.Count
+                    : 0;
 
-            Vector3 targetWorldPosition = Vector3.zero;
+            Vector3 targetWorldPosition =
+                Vector3.zero;
+
             if (trayController.View != null)
-                targetWorldPosition = trayController.View.GetSlotWorldPosition(targetSlotIndex);
+            {
+                targetWorldPosition =
+                    trayController.View
+                        .GetSlotWorldPosition(
+                            targetSlotIndex);
+            }
 
-            StartCoroutine(HandleMoveRoutine(
-    removedTile,
-    startWorldPosition,
-    targetWorldPosition,
-    false,
-    null,
-    -1,
-    null,
-    null));
+            StartCoroutine(
+                HandleMoveRoutine(
+                    removedTile,
+                    startWorldPosition,
+                    targetWorldPosition,
+                    false,
+                    null,
+                    -1,
+                    null,
+                    null));
         }
 
+        // =========================================================
+        // MOVE
+        // =========================================================
+
         private IEnumerator HandleMoveRoutine(
-    BoardTileInstance removedTile,
-    Vector3 startWorldPosition,
-    Vector3 targetWorldPosition,
-    bool recordUndo,
-    string sourcePointId,
-    int sourceTileIndex,
-    List<TileTypeSO> trayBeforeSlots,
-    RewardGiftControllerSnapshot rewardGiftSnapshotBefore)
+            BoardTileInstance removedTile,
+            Vector3 startWorldPosition,
+            Vector3 targetWorldPosition,
+            bool recordUndo,
+            string sourcePointId,
+            int sourceTileIndex,
+            List<TileTypeSO> trayBeforeSlots,
+            RewardGiftControllerSnapshot
+                rewardGiftSnapshotBefore)
         {
             _isMoveInProgress = true;
 
             float waitDuration = 0f;
 
-            if (tileFlyAnimator != null && removedTile != null && removedTile.TileType != null)
+            if (tileFlyAnimator != null &&
+                removedTile != null &&
+                removedTile.TileType != null)
             {
                 tileFlyAnimator.Play(
-                    sprite: removedTile.TileType.Icon,
-                    worldStart: startWorldPosition,
-                    worldTarget: targetWorldPosition,
-                    visualParent: null,
-                    sortingOrder: 9999,
-                    sortingLayerName: "FlyingTile");
+                    sprite:
+                        removedTile.TileType.Icon,
 
-                waitDuration = tileFlyAnimator.Duration;
+                    worldStart:
+                        startWorldPosition,
+
+                    worldTarget:
+                        targetWorldPosition,
+
+                    visualParent:
+                        null,
+
+                    sortingOrder:
+                        9999,
+
+                    sortingLayerName:
+                        "FlyingTile");
+
+                waitDuration =
+                    tileFlyAnimator.Duration;
             }
 
             if (waitDuration > 0f)
-                yield return new WaitForSeconds(waitDuration);
-
-            bool addedSuccessfully = trayController.TryAddTile(removedTile.TileType, out _);
-
-            if (addedSuccessfully && boosterManager != null)
-                boosterManager.NotifyTileAddedToTray();
-
-            if (addedSuccessfully && recordUndo && rewardGiftController != null)
-                rewardGiftController.NotifySuccessfulTileSelection(sourcePointId, removedTile);
-
-            if (addedSuccessfully && recordUndo)
             {
-                _lastMove = new LastMoveRecord
-                {
-                    PointId = sourcePointId,
-                    TileIndex = sourceTileIndex,
-                    RemovedTile = removedTile,
-                    TrayBeforeSlots = trayBeforeSlots != null
-        ? new List<TileTypeSO>(trayBeforeSlots)
-        : new List<TileTypeSO>(),
-                    TileSprite = removedTile.TileType != null ? removedTile.TileType.Icon : null,
-                    UnlockedTraySlot =
-        boardSpawner != null &&
-        boardSpawner.IsTraySlotUnlockPoint(sourcePointId) &&
-        boardSpawner.IsPointCompleted(sourcePointId),
-                    RewardGiftSnapshotBefore = rewardGiftSnapshotBefore,
-                    IsValid = true
-                };
+                yield return
+                    new WaitForSeconds(
+                        waitDuration);
+            }
+
+            bool addedSuccessfully =
+                trayController.TryAddTile(
+                    removedTile.TileType,
+                    out _);
+
+            if (addedSuccessfully &&
+                boosterManager != null)
+            {
+                boosterManager
+                    .NotifyTileAddedToTray();
+            }
+
+            if (addedSuccessfully &&
+                recordUndo &&
+                rewardGiftController != null)
+            {
+                rewardGiftController
+                    .NotifySuccessfulTileSelection(
+                        sourcePointId,
+                        removedTile);
+            }
+
+            if (addedSuccessfully &&
+                recordUndo &&
+                boardSpawner != null)
+            {
+                boardSpawner
+                    .NotifySuccessfulTileSelectionForTrayRisk(
+                        sourcePointId);
+            }
+
+            if (addedSuccessfully &&
+                recordUndo)
+            {
+                _lastMove =
+                    new LastMoveRecord
+                    {
+                        PointId =
+                            sourcePointId,
+
+                        TileIndex =
+                            sourceTileIndex,
+
+                        RemovedTile =
+                            removedTile,
+
+                        TrayBeforeSlots =
+                            trayBeforeSlots != null
+                                ? new List<TileTypeSO>(
+                                    trayBeforeSlots)
+                                : new List<TileTypeSO>(),
+
+                        TileSprite =
+                            removedTile.TileType != null
+                                ? removedTile.TileType.Icon
+                                : null,
+
+                        UnlockedTraySlot =
+                            boardSpawner != null &&
+                            boardSpawner
+                                .IsTraySlotUnlockPoint(
+                                    sourcePointId) &&
+                            boardSpawner
+                                .IsPointCompleted(
+                                    sourcePointId),
+
+                        RewardGiftSnapshotBefore =
+                            rewardGiftSnapshotBefore,
+
+                        IsValid =
+                            true
+                    };
             }
             else if (!recordUndo)
             {
                 _lastMove = null;
             }
 
-            if (logTrayStateAfterEachMove && trayController.State != null)
-                Debug.Log(trayController.State.GetDebugSummary(), this);
+            if (logTrayStateAfterEachMove &&
+                trayController.State != null)
+            {
+                Debug.Log(
+                    trayController.State
+                        .GetDebugSummary(),
+                    this);
+            }
 
-            if (logBoardStateAfterEachMove && boardSpawner != null)
-                Debug.Log(boardSpawner.GetRemainingStacksSummary(), this);
+            if (logBoardStateAfterEachMove &&
+                boardSpawner != null)
+            {
+                Debug.Log(
+                    boardSpawner
+                        .GetRemainingStacksSummary(),
+                    this);
+            }
 
-            bool boardEmpty = !boardSpawner.HasAnyRemainingTiles();
-            bool trayEmpty = trayController.State == null || trayController.State.Count == 0;
+            bool boardEmpty =
+                !boardSpawner
+                    .HasAnyRemainingTiles();
+
+            bool trayEmpty =
+                trayController.State == null ||
+                trayController.State.Count == 0;
+
+            // =====================================================
+            // BOARD FINISHED
+            // =====================================================
 
             if (boardEmpty)
             {
@@ -439,14 +1027,27 @@ namespace ZenMatch.Gameplay
                 else
                 {
                     Debug.LogWarning(
-                        "[LevelController] Board bitti ama tray bo� de�il. Bu run tamamlanamaz durumda kald�.",
+                        "[LevelController] " +
+                        "Board bitti ama tray boş değil. " +
+                        "Bu run tamamlanamaz durumda kaldı.",
                         this);
 
                     if (trayController.State != null)
-                        Debug.Log(trayController.State.GetDebugSummary(), this);
+                    {
+                        Debug.Log(
+                            trayController.State
+                                .GetDebugSummary(),
+                            this);
+                    }
 
-                    if (logBoardStateAfterEachMove && boardSpawner != null)
-                        Debug.Log(boardSpawner.GetRemainingStacksSummary(), this);
+                    if (logBoardStateAfterEachMove &&
+                        boardSpawner != null)
+                    {
+                        Debug.Log(
+                            boardSpawner
+                                .GetRemainingStacksSummary(),
+                            this);
+                    }
 
                     SetLose();
                 }
@@ -455,9 +1056,14 @@ namespace ZenMatch.Gameplay
                 yield break;
             }
 
+            // =====================================================
+            // TRAY FULL
+            // =====================================================
+
             if (trayController.IsFull)
             {
                 SetLose();
+
                 _isMoveInProgress = false;
                 yield break;
             }
@@ -465,16 +1071,218 @@ namespace ZenMatch.Gameplay
             _isMoveInProgress = false;
         }
 
+        // =========================================================
+        // WIN
+        // =========================================================
+
         private void SetWin()
         {
-            _gameState = LevelGameState.Win;
-            Debug.Log("[LevelController] WIN - Board ve tray tamamen temizlendi.");
+            if (_gameState !=
+                LevelGameState.Playing)
+            {
+                return;
+            }
+
+            _gameState =
+                LevelGameState.Win;
+
+            _inputEnabled = false;
+            _lastMove = null;
+
+            int completedLevel =
+                CurrentLevel;
+
+            // =====================================================
+            // PLAYER PROGRESS + ATTEMPT COMMIT
+            // =====================================================
+
+            ResolveReferences();
+
+            if (progressService != null &&
+                progressService.Data != null)
+            {
+                // Bölüm içi kazanımlar artık kalıcı.
+                //
+                // false:
+                // Henüz ayrı Save yapma.
+                // Level completion ile birlikte
+                // aşağıdaki NotifyChanged() tek Save yapsın.
+                bool committed =
+                    progressService
+                        .CommitActiveLevelAttempt(
+                            false);
+
+                progressService.Data
+                    .MarkLevelCompleted(
+                        completedLevel);
+
+                progressService
+                    .NotifyChanged();
+
+                Debug.Log(
+                    $"[LevelController] " +
+                    $"Level tamamlandı ve kaydedildi. " +
+                    $"Completed: {completedLevel} | " +
+                    $"AttemptCommitted: {committed} | " +
+                    $"HighestUnlocked: " +
+                    $"{progressService.Data.highestUnlockedLevel}",
+                    this);
+            }
+            else
+            {
+                Debug.LogWarning(
+                    "[LevelController] " +
+                    "PlayerProgressService bulunamadı. " +
+                    "Level progress / attempt commit " +
+                    "kaydedilemedi.",
+                    this);
+            }
+
+            // =====================================================
+            // MISSION PROGRESS
+            // =====================================================
+
+            if (missionProgressService == null)
+            {
+                missionProgressService =
+                    MissionProgressService.Instance;
+            }
+
+            if (missionProgressService == null)
+            {
+                missionProgressService =
+                    FindFirstObjectByType<
+                        MissionProgressService>();
+            }
+
+            if (missionProgressService != null)
+            {
+                missionProgressService
+                    .NotifyLevelCompleted(
+                        completedLevel);
+            }
+
+            // =====================================================
+            // LEVEL COMPLETE GOLD
+            // =====================================================
+            //
+            // Base bölüm Gold'u burada VERİLMİYOR.
+            // Reward panelindeki "Ödülleri Topla"
+            // butonunda verilmeye devam ediyor.
+            //
+            // Attempt zaten WIN ile commit edildiği için
+            // LevelComplete Gold rollback kapsamında değildir.
+            // =====================================================
+
+            LevelWon?.Invoke();
+
+            Debug.Log(
+                $"[LevelController] WIN - " +
+                $"Level {completedLevel} tamamlandı. " +
+                $"Attempt commit edildi.",
+                this);
         }
+
+        // =========================================================
+        // REWARDED CONTINUE
+        // =========================================================
+
+        public bool TryContinueAfterLoseWithExtraSlot()
+        {
+            if (_gameState !=
+                LevelGameState.Lose)
+            {
+                Debug.LogWarning(
+                    "[LevelController] " +
+                    "Continue çağrıldı ancak " +
+                    "oyun Lose durumunda değil.",
+                    this);
+
+                return false;
+            }
+
+            if (trayController == null ||
+                trayController.State == null)
+            {
+                Debug.LogWarning(
+                    "[LevelController] " +
+                    "Continue için TrayState bulunamadı.",
+                    this);
+
+                return false;
+            }
+
+            // Aynı attempt devam ediyor.
+            //
+            // Yeni can harcanmaz.
+            // Transaction rollback edilmez.
+
+            trayController.State
+                .AddTemporaryCapacityBonus(1);
+
+            trayController.RefreshView();
+
+            _gameState =
+                LevelGameState.Playing;
+
+            _inputEnabled = true;
+            _isMoveInProgress = false;
+            _lastMove = null;
+
+            Debug.Log(
+                $"[LevelController] " +
+                $"Rewarded Continue başarılı. " +
+                $"Aynı attempt devam ediyor. " +
+                $"+1 Tray Slot | " +
+                $"Yeni kapasite: " +
+                $"{trayController.State.CurrentCapacity}",
+                this);
+
+            return true;
+        }
+
+        // =========================================================
+        // LOSE
+        // =========================================================
 
         private void SetLose()
         {
-            _gameState = LevelGameState.Lose;
-            Debug.Log("[LevelController] LOSE - Tray doldu veya board bitmesine ra�men tray temizlenemedi.");
+            if (_gameState !=
+                LevelGameState.Playing)
+            {
+                return;
+            }
+
+            _gameState =
+                LevelGameState.Lose;
+
+            _inputEnabled = false;
+            _lastMove = null;
+
+            // =====================================================
+            // IMPORTANT
+            // =====================================================
+            //
+            // LOSE ANINDA:
+            //
+            // - can harcanmaz
+            // - transaction rollback edilmez
+            //
+            // Çünkü oyuncu rewarded +1 slot ile
+            // AYNI attempt'ten devam edebilir.
+            //
+            // Retry veya Main Menu seçerse
+            // UI controller rollback yapacaktır.
+            // =====================================================
+
+            LevelLost?.Invoke();
+
+            Debug.Log(
+                "[LevelController] LOSE - " +
+                "Attempt hâlâ açık. " +
+                "Rewarded Continue / Retry / " +
+                "Main Menu kararı bekleniyor.",
+                this);
         }
     }
 }

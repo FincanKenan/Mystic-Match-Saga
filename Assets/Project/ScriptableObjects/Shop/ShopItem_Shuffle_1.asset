@@ -15,7 +15,7 @@ MonoBehaviour:
   itemId: ShopItem_Shuffle_1
   displayName: "1 Kar\u0131\u015Ft\u0131rma"
   icon: {fileID: -6027277749744776330, guid: ffd920d3310cfe042ada6196ac3b8b98, type: 3}
-  coinPrice: 175
+  coinPrice: 400
   rewardType: 1
   rewardAmount: 1
   boosterType: 2

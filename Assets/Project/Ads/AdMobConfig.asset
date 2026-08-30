@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e5ce6f44d4911d40b01067132ca98b3, type: 3}
+  m_Name: AdMobConfig
+  m_EditorClassIdentifier: 
+  useTestAds: 1
+  androidRewardedLifeId: ca-app-pub-8852032082574858/9010284419
+  androidInterstitialLevelCompleteId: ca-app-pub-8852032082574858/3459358654
+  iosRewardedLifeId: 
+  iosInterstitialLevelCompleteId: 
+  noInterstitialThroughLevel: 5
+  interstitialEveryLevels: 3
+  minimumSecondsBetweenFullScreenAds: 120

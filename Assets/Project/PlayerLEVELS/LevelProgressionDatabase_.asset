@@ -13,13 +13,87 @@ MonoBehaviour:
   m_Name: LevelProgressionDatabase_
   m_EditorClassIdentifier: 
   manualRanges:
-  - minLevel: 13
-    maxLevel: 25
+  - minLevel: 1
+    maxLevel: 16
     defaultTileBag: {fileID: 11400000, guid: d256eaf7b67feb547a26d43454db8a4b, type: 2}
+    levelCompleteGold: 20
     minTotalTiles: 18
     maxTotalTiles: 30
     backgroundLayerBottom: {fileID: -7758987736131382979, guid: 32c77536f63970645baf5577785f3554, type: 3}
-    backgroundLayerTop: {fileID: 6590819791286682477, guid: 0498bbafd461fe24b9686ac65369cb83, type: 3}
+    backgroundLayerTop: {fileID: -8078968449097588848, guid: f8cc83ec7189b654c8f0e56d761c6f79, type: 3}
+    entries:
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: a68c6db2f70987d4fae26bd9e471bcbb, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 833c37973ccf473488901cef5c947612, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 6bacfb44db64d9b438b1b90d2cbff198, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: b87c096b233ce4644a8213d1cf3d1e95, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 9e4cabd60b6dd0c40941c834ab0d12b3, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 94bedfc9da07b05479e62678df877e33, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 0c03c62e158d5044b859c19957c90ba6, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 9dbfcf34e8341a24e8e9bfdf0cd6eeda, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: d93b491566e72ae4aac53ac613abd6f8, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 9285e7f53317ae8478e756fdf0cb9a94, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 35c51ab974602144f99a3664244b7aab, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 6f443deb4fcf7c243a0008b15b5cd21f, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 289174901c873b4449868dc178b52967, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 23853f41162187146b66b1e1a4be2ca9, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 35d67a0b3d1048040aa06034d11f433e, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 18bc0749b349aa34ab442eb89542f4fb, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+  - minLevel: 17
+    maxLevel: 33
+    defaultTileBag: {fileID: 11400000, guid: d256eaf7b67feb547a26d43454db8a4b, type: 2}
+    levelCompleteGold: 30
+    minTotalTiles: 18
+    maxTotalTiles: 30
+    backgroundLayerBottom: {fileID: -7758987736131382979, guid: 32c77536f63970645baf5577785f3554, type: 3}
+    backgroundLayerTop: {fileID: -8078968449097588848, guid: f8cc83ec7189b654c8f0e56d761c6f79, type: 3}
     entries:
     - sourceType: 0
       boardLayout: {fileID: 11400000, guid: b3bbced42f24eb346b20672fb9f72ca5, type: 2}
@@ -27,6 +101,10 @@ MonoBehaviour:
       tileBagOverride: {fileID: 0}
     - sourceType: 0
       boardLayout: {fileID: 11400000, guid: a94b17f490eaa664d93482e3dc97f73c, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 679fd12a2db789347826ebccf6527cd1, type: 2}
       fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
     - sourceType: 0
@@ -39,6 +117,10 @@ MonoBehaviour:
       tileBagOverride: {fileID: 0}
     - sourceType: 0
       boardLayout: {fileID: 11400000, guid: 4f11006cad163044dbc06aeefa64c77e, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: d79985170eb2cde41bb9f5d42039dcc1, type: 2}
       fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
     - sourceType: 0
@@ -58,6 +140,10 @@ MonoBehaviour:
       fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
     - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 8b71007ae76f8994e9eadee305146f01, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
       boardLayout: {fileID: 11400000, guid: 7154d5d08e004c34b8c14edbf661a551, type: 2}
       fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
@@ -70,68 +156,472 @@ MonoBehaviour:
       fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
     - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: a57c46038fcc216479546eaac02d13fa, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
       boardLayout: {fileID: 11400000, guid: 4dd640405f4b14e4b922a269a4cd4bba, type: 2}
       fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
-  - minLevel: 1
-    maxLevel: 12
-    defaultTileBag: {fileID: 11400000, guid: d256eaf7b67feb547a26d43454db8a4b, type: 2}
-    minTotalTiles: 18
-    maxTotalTiles: 30
-    backgroundLayerBottom: {fileID: -7758987736131382979, guid: 32c77536f63970645baf5577785f3554, type: 3}
-    backgroundLayerTop: {fileID: 6590819791286682477, guid: 0498bbafd461fe24b9686ac65369cb83, type: 3}
+  - minLevel: 34
+    maxLevel: 57
+    defaultTileBag: {fileID: 11400000, guid: 027c941027e3cc8409f8f24d3d41596f, type: 2}
+    levelCompleteGold: 40
+    minTotalTiles: 39
+    maxTotalTiles: 58
+    backgroundLayerBottom: {fileID: 3229507492666951288, guid: 9872d30bcc8badb4f8031c854c366476, type: 3}
+    backgroundLayerTop: {fileID: -8985808423211435256, guid: 40370233a2d8ef34eacfcd5aca86c3e3, type: 3}
     entries:
-    - sourceType: 1
-      boardLayout: {fileID: 0}
-      fixedLevel: {fileID: 11400000, guid: 8f8b2cad5288a6548a4eac3c369ced4d, type: 2}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: c6bf5e7b790b6a94e91e8f893b5ee8e7, type: 2}
+      fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
-    - sourceType: 1
-      boardLayout: {fileID: 0}
-      fixedLevel: {fileID: 11400000, guid: 5e035467ad82e4241b4ebd7552f48904, type: 2}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 71c4c792efa4cbd4d9a3fe0b61191b48, type: 2}
+      fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
-    - sourceType: 1
-      boardLayout: {fileID: 0}
-      fixedLevel: {fileID: 11400000, guid: c24acc75a73d1e34d83005d417c725e8, type: 2}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: ff7da270e14aa0d498d106414e608af4, type: 2}
+      fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
-    - sourceType: 1
-      boardLayout: {fileID: 0}
-      fixedLevel: {fileID: 11400000, guid: f13aed1947eb52b4288f7c47eff0a14b, type: 2}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: e1d5f14daaf3c1543be5d4ac7d19d7f2, type: 2}
+      fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
-    - sourceType: 1
-      boardLayout: {fileID: 0}
-      fixedLevel: {fileID: 11400000, guid: 814581247f514aa4bb098c47fa217bc8, type: 2}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 8eb8498a25d5b7346981516b56735770, type: 2}
+      fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
-    - sourceType: 1
-      boardLayout: {fileID: 0}
-      fixedLevel: {fileID: 11400000, guid: eb49c2356fa8290488573ba9efb7be55, type: 2}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 86f6c033fcf7a3b43b60d7173dcaf11b, type: 2}
+      fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
-    - sourceType: 1
-      boardLayout: {fileID: 0}
-      fixedLevel: {fileID: 11400000, guid: 9df1e2cf47a332f47a1a6d24acef09a3, type: 2}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: da45352d5e4d05b48bf6e411bf53688e, type: 2}
+      fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
-    - sourceType: 1
-      boardLayout: {fileID: 0}
-      fixedLevel: {fileID: 11400000, guid: e90e30dbecd215440a1f6df5ce23caae, type: 2}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 80dafd12a6a43b3468dc68a53ff089f5, type: 2}
+      fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
-    - sourceType: 1
-      boardLayout: {fileID: 0}
-      fixedLevel: {fileID: 11400000, guid: 20a4137e45ba2134e9e393f9db3f096c, type: 2}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 8f028fc092843f14fb8754f65236e501, type: 2}
+      fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
-    - sourceType: 1
-      boardLayout: {fileID: 0}
-      fixedLevel: {fileID: 11400000, guid: 73741792951136a498e9236465fae147, type: 2}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 269bee86c2707ee43bc032a3e325a445, type: 2}
+      fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
-    - sourceType: 1
-      boardLayout: {fileID: 0}
-      fixedLevel: {fileID: 11400000, guid: 89c49f9ea3b15d84dbcfcd9b64bf12c9, type: 2}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 21d151ee27795994792d5c458e4c6acb, type: 2}
+      fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
-    - sourceType: 1
-      boardLayout: {fileID: 0}
-      fixedLevel: {fileID: 11400000, guid: 70c20424b1281e84daaa618e59cfb452, type: 2}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 355d1547ee6b48947b7b06e9c75f8e2f, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 094d53c44394f0f499ac8cd9f3712c8a, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 7830dbe917a48e64f98dbdd77bd2d24d, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: dd0e1456ae993d349b877a397a8f8f6f, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: f46f3786450df31439b7bef1b3a4c4f7, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: f44e6613ae089e9429a5e961dc93c1f7, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 799ea0e08fbaefc458ed18c7a3fc5e0b, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: db04ea333dbab6d4da20f982cc1b0268, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: ac29317757a40504d90fc6880db49662, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 0ac008427165af84fa09ad7e7530b3ac, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 1c112ebd02db70d42a4124e7e5e197d9, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 4f5fa2a25b6563d40845f8d7e015c3b4, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 609f5130f59acf34ea145c166477012b, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 43beef68c94e02f4392b1ee907799a7c, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 3413aceecca77c342b5abc527fc9eb8c, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 2f7b36245445c4543a7975d7c42ea06e, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 5a99b0fb663a33940b544850d6d33f29, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+  - minLevel: 58
+    maxLevel: 86
+    defaultTileBag: {fileID: 11400000, guid: d27206962d2ca8a4fa77e819b7d23d11, type: 2}
+    levelCompleteGold: 50
+    minTotalTiles: 42
+    maxTotalTiles: 81
+    backgroundLayerBottom: {fileID: 3229507492666951288, guid: 9872d30bcc8badb4f8031c854c366476, type: 3}
+    backgroundLayerTop: {fileID: -8985808423211435256, guid: 40370233a2d8ef34eacfcd5aca86c3e3, type: 3}
+    entries:
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: b67ae7a8e0197a841baa5228189f861e, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 6b3a8eaf4223c904892d73a27d7e2ec7, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 60bcda5ddb21a114688d58fcf932e9ef, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 0ac9663fa7329444d9d87b149a46da6e, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: f1939d85e0efbfb48968587ff001ba90, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: ae3bdae2a46c2a142bd01359f6de8f89, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 7cefc6af127f64c42aba0fd92be45439, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 106228d55c6439848be123c4377aef6d, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 933fb9529978af64eb42a8f196eee37e, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: c3fc809abdbc60d4696f75a9202e4f70, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: ce846d3e8b6db154086793b9225a643b, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 8f8abbfe66aa14547bade042a9fe4340, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: dec3d96ae80833045a87ada523a3c23d, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 14109c9d1ac164344a3c59f8a9201a45, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 787aa1cb07753f14ca6221299ddc4bc4, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 382bc22916ecf3b48b55f7012793f0a2, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: fce60f4a74af3f349a0ed10945fce679, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 214ba42ecc407dd489801960a3d6e46e, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 0300abc94a3e6c040aaff2d99a129d8b, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: ad7e23bbed30ded40b4c6f2326c311c3, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: eae78bd6fbb6929448bf8088a5f35d81, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 700be6b5b9fad3743b301a3d0553cb37, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: ef6e89a5cf7d7d041ac5fe9ea5c45de4, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 381f2ea781d89fa42b30c89c048d740d, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 17141ea0ae39dd1428ac79f97cc654c4, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 120c314bee8ae7f4a877767dbbb99711, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: e100a63d5f6b66447836a6421646021b, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 2a5112267aedc984baba58574f8696a1, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 3de09d8ad300ec345bf954e7214db2b1, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 494beef2c701d2b48ad399dc33da1b1a, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 5969079e72e08be46ab711ca60752826, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: d88f3e1ed88944a4abc14c2e4c38852e, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: b55b169276d1cba4d9e17a455bdbebf4, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+  - minLevel: 87
+    maxLevel: 133
+    defaultTileBag: {fileID: 11400000, guid: e6fc3c03d09c8d24a943cc859b01b3d4, type: 2}
+    levelCompleteGold: 60
+    minTotalTiles: 45
+    maxTotalTiles: 93
+    backgroundLayerBottom: {fileID: 7108675125740071113, guid: 2fc300c6c9ac1b24ca987ae19bb81d8a, type: 3}
+    backgroundLayerTop: {fileID: -8001208057857852343, guid: c293dc6156c16e04e9ad8278fc1bb3ed, type: 3}
+    entries:
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 87c33e44c016aef4391d5120d6853c84, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 2685f6d7bb5d1d147b699bc026fb98b4, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 9e3e7c10efe756242b6713034cc7cf4d, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 19c839f370b61f34c9d340af2d37aed1, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 045008f3e3f9f9f4a9b2eec50b2576ea, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 7dfa849daf0f89241a03b25da674e127, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 5d7d86930bb78e84dac1c4f1358d9f2c, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: f4fb3b98e7a7cfb4b9d1abf56043fac2, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: af0f01d0f7e196542a89e17dd758c1b9, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 4c52a01f421335848a9e20f7939dd7a5, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 86dab2bb0d7cbd343a2e473785af9493, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: bc50eecc944fb924d987438f09abf1df, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 197a2f5be2003f640a24f354ac866070, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: eed3ad9cdde2e6f43ae656e719663ffb, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: b30642ffada5a5e45885c08e935f02db, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 5c994602ab7c3fd4a9ea321d60fd9250, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: c479cd66af166b040b11ac54c258caa1, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 149ef377ac5256940bb0618cd6a8bde7, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: dfc086de4764ef3479a0667862ffe02c, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 8e8fb16995686a647abaf80e48f0a689, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: b817fa278097b2a48ad6d077490f666b, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 6535c799b51f4104e94f4236ea04ff54, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 9ea83bca6563a574b96feadc7c1d6a56, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 6d5b0b0db6a34c542bcd49f204fb07bd, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 66d83f8260bcab743a0b1333663613e1, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 8188d452dbb2df341a89da4161fea04c, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: e71eb910fa1c65240afdae1cafc2806a, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 4bc3ddb67180ddf4480bb21423e302fb, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 5be829e57d5b5fc489cf95adb9954bd4, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 2f2a670c4ff8f29418ba32f959699008, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 80e24755b6a2e1041aeb9c25dd48e12c, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: cb8f276f7591cdf42937b2d2a5e8bcd8, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 623cc5ab2eee1f34db76bf0bb668b1ee, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 264f7e3155483f748a59a2ab36d5287d, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 15fef26656d74994f890fe5567ab720b, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 39c00e9d3b4542647a7256effa44c1d0, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 11fb7d71c3dbbee4484828313a0c51bb, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 4feaef92f8fac884a9fd571992e182bc, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: b0fbceb13e8ba754d963b0c10e58470d, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: c1597c8628a81e94eb0ab19f8b1d948d, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: f2edaaad036589041974dea196b91811, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: bb9a66716f778f649aace4482865dbf6, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 5e4ad829de981534eadc29b24ed2bc85, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 0bea67bd909589348b6cc1cc72348981, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 92c149ef3fb0eca4c9ab9de95a19da87, type: 2}
+      fixedLevel: {fileID: 0}
+      tileBagOverride: {fileID: 0}
+    - sourceType: 0
+      boardLayout: {fileID: 11400000, guid: 0ed6a474a429b0c40b4f9dcf6a2b1c10, type: 2}
+      fixedLevel: {fileID: 0}
       tileBagOverride: {fileID: 0}
   poolRanges:
-  - minLevel: 1
-    maxLevel: 1
-    levelRangeRule: {fileID: 0}
-    deterministicByLevel: 0
-    seedOffset: 0
+  - minLevel: 134
+    maxLevel: 500
+    levelRangeRule: {fileID: 11400000, guid: 2ac8731250736a5499d4ee3061d4e7c8, type: 2}
+    levelCompleteGold: 60
+    deterministicByLevel: 1
+    seedOffset: 7000

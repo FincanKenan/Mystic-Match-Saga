@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7,138 +8,488 @@ using ZenMatch.Runtime.PlayerProgress;
 namespace ZenMatch.UI
 {
     [RequireComponent(typeof(Collider2D))]
+    [DisallowMultipleComponent]
     public sealed class MainMenuPlayLevelWorldButton : MonoBehaviour
     {
+        // =========================================================
+        // REFERENCES
+        // =========================================================
+
         [Header("References")]
-        [SerializeField] private PlayerProgressService progressService;
-        [SerializeField] private PlayerWalletService walletService;
+        [SerializeField]
+        private PlayerProgressService progressService;
+
+        [SerializeField]
+        private PlayerWalletService walletService;
+
+        // =========================================================
+        // UI
+        // =========================================================
 
         [Header("UI")]
-        [SerializeField] private TMP_Text levelText;
-        [SerializeField] private string levelTextFormat = "{0}";
+        [SerializeField]
+        private TMP_Text levelText;
+
+        [SerializeField]
+        private string levelTextFormat = "{0}";
+
+        // =========================================================
+        // SCENE
+        // =========================================================
 
         [Header("Scene")]
-        [SerializeField] private string gameSceneName = "GameScene";
+        [SerializeField]
+        private string gameSceneName = "GameScene";
+
+        // =========================================================
+        // WORLD CLICK
+        // =========================================================
+
+        [Header("World Click")]
+        [Tooltip(
+            "Bu world yumurtasýna doðrudan týklanarak " +
+            "bölüm baþlatýlabilir.")]
+        [SerializeField]
+        private bool enableWorldClick = true;
+
+        // =========================================================
+        // LIFE CHECK
+        // =========================================================
 
         [Header("Life Check")]
-        [SerializeField] private bool requireLifeToPlay = true;
+        [SerializeField]
+        private bool requireLifeToPlay = true;
 
-        [Tooltip("Can yoksa açýlacak panel. Þimdilik ShopPanel verebilirsin.")]
-        [SerializeField] private GameObject noLivesPanel;
+        [Tooltip("Can yoksa açýlacak panel.")]
+        [SerializeField]
+        private GameObject noLivesPanel;
+
+        // =========================================================
+        // CLICK BLOCKING
+        // =========================================================
 
         [Header("Click Blocking")]
-        [Tooltip("Bu paneller açýksa yumurtaya týklama çalýþmaz.")]
-        [SerializeField] private GameObject[] blockingPanels;
+        [Tooltip(
+            "Bu paneller açýksa büyük yumurtaya " +
+            "týklama çalýþmaz.")]
+        [SerializeField]
+        private GameObject[] blockingPanels;
+
+        // =========================================================
+        // UI SYNC
+        // =========================================================
+
+        [Header("UI Sync")]
+        [Tooltip(
+            "Sahne geçiþlerinde kaçýrýlan progress eventleri için " +
+            "çok hafif güvenlik senkronizasyonu.")]
+        [Min(0.1f)]
+        [SerializeField]
+        private float safetyRefreshInterval = 0.25f;
+
+        // =========================================================
+        // DEBUG
+        // =========================================================
 
         [Header("Debug")]
-        [SerializeField] private bool logDebug = true;
+        [SerializeField]
+        private bool logDebug = true;
+
+        // =========================================================
+        // RUNTIME
+        // =========================================================
 
         private Camera _mainCamera;
         private Collider2D _collider;
 
+        private PlayerProgressService
+            _subscribedProgressService;
+
+        private PlayerWalletService
+            _subscribedWalletService;
+
+        private Coroutine
+            _delayedRefreshRoutine;
+
+        private float
+            _nextSafetyRefreshTime;
+
+        private int
+            _lastDisplayedLevel = -1;
+
+        // =========================================================
+        // UNITY
+        // =========================================================
+
         private void Awake()
         {
-            _collider = GetComponent<Collider2D>();
-            ResolveReferences();
+            _collider =
+                GetComponent<Collider2D>();
+
+            _mainCamera =
+                Camera.main;
+
+            RebindServices();
         }
 
         private void OnEnable()
         {
-            ResolveReferences();
-            Subscribe();
-            Refresh();
+            SceneManager.sceneLoaded +=
+                HandleSceneLoaded;
+
+            RebindServices();
+
+            Refresh(true);
+
+            if (_delayedRefreshRoutine != null)
+            {
+                StopCoroutine(
+                    _delayedRefreshRoutine);
+            }
+
+            _delayedRefreshRoutine =
+                StartCoroutine(
+                    DelayedRefreshRoutine());
+
+            _nextSafetyRefreshTime =
+                Time.unscaledTime +
+                safetyRefreshInterval;
         }
 
         private void OnDisable()
         {
-            Unsubscribe();
+            SceneManager.sceneLoaded -=
+                HandleSceneLoaded;
+
+            UnsubscribeServices();
+
+            if (_delayedRefreshRoutine != null)
+            {
+                StopCoroutine(
+                    _delayedRefreshRoutine);
+
+                _delayedRefreshRoutine = null;
+            }
         }
 
         private void Update()
         {
-            if (Input.GetMouseButtonUp(0))
-                TryHandlePointer(Input.mousePosition);
+            // =====================================================
+            // SAFETY REFRESH
+            // =====================================================
 
+            if (Time.unscaledTime >=
+                _nextSafetyRefreshTime)
+            {
+                _nextSafetyRefreshTime =
+                    Time.unscaledTime +
+                    safetyRefreshInterval;
+
+                RebindServices();
+
+                Refresh(false);
+            }
+
+            // =====================================================
+            // WORLD CLICK
+            // =====================================================
+
+            if (!enableWorldClick)
+                return;
+
+            // Önce touch kontrol edilir.
             if (Input.touchCount > 0)
             {
-                Touch touch = Input.GetTouch(0);
+                Touch touch =
+                    Input.GetTouch(0);
 
-                if (touch.phase == TouchPhase.Ended)
-                    TryHandlePointer(touch.position);
+                if (touch.phase ==
+                    TouchPhase.Ended)
+                {
+                    TryHandlePointer(
+                        touch.position,
+                        touch.fingerId);
+                }
+
+                return;
+            }
+
+            // Editor / PC mouse kontrolü.
+            if (Input.GetMouseButtonUp(0))
+            {
+                TryHandlePointer(
+                    Input.mousePosition,
+                    -1);
             }
         }
 
-        private void ResolveReferences()
+        // =========================================================
+        // DELAYED REFRESH
+        // =========================================================
+
+        private IEnumerator DelayedRefreshRoutine()
         {
+            // Sahnedeki tüm Awake / OnEnable iþlemlerinin
+            // tamamlanmasýný bekle.
+            yield return null;
+
+            RebindServices();
+
+            Refresh(true);
+
+            // Persistent servislerin sahne geçiþinden sonra
+            // tamamen oturmasý için bir kez daha kontrol et.
+            yield return
+                new WaitForSecondsRealtime(
+                    0.1f);
+
+            RebindServices();
+
+            Refresh(true);
+
+            _delayedRefreshRoutine = null;
+        }
+
+        // =========================================================
+        // SCENE LOADED
+        // =========================================================
+
+        private void HandleSceneLoaded(
+            Scene scene,
+            LoadSceneMode mode)
+        {
+            RebindServices();
+
+            Refresh(true);
+        }
+
+        // =========================================================
+        // SERVICE BINDING
+        // =========================================================
+
+        private void RebindServices()
+        {
+            // =====================================================
+            // PROGRESS SERVICE
+            // =====================================================
+
+            PlayerProgressService
+                newProgressService =
+                    PlayerProgressService.Instance;
+
+            if (newProgressService == null)
+            {
+                newProgressService =
+                    progressService != null
+                        ? progressService
+                        : FindFirstObjectByType<
+                            PlayerProgressService>();
+            }
+
+            if (_subscribedProgressService !=
+                newProgressService)
+            {
+                if (_subscribedProgressService != null)
+                {
+                    _subscribedProgressService
+                        .OnProgressLoaded -=
+                        HandleProgressChanged;
+
+                    _subscribedProgressService
+                        .OnProgressChanged -=
+                        HandleProgressChanged;
+                }
+
+                _subscribedProgressService =
+                    newProgressService;
+
+                progressService =
+                    newProgressService;
+
+                if (_subscribedProgressService != null)
+                {
+                    _subscribedProgressService
+                        .OnProgressLoaded +=
+                        HandleProgressChanged;
+
+                    _subscribedProgressService
+                        .OnProgressChanged +=
+                        HandleProgressChanged;
+                }
+            }
+
+            // =====================================================
+            // WALLET SERVICE
+            // =====================================================
+
+            PlayerWalletService
+                newWalletService =
+                    PlayerWalletService.Instance;
+
+            if (newWalletService == null)
+            {
+                newWalletService =
+                    walletService != null
+                        ? walletService
+                        : FindFirstObjectByType<
+                            PlayerWalletService>();
+            }
+
+            if (_subscribedWalletService !=
+                newWalletService)
+            {
+                if (_subscribedWalletService != null)
+                {
+                    _subscribedWalletService
+                        .OnLivesChanged -=
+                        HandleLivesChanged;
+                }
+
+                _subscribedWalletService =
+                    newWalletService;
+
+                walletService =
+                    newWalletService;
+
+                if (_subscribedWalletService != null)
+                {
+                    _subscribedWalletService
+                        .OnLivesChanged +=
+                        HandleLivesChanged;
+                }
+            }
+
             if (_mainCamera == null)
-                _mainCamera = Camera.main;
-
-            if (progressService == null)
-                progressService = PlayerProgressService.Instance;
-
-            if (progressService == null)
-                progressService = FindFirstObjectByType<PlayerProgressService>();
-
-            if (walletService == null)
-                walletService = PlayerWalletService.Instance;
-
-            if (walletService == null)
-                walletService = FindFirstObjectByType<PlayerWalletService>();
+            {
+                _mainCamera =
+                    Camera.main;
+            }
         }
 
-        private void Subscribe()
+        private void UnsubscribeServices()
         {
-            if (progressService != null)
-                progressService.OnProgressChanged += HandleProgressChanged;
+            if (_subscribedProgressService != null)
+            {
+                _subscribedProgressService
+                    .OnProgressLoaded -=
+                    HandleProgressChanged;
 
-            if (walletService != null)
-                walletService.OnLivesChanged += HandleLivesChanged;
+                _subscribedProgressService
+                    .OnProgressChanged -=
+                    HandleProgressChanged;
+            }
+
+            if (_subscribedWalletService != null)
+            {
+                _subscribedWalletService
+                    .OnLivesChanged -=
+                    HandleLivesChanged;
+            }
+
+            _subscribedProgressService = null;
+            _subscribedWalletService = null;
         }
 
-        private void Unsubscribe()
+        // =========================================================
+        // EVENTS
+        // =========================================================
+
+        private void HandleProgressChanged(
+            PlayerProgressData data)
         {
-            if (progressService != null)
-                progressService.OnProgressChanged -= HandleProgressChanged;
-
-            if (walletService != null)
-                walletService.OnLivesChanged -= HandleLivesChanged;
+            Refresh(true);
         }
 
-        private void HandleProgressChanged(PlayerProgressData data)
+        private void HandleLivesChanged(
+            int lives)
         {
-            Refresh();
+            // Life deðiþikliði level numarasýný
+            // deðiþtirmese bile UI güvenli þekilde
+            // senkronize edilir.
+            Refresh(false);
         }
 
-        private void HandleLivesChanged(int lives)
-        {
-            Refresh();
-        }
+        // =========================================================
+        // REFRESH
+        // =========================================================
 
         public void Refresh()
         {
-            ResolveReferences();
+            Refresh(true);
+        }
 
-            int levelNumber = GetCurrentLevelNumber();
+        private void Refresh(
+            bool force)
+        {
+            RebindServices();
+
+            int levelNumber =
+                GetCurrentLevelNumber();
+
+            if (!force &&
+                _lastDisplayedLevel ==
+                levelNumber)
+            {
+                return;
+            }
+
+            _lastDisplayedLevel =
+                levelNumber;
 
             if (levelText != null)
-                levelText.text = string.Format(levelTextFormat, levelNumber);
+            {
+                levelText.text =
+                    string.Format(
+                        levelTextFormat,
+                        levelNumber);
+            }
+
+            if (logDebug)
+            {
+                Debug.Log(
+                    $"[MainMenuPlayLevelWorldButton] " +
+                    $"Level UI refreshed: " +
+                    $"{levelNumber}",
+                    this);
+            }
         }
+
+        // =========================================================
+        // CURRENT LEVEL
+        // =========================================================
 
         private int GetCurrentLevelNumber()
         {
-            if (progressService == null || progressService.Data == null)
+            if (progressService == null ||
+                progressService.Data == null)
+            {
                 return 1;
+            }
 
-            return Mathf.Max(1, progressService.Data.highestUnlockedLevel);
+            // Ana Menü oyuncunun açýlmýþ olan
+            // güncel bölümünü gösterir.
+            return Mathf.Max(
+                1,
+                progressService.Data
+                    .highestUnlockedLevel);
         }
 
-        private void TryHandlePointer(Vector3 screenPosition)
+        // =========================================================
+        // POINTER
+        // =========================================================
+
+        private void TryHandlePointer(
+            Vector3 screenPosition,
+            int pointerId)
         {
             if (_collider == null)
                 return;
 
             if (_mainCamera == null)
-                _mainCamera = Camera.main;
+            {
+                _mainCamera =
+                    Camera.main;
+            }
 
             if (_mainCamera == null)
                 return;
@@ -146,64 +497,141 @@ namespace ZenMatch.UI
             if (IsBlockedByPanel())
                 return;
 
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            // UI elementine basýlmýþsa
+            // world yumurtasýný çalýþtýrma.
+            if (EventSystem.current != null)
+            {
+                bool overUI;
+
+                if (pointerId >= 0)
+                {
+                    overUI =
+                        EventSystem.current
+                            .IsPointerOverGameObject(
+                                pointerId);
+                }
+                else
+                {
+                    overUI =
+                        EventSystem.current
+                            .IsPointerOverGameObject();
+                }
+
+                if (overUI)
+                    return;
+            }
+
+            Vector3 worldPosition =
+                _mainCamera.ScreenToWorldPoint(
+                    screenPosition);
+
+            Vector2 worldPoint =
+                new Vector2(
+                    worldPosition.x,
+                    worldPosition.y);
+
+            if (!_collider.OverlapPoint(
+                    worldPoint))
+            {
                 return;
+            }
 
-            Vector3 worldPosition = _mainCamera.ScreenToWorldPoint(screenPosition);
-            Vector2 worldPoint = new Vector2(worldPosition.x, worldPosition.y);
-
-            if (!_collider.OverlapPoint(worldPoint))
-                return;
-
-            HandleClicked();
+            StartLevel();
         }
+
+        // =========================================================
+        // BLOCKING PANELS
+        // =========================================================
 
         private bool IsBlockedByPanel()
         {
             if (blockingPanels == null)
                 return false;
 
-            for (int i = 0; i < blockingPanels.Length; i++)
+            for (int i = 0;
+                 i < blockingPanels.Length;
+                 i++)
             {
-                GameObject panel = blockingPanels[i];
+                GameObject panel =
+                    blockingPanels[i];
 
-                if (panel != null && panel.activeInHierarchy)
+                if (panel != null &&
+                    panel.activeInHierarchy)
+                {
                     return true;
+                }
             }
 
             return false;
         }
 
-        private void HandleClicked()
-        {
-            ResolveReferences();
+        // =========================================================
+        // START LEVEL
+        // =========================================================
 
-            if (progressService == null || progressService.Data == null)
+        public void StartLevel()
+        {
+            RebindServices();
+
+            if (progressService == null ||
+                progressService.Data == null)
             {
-                Debug.LogWarning("[MainMenuPlayLevelWorldButton] PlayerProgressService bulunamadý.", this);
+                Debug.LogWarning(
+                    "[MainMenuPlayLevelWorldButton] " +
+                    "PlayerProgressService bulunamadý.",
+                    this);
+
                 return;
             }
 
-            if (requireLifeToPlay && walletService != null && walletService.Lives <= 0)
+            if (requireLifeToPlay &&
+                walletService != null &&
+                walletService.Lives <= 0)
             {
                 if (logDebug)
-                    Debug.Log("[MainMenuPlayLevelWorldButton] Can yok. Bölüme geçiþ engellendi.", this);
+                {
+                    Debug.Log(
+                        "[MainMenuPlayLevelWorldButton] " +
+                        "Can yok. Bölüme geçiþ engellendi.",
+                        this);
+                }
 
                 if (noLivesPanel != null)
-                    noLivesPanel.SetActive(true);
+                {
+                    noLivesPanel.SetActive(
+                        true);
+                }
 
                 return;
             }
 
-            int levelNumber = GetCurrentLevelNumber();
+            int levelNumber =
+                GetCurrentLevelNumber();
 
-            progressService.Data.lastPlayedLevel = levelNumber;
+            progressService.Data.lastPlayedLevel =
+                levelNumber;
+
             progressService.NotifyChanged();
 
             if (logDebug)
-                Debug.Log($"[MainMenuPlayLevelWorldButton] GameScene yükleniyor. Level: {levelNumber}", this);
+            {
+                Debug.Log(
+                    $"[MainMenuPlayLevelWorldButton] " +
+                    $"GameScene yükleniyor. " +
+                    $"Level: {levelNumber}",
+                    this);
+            }
 
-            SceneManager.LoadScene(gameSceneName);
+            if (LoadingScreenService.Instance != null)
+            {
+                LoadingScreenService.Instance.LoadScene(
+                    gameSceneName);
+            }
+            else
+            {
+                SceneManager.LoadScene(
+                    gameSceneName);
+            }
         }
     }
 }

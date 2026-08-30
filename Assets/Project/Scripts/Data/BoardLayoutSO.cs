@@ -6,85 +6,167 @@ using ZenMatch.Runtime.Rewards;
 
 namespace ZenMatch.Data
 {
-    [CreateAssetMenu(fileName = "BoardLayout_", menuName = "ZenMatch/Board/Layout")]
+    [CreateAssetMenu(
+        fileName = "BoardLayout_",
+        menuName = "ZenMatch/Board/Layout")]
     public sealed class BoardLayoutSO : ScriptableObject
     {
         [Header("Identity")]
         [SerializeField] private string layoutId = "Normal_1";
-        [SerializeField] private LayoutCategory category = LayoutCategory.Normal;
+        [SerializeField]
+        private LayoutCategory category =
+            LayoutCategory.Normal;
+
+        // =========================================================
+        // SPECIAL TRAY SETTINGS
+        // =========================================================
+
+        [Header("Special Tray Settings")]
+        [Tooltip(
+            "Açýksa bu layout çalýþtýrýldýðýnda tray, " +
+            "özel baþlangýç kapasitesiyle baþlar.")]
+        [SerializeField] private bool useSpecialTraySettings = false;
+
+        [Tooltip(
+            "Bölüm baþýnda aktif olacak tray slot sayýsý. " +
+            "Normal tray kapasitesi 7'dir.")]
+        [Range(1, 7)]
+        [SerializeField] private int startingActiveTrayCapacity = 7;
 
         [Header("Groups")]
-        [SerializeField] private List<SpawnGroupDefinition> groups = new();
+        [SerializeField]
+        private List<SpawnGroupDefinition> groups =
+            new();
 
         [Header("Reward Gifts")]
-        [Tooltip("Bu layout içinde yer alan hediyeye ulaþma özel bölüm ödülleri.")]
-        [SerializeField] private List<RewardGiftReference> rewardGifts = new();
+        [Tooltip(
+            "Bu layout içinde yer alan hediyeye ulaþma " +
+            "özel bölüm ödülleri.")]
+        [SerializeField]
+        private List<RewardGiftReference> rewardGifts =
+            new();
 
         [Header("Special Stone Rewards")]
-        [Tooltip("Bu layout içinde özel taþ toplandýðýnda verilecek anlýk ödüller ve görev tagleri.")]
-        [SerializeField] private List<SpecialStoneRewardReference> specialStoneRewards = new();
+        [Tooltip(
+            "Bu layout içinde özel taþ toplandýðýnda verilecek " +
+            "anlýk ödüller ve görev tagleri.")]
+        [SerializeField]
+        private List<SpecialStoneRewardReference> specialStoneRewards =
+            new();
+
+        // =========================================================
+        // PUBLIC PROPERTIES
+        // =========================================================
 
         public string LayoutId => layoutId;
+
         public LayoutCategory Category => category;
-        public IReadOnlyList<SpawnGroupDefinition> Groups => groups;
-        public IReadOnlyList<RewardGiftReference> RewardGifts => rewardGifts;
-        public IReadOnlyList<SpecialStoneRewardReference> SpecialStoneRewards => specialStoneRewards;
+
+        public bool UseSpecialTraySettings =>
+            useSpecialTraySettings;
+
+        public int StartingActiveTrayCapacity =>
+            startingActiveTrayCapacity;
+
+        public IReadOnlyList<SpawnGroupDefinition> Groups =>
+            groups;
+
+        public IReadOnlyList<RewardGiftReference> RewardGifts =>
+            rewardGifts;
+
+        public IReadOnlyList<SpecialStoneRewardReference>
+            SpecialStoneRewards =>
+                specialStoneRewards;
+
+        // =========================================================
+        // VALIDATION
+        // =========================================================
 
         private void OnValidate()
         {
             if (string.IsNullOrWhiteSpace(layoutId))
                 layoutId = name;
 
+            startingActiveTrayCapacity =
+                Mathf.Clamp(
+                    startingActiveTrayCapacity,
+                    1,
+                    7);
+
             if (groups == null)
-                groups = new List<SpawnGroupDefinition>();
+                groups =
+                    new List<SpawnGroupDefinition>();
 
             for (int i = 0; i < groups.Count; i++)
             {
                 if (groups[i] == null)
-                    groups[i] = new SpawnGroupDefinition();
+                    groups[i] =
+                        new SpawnGroupDefinition();
 
                 groups[i].Validate();
             }
 
             if (rewardGifts == null)
-                rewardGifts = new List<RewardGiftReference>();
+                rewardGifts =
+                    new List<RewardGiftReference>();
 
             for (int i = 0; i < rewardGifts.Count; i++)
             {
                 if (rewardGifts[i] == null)
-                    rewardGifts[i] = new RewardGiftReference();
+                    rewardGifts[i] =
+                        new RewardGiftReference();
 
                 rewardGifts[i].Validate();
             }
 
             if (specialStoneRewards == null)
-                specialStoneRewards = new List<SpecialStoneRewardReference>();
+            {
+                specialStoneRewards =
+                    new List<SpecialStoneRewardReference>();
+            }
 
-            for (int i = 0; i < specialStoneRewards.Count; i++)
+            for (int i = 0;
+                 i < specialStoneRewards.Count;
+                 i++)
             {
                 if (specialStoneRewards[i] == null)
-                    specialStoneRewards[i] = new SpecialStoneRewardReference();
+                {
+                    specialStoneRewards[i] =
+                        new SpecialStoneRewardReference();
+                }
 
                 specialStoneRewards[i].Validate();
             }
         }
 
+        // =========================================================
+        // REWARD GIFTS
+        // =========================================================
+
         public bool HasRewardGifts()
         {
-            if (rewardGifts == null || rewardGifts.Count == 0)
-                return false;
-
-            for (int i = 0; i < rewardGifts.Count; i++)
+            if (rewardGifts == null ||
+                rewardGifts.Count == 0)
             {
-                RewardGiftReference gift = rewardGifts[i];
+                return false;
+            }
+
+            for (int i = 0;
+                 i < rewardGifts.Count;
+                 i++)
+            {
+                RewardGiftReference gift =
+                    rewardGifts[i];
 
                 if (gift == null)
                     continue;
 
                 gift.Validate();
 
-                if (!string.IsNullOrWhiteSpace(gift.giftId) &&
-                    !string.IsNullOrWhiteSpace(gift.GetSceneAnchorId()))
+                if (!string.IsNullOrWhiteSpace(
+                        gift.giftId) &&
+                    !string.IsNullOrWhiteSpace(
+                        gift.GetSceneAnchorId()))
                 {
                     return true;
                 }
@@ -93,14 +175,24 @@ namespace ZenMatch.Data
             return false;
         }
 
+        // =========================================================
+        // SPECIAL STONE REWARDS
+        // =========================================================
+
         public bool HasSpecialStoneRewards()
         {
-            if (specialStoneRewards == null || specialStoneRewards.Count == 0)
-                return false;
-
-            for (int i = 0; i < specialStoneRewards.Count; i++)
+            if (specialStoneRewards == null ||
+                specialStoneRewards.Count == 0)
             {
-                SpecialStoneRewardReference reward = specialStoneRewards[i];
+                return false;
+            }
+
+            for (int i = 0;
+                 i < specialStoneRewards.Count;
+                 i++)
+            {
+                SpecialStoneRewardReference reward =
+                    specialStoneRewards[i];
 
                 if (reward == null)
                     continue;
@@ -121,20 +213,30 @@ namespace ZenMatch.Data
         {
             rewardReference = null;
 
-            if (specialStoneRewards == null || specialStoneRewards.Count == 0)
-                return false;
-
-            for (int i = 0; i < specialStoneRewards.Count; i++)
+            if (specialStoneRewards == null ||
+                specialStoneRewards.Count == 0)
             {
-                SpecialStoneRewardReference reward = specialStoneRewards[i];
+                return false;
+            }
+
+            for (int i = 0;
+                 i < specialStoneRewards.Count;
+                 i++)
+            {
+                SpecialStoneRewardReference reward =
+                    specialStoneRewards[i];
 
                 if (reward == null)
                     continue;
 
                 reward.Validate();
 
-                if (!reward.Matches(specialTileGroupId, tileType))
+                if (!reward.Matches(
+                        specialTileGroupId,
+                        tileType))
+                {
                     continue;
+                }
 
                 rewardReference = reward;
                 return true;
@@ -143,14 +245,26 @@ namespace ZenMatch.Data
             return false;
         }
 
-        public bool TryGetGroup(string groupId, out SpawnGroupDefinition group)
+        // =========================================================
+        // GROUPS
+        // =========================================================
+
+        public bool TryGetGroup(
+            string groupId,
+            out SpawnGroupDefinition group)
         {
-            if (!string.IsNullOrWhiteSpace(groupId) && groups != null)
+            if (!string.IsNullOrWhiteSpace(groupId) &&
+                groups != null)
             {
-                for (int i = 0; i < groups.Count; i++)
+                for (int i = 0;
+                     i < groups.Count;
+                     i++)
                 {
                     if (groups[i] != null &&
-                        string.Equals(groups[i].GroupId, groupId, StringComparison.Ordinal))
+                        string.Equals(
+                            groups[i].GroupId,
+                            groupId,
+                            StringComparison.Ordinal))
                     {
                         group = groups[i];
                         return true;
@@ -162,16 +276,27 @@ namespace ZenMatch.Data
             return false;
         }
 
-        public bool ContainsPoint(string pointId)
+        public bool ContainsPoint(
+            string pointId)
         {
-            if (string.IsNullOrWhiteSpace(pointId) || groups == null)
-                return false;
-
-            for (int i = 0; i < groups.Count; i++)
+            if (string.IsNullOrWhiteSpace(pointId) ||
+                groups == null)
             {
-                var group = groups[i];
-                if (group != null && group.ContainsPoint(pointId))
+                return false;
+            }
+
+            for (int i = 0;
+                 i < groups.Count;
+                 i++)
+            {
+                SpawnGroupDefinition group =
+                    groups[i];
+
+                if (group != null &&
+                    group.ContainsPoint(pointId))
+                {
                     return true;
+                }
             }
 
             return false;
@@ -184,12 +309,15 @@ namespace ZenMatch.Data
             if (groups == null)
                 return total;
 
-            for (int i = 0; i < groups.Count; i++)
+            for (int i = 0;
+                 i < groups.Count;
+                 i++)
             {
                 if (groups[i] == null)
                     continue;
 
-                total += groups[i].GetPointCount();
+                total +=
+                    groups[i].GetPointCount();
             }
 
             return total;
@@ -197,25 +325,45 @@ namespace ZenMatch.Data
 
         public List<string> GetAllPointIds()
         {
-            List<string> result = new();
+            List<string> result =
+                new();
 
             if (groups == null)
                 return result;
 
-            for (int i = 0; i < groups.Count; i++)
+            for (int i = 0;
+                 i < groups.Count;
+                 i++)
             {
-                var group = groups[i];
-                if (group == null || group.Points == null)
-                    continue;
+                SpawnGroupDefinition group =
+                    groups[i];
 
-                for (int j = 0; j < group.Points.Count; j++)
+                if (group == null ||
+                    group.Points == null)
                 {
-                    var point = group.Points[j];
-                    if (point == null || string.IsNullOrWhiteSpace(point.pointId))
-                        continue;
+                    continue;
+                }
 
-                    if (!result.Contains(point.pointId))
-                        result.Add(point.pointId);
+                for (int j = 0;
+                     j < group.Points.Count;
+                     j++)
+                {
+                    var point =
+                        group.Points[j];
+
+                    if (point == null ||
+                        string.IsNullOrWhiteSpace(
+                            point.pointId))
+                    {
+                        continue;
+                    }
+
+                    if (!result.Contains(
+                            point.pointId))
+                    {
+                        result.Add(
+                            point.pointId);
+                    }
                 }
             }
 

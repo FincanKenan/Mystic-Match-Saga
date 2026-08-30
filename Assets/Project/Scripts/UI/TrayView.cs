@@ -122,7 +122,12 @@ namespace ZenMatch.UI
                 StopCoroutine(_activeAnimation);
 
             _currentCapacity = currentCapacity;
-            _maxVisualCapacity = Mathf.Max(maxVisualCapacity, currentCapacity);
+
+            _maxVisualCapacity =
+                Mathf.Max(
+                    maxVisualCapacity,
+                    currentCapacity);
+
             _lockedSlots = lockedSlots;
 
             EnsureBaseSlots(_maxVisualCapacity);

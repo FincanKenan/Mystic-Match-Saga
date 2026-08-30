@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 458729016283936850}
+  - component: {fileID: 2242810009191024451}
   m_Layer: 0
   m_Name: GameServices
   m_TagString: Untagged
@@ -33,8 +34,22 @@ Transform:
   - {fileID: 586484728383169691}
   - {fileID: 4858143071006039277}
   - {fileID: 2784898210742179531}
+  - {fileID: 1896119817655609209}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2242810009191024451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361746698471963828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae3845fb645308f4a8ea783e22035311, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shopPanel: {fileID: 0}
 --- !u!1 &1358963576039989328
 GameObject:
   m_ObjectHideFlags: 0
@@ -95,6 +110,64 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6e4350629c413d142ae4a3481dc4a07c, type: 2}
   - {fileID: 11400000, guid: c9f7a1f1890ab3940bddf12fc164ff5a, type: 2}
   logDebug: 1
+--- !u!1 &1562311127470349058
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1896119817655609209}
+  - component: {fileID: 6130252845548584658}
+  - component: {fileID: 9027763835170175723}
+  m_Layer: 0
+  m_Name: GoogleAdsConsentService
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1896119817655609209
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1562311127470349058}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 458729016283936850}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6130252845548584658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1562311127470349058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28253704a45758149bedfe9f47b79a92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &9027763835170175723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1562311127470349058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b490709934be7fd4190f66ea9dd9359d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config: {fileID: 11400000, guid: 32e3ba8f3783cdc41800f8b1f828e160, type: 2}
 --- !u!1 &3008405516359024961
 GameObject:
   m_ObjectHideFlags: 0
@@ -188,6 +261,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 1
   logDebug: 1
+  debugCoinGrantAmount: 100
+  debugLevelSkipAmount: 1
+  debugLifeGrantAmount: 1
 --- !u!114 &3480154027967362984
 MonoBehaviour:
   m_ObjectHideFlags: 0

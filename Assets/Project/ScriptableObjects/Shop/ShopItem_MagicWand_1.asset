@@ -15,7 +15,7 @@ MonoBehaviour:
   itemId: ShopItem_MagicWand
   displayName: 1 Sihirli Asa
   icon: {fileID: 7843106906694883005, guid: 739784b19cede934f9c5d3f56fbf3821, type: 3}
-  coinPrice: 200
+  coinPrice: 450
   rewardType: 1
   rewardAmount: 1
   boosterType: 1

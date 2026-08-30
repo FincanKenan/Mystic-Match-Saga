@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d16cc4f6740c0fe458f783e587491f08, type: 3}
+  m_Name: RewardPack_LevelComplete_Default
+  m_EditorClassIdentifier: 
+  rewardPackId: level_complete_default
+  displayName: "B\xF6l\xFCm Tamamlama \xD6d\xFCl\xFC"
+  description: "B\xF6l\xFCm tamamland\u0131\u011F\u0131nda verilen standart \xF6d\xFCl."
+  rewards:
+  - rewardType: 10
+    amount: 20
+    rewardId: 
+    displayName: "Alt\u0131n"
+    icon: {fileID: -308007156058307332, guid: cef0e485f6c59a047936c9a1832599fb, type: 3}
