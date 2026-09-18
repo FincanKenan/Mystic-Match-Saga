@@ -44,6 +44,12 @@ namespace ZenMatch.Runtime.Shop
             if (!IsRewardValid(item))
                 return false;
 
+            if (item.RewardType == ShopRewardType.Life &&
+                !walletService.CanAddLives(item.RewardAmount))
+            {
+                return false;
+            }
+
             return walletService.Coins >= item.CoinPrice;
         }
 
@@ -60,11 +66,23 @@ namespace ZenMatch.Runtime.Shop
                 return Fail(
                     item,
                     ShopPurchaseFailReason.MissingWalletService);
-
             if (!IsRewardValid(item))
                 return Fail(
                     item,
                     ShopPurchaseFailReason.InvalidReward);
+
+            if (item.RewardType == ShopRewardType.Life &&
+                !walletService.CanAddLives(item.RewardAmount))
+            {
+                return Fail(
+                    item,
+                    ShopPurchaseFailReason.LifeLimitReached);
+            }
+
+            if (walletService.Coins < item.CoinPrice)
+                return Fail(
+                    item,
+                    ShopPurchaseFailReason.NotEnoughCoins);
 
             if (walletService.Coins < item.CoinPrice)
                 return Fail(

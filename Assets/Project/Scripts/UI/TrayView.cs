@@ -49,6 +49,9 @@ namespace ZenMatch.UI
         private readonly List<GameObject> _baseSlots = new();
         private readonly List<GameObject> _lockIcons = new();
         private readonly List<GameObject> _tileVisuals = new();
+        private readonly List<GameObject> _tempAnimationVisuals = new();
+
+        
 
         private Coroutine _activeAnimation;
         private int _currentCapacity = 0;
@@ -118,8 +121,7 @@ namespace ZenMatch.UI
             int maxVisualCapacity,
             int lockedSlots)
         {
-            if (_activeAnimation != null)
-                StopCoroutine(_activeAnimation);
+            StopActiveAnimation();
 
             _currentCapacity = currentCapacity;
 
@@ -256,8 +258,7 @@ namespace ZenMatch.UI
     int maxVisualCapacity,
     int lockedSlots)
         {
-            if (_activeAnimation != null)
-                StopCoroutine(_activeAnimation);
+            StopActiveAnimation();
 
             _currentCapacity = currentCapacity;
             _maxVisualCapacity = maxVisualCapacity;
@@ -411,6 +412,7 @@ namespace ZenMatch.UI
                 GameObject go = new GameObject($"TrayAnimTile_{i}");
                 go.transform.SetParent(visualsRoot, false);
                 go.transform.localPosition = GetSlotLocalPosition(i);
+                _tempAnimationVisuals.Add(go);
 
                 SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
                 sr.sortingLayerName = sortingLayerName;
@@ -574,16 +576,54 @@ namespace ZenMatch.UI
             _tileVisuals.Clear();
         }
 
-        private void ClearTempVisuals(List<TraySlotVisual> visuals)
+        private void ClearTempVisuals(
+    List<TraySlotVisual> visuals)
         {
             if (visuals == null)
                 return;
 
             for (int i = visuals.Count - 1; i >= 0; i--)
             {
-                if (visuals[i] != null && visuals[i].GameObject != null)
-                    DestroySafe(visuals[i].GameObject);
+                if (visuals[i] == null ||
+                    visuals[i].GameObject == null)
+                {
+                    continue;
+                }
+
+                GameObject go =
+                    visuals[i].GameObject;
+
+                _tempAnimationVisuals.Remove(go);
+
+                go.SetActive(false);
+                DestroySafe(go);
             }
+        }
+
+        private void StopActiveAnimation()
+        {
+            if (_activeAnimation != null)
+            {
+                StopCoroutine(_activeAnimation);
+                _activeAnimation = null;
+            }
+
+            for (int i =
+                     _tempAnimationVisuals.Count - 1;
+                 i >= 0;
+                 i--)
+            {
+                GameObject go =
+                    _tempAnimationVisuals[i];
+
+                if (go == null)
+                    continue;
+
+                go.SetActive(false);
+                DestroySafe(go);
+            }
+
+            _tempAnimationVisuals.Clear();
         }
 
         private void DestroySafe(GameObject go)

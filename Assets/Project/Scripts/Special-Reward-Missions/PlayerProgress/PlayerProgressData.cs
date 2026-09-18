@@ -42,6 +42,8 @@ namespace ZenMatch.Runtime.PlayerProgress
 
         public string startedUtc;
 
+        public bool lifeSpent;
+
         // Bu attempt sýrasýnda KAZANILAN ödüller.
         // Bölüm terk edilirse / kaybedilip retry yapýlýrsa
         // yalnýzca bunlar geri alýnýr.
@@ -70,6 +72,8 @@ namespace ZenMatch.Runtime.PlayerProgress
 
             startedUtc =
                 DateTime.UtcNow.ToString("O");
+
+            lifeSpent = false;
         }
 
         public void Clear()
@@ -79,6 +83,7 @@ namespace ZenMatch.Runtime.PlayerProgress
             levelNumber = -1;
 
             startedUtc = string.Empty;
+            lifeSpent = false;
 
             earnedCoins = 0;
             earnedLives = 0;
@@ -150,6 +155,8 @@ namespace ZenMatch.Runtime.PlayerProgress
         public int coins;
         public int lives;
 
+        public string nextLifeRegenUtc;
+
         // Þimdilik kullanýlmayacak.
         // Ýleride leaderboard / event / profil puaný.
         public int score;
@@ -161,6 +168,12 @@ namespace ZenMatch.Runtime.PlayerProgress
 
         public List<PlayerBoosterAmount>
             boosters = new();
+
+        public List<string>
+            pendingBoosterTutorialIds = new();
+
+        public List<string>
+            completedBoosterTutorialIds = new();
 
         // Eski/global daily reset bilgisi.
         public string lastDailyMissionResetUtc;
@@ -197,6 +210,7 @@ namespace ZenMatch.Runtime.PlayerProgress
 
                 coins = 250,
                 lives = 5,
+                nextLifeRegenUtc = string.Empty,
                 score = 0,
 
                 highestUnlockedLevel = 1,
@@ -207,6 +221,12 @@ namespace ZenMatch.Runtime.PlayerProgress
 
                 boosters =
                     new List<PlayerBoosterAmount>(),
+
+                pendingBoosterTutorialIds =
+                    new List<string>(),
+
+                completedBoosterTutorialIds =
+                    new List<string>(),
 
                 lastDailyMissionResetUtc = now,
 
@@ -229,6 +249,12 @@ namespace ZenMatch.Runtime.PlayerProgress
 
             boosters ??=
                 new List<PlayerBoosterAmount>();
+
+            pendingBoosterTutorialIds ??=
+                new List<string>();
+
+            completedBoosterTutorialIds ??=
+                new List<string>();
 
             missionProgresses ??=
                 new List<PlayerMissionProgressData>();
@@ -448,6 +474,87 @@ namespace ZenMatch.Runtime.PlayerProgress
                 current - amount);
 
             return true;
+        }
+
+        // =========================================================
+        // BOOSTER TUTORIALS
+        // =========================================================
+
+        public bool IsBoosterTutorialPending(
+            string tutorialId)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    tutorialId))
+            {
+                return false;
+            }
+
+            EnsureCollections();
+
+            return pendingBoosterTutorialIds
+                .Contains(tutorialId);
+        }
+
+        public bool IsBoosterTutorialCompleted(
+            string tutorialId)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    tutorialId))
+            {
+                return false;
+            }
+
+            EnsureCollections();
+
+            return completedBoosterTutorialIds
+                .Contains(tutorialId);
+        }
+
+        public void MarkBoosterTutorialPending(
+            string tutorialId)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    tutorialId))
+            {
+                return;
+            }
+
+            EnsureCollections();
+
+            if (completedBoosterTutorialIds
+                .Contains(tutorialId))
+            {
+                return;
+            }
+
+            if (!pendingBoosterTutorialIds
+                .Contains(tutorialId))
+            {
+                pendingBoosterTutorialIds.Add(
+                    tutorialId);
+            }
+        }
+
+        public void MarkBoosterTutorialCompleted(
+            string tutorialId)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    tutorialId))
+            {
+                return;
+            }
+
+            EnsureCollections();
+
+            pendingBoosterTutorialIds.Remove(
+                tutorialId);
+
+            if (!completedBoosterTutorialIds
+                .Contains(tutorialId))
+            {
+                completedBoosterTutorialIds.Add(
+                    tutorialId);
+            }
         }
 
         // =========================================================

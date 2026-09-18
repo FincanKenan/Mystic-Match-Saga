@@ -1,7 +1,9 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using ZenMatch.Runtime.PlayerProgress;
 
@@ -117,6 +119,10 @@ namespace ZenMatch.UI
         private int
             _lastDisplayedLevel = -1;
 
+        // EventSystem UI raycast için tekrar kullanýlacak liste.
+        private readonly List<RaycastResult>
+            _uiRaycastResults = new List<RaycastResult>();
+
         // =========================================================
         // UNITY
         // =========================================================
@@ -197,29 +203,37 @@ namespace ZenMatch.UI
             if (!enableWorldClick)
                 return;
 
-            // Önce touch kontrol edilir.
-            if (Input.touchCount > 0)
-            {
-                Touch touch =
-                    Input.GetTouch(0);
+            // -----------------------------------------------------
+            // ANDROID / TOUCH
+            // -----------------------------------------------------
 
-                if (touch.phase ==
-                    TouchPhase.Ended)
-                {
-                    TryHandlePointer(
-                        touch.position,
-                        touch.fingerId);
-                }
+            if (Touchscreen.current != null &&
+                Touchscreen.current.primaryTouch.press
+                    .wasReleasedThisFrame)
+            {
+                Vector2 touchPosition =
+                    Touchscreen.current.primaryTouch
+                        .position.ReadValue();
+
+                TryHandlePointer(
+                    touchPosition);
 
                 return;
             }
 
-            // Editor / PC mouse kontrolü.
-            if (Input.GetMouseButtonUp(0))
+            // -----------------------------------------------------
+            // EDITOR / PC MOUSE
+            // -----------------------------------------------------
+
+            if (Mouse.current != null &&
+                Mouse.current.leftButton
+                    .wasReleasedThisFrame)
             {
+                Vector2 mousePosition =
+                    Mouse.current.position.ReadValue();
+
                 TryHandlePointer(
-                    Input.mousePosition,
-                    -1);
+                    mousePosition);
             }
         }
 
@@ -479,8 +493,7 @@ namespace ZenMatch.UI
         // =========================================================
 
         private void TryHandlePointer(
-            Vector3 screenPosition,
-            int pointerId)
+            Vector2 screenPosition)
         {
             if (_collider == null)
                 return;
@@ -499,31 +512,18 @@ namespace ZenMatch.UI
 
             // UI elementine basýlmýþsa
             // world yumurtasýný çalýþtýrma.
-            if (EventSystem.current != null)
+            if (IsPointerOverUI(
+                    screenPosition))
             {
-                bool overUI;
-
-                if (pointerId >= 0)
-                {
-                    overUI =
-                        EventSystem.current
-                            .IsPointerOverGameObject(
-                                pointerId);
-                }
-                else
-                {
-                    overUI =
-                        EventSystem.current
-                            .IsPointerOverGameObject();
-                }
-
-                if (overUI)
-                    return;
+                return;
             }
 
             Vector3 worldPosition =
                 _mainCamera.ScreenToWorldPoint(
-                    screenPosition);
+                    new Vector3(
+                        screenPosition.x,
+                        screenPosition.y,
+                        0f));
 
             Vector2 worldPoint =
                 new Vector2(
@@ -537,6 +537,32 @@ namespace ZenMatch.UI
             }
 
             StartLevel();
+        }
+
+        // =========================================================
+        // UI RAYCAST
+        // =========================================================
+
+        private bool IsPointerOverUI(
+            Vector2 screenPosition)
+        {
+            if (EventSystem.current == null)
+                return false;
+
+            PointerEventData pointerEventData =
+                new PointerEventData(
+                    EventSystem.current)
+                {
+                    position = screenPosition
+                };
+
+            _uiRaycastResults.Clear();
+
+            EventSystem.current.RaycastAll(
+                pointerEventData,
+                _uiRaycastResults);
+
+            return _uiRaycastResults.Count > 0;
         }
 
         // =========================================================

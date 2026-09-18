@@ -81,6 +81,25 @@ namespace ZenMatch.Runtime
             }
         }
 
+        public readonly struct TraySlotRiskHudInfo
+        {
+            public string PointId { get; }
+            public int RemainingSelections { get; }
+
+            public TraySlotRiskHudInfo(
+                string pointId,
+                int remainingSelections)
+            {
+                PointId =
+                    pointId;
+
+                RemainingSelections =
+                    Mathf.Max(
+                        0,
+                        remainingSelections);
+            }
+        }
+
         private sealed class TraySlotRiskState
         {
             public string PointId;
@@ -368,6 +387,42 @@ namespace ZenMatch.Runtime
             SpawnProceduralFromRange(rng);
         }
 
+        public void GetActiveTraySlotRiskHudInfos(
+    List<TraySlotRiskHudInfo> results)
+        {
+            if (results == null)
+                return;
+
+            results.Clear();
+
+            foreach (var pair in
+                     _traySlotRiskStateByPointId)
+            {
+                TraySlotRiskState state =
+                    pair.Value;
+
+                if (state == null ||
+                    state.IsResolved)
+                {
+                    continue;
+                }
+
+                int remaining =
+                    Mathf.Max(
+                        0,
+                        state.TotalSelectionCount -
+                        state.AppliedSelectionCount);
+
+                if (remaining <= 0)
+                    continue;
+
+                results.Add(
+                    new TraySlotRiskHudInfo(
+                        state.PointId,
+                        remaining));
+            }
+        }
+
         private void ResolveProgressService()
         {
             // Her zaman yaşayan singleton'ı önceliklendir.
@@ -386,12 +441,22 @@ namespace ZenMatch.Runtime
             if (!Application.isPlaying)
                 return;
 
+#if UNITY_EDITOR
             if (useInspectorCurrentLevelInPlayMode)
             {
-                currentLevel = Mathf.Max(1, currentLevel);
-                Debug.Log($"[BoardSpawner] Debug current level kullanılıyor: {currentLevel}", this);
+                currentLevel =
+                    Mathf.Max(
+                        1,
+                        currentLevel);
+
+                Debug.Log(
+                    $"[BoardSpawner] Debug current level kullanılıyor: " +
+                    $"{currentLevel}",
+                    this);
+
                 return;
             }
+#endif
 
             ResolveProgressService();
 

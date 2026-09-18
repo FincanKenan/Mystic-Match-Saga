@@ -9,6 +9,8 @@ namespace ZenMatch.Runtime.PlayerProgress
     public sealed class PlayerWalletService :
         MonoBehaviour
     {
+        public const int MaxLives = 5;
+
         public static PlayerWalletService
             Instance
         { get; private set; }
@@ -295,6 +297,17 @@ namespace ZenMatch.Runtime.PlayerProgress
                 null);
         }
 
+        public bool CanAddLives(int amount)
+        {
+            if (!HasProgress())
+                return false;
+
+            if (amount <= 0)
+                return false;
+
+            return progressService.Data.lives + amount <= MaxLives;
+        }
+
         public void AddLives(
             int amount,
             RewardContext context)
@@ -305,8 +318,8 @@ namespace ZenMatch.Runtime.PlayerProgress
         }
 
         private void AddLivesInternal(
-            int amount,
-            RewardContext context)
+    int amount,
+    RewardContext context)
         {
             if (!HasProgress())
                 return;
@@ -314,16 +327,33 @@ namespace ZenMatch.Runtime.PlayerProgress
             if (amount <= 0)
                 return;
 
-            progressService.Data.lives +=
-                amount;
+            int currentLives =
+                Mathf.Clamp(
+                    progressService.Data.lives,
+                    0,
+                    MaxLives);
 
-            if (ShouldTrackAsLevelAttemptReward(
-                    context))
+            int newLives =
+                Mathf.Clamp(
+                    currentLives + amount,
+                    0,
+                    MaxLives);
+
+            int addedLives =
+                newLives - currentLives;
+
+            progressService.Data.lives =
+                newLives;
+            progressService.RefreshLifeRegenSchedule();
+
+            if (addedLives <= 0)
+                return;
+
+            if (ShouldTrackAsLevelAttemptReward(context))
             {
                 progressService.Data
                     .activeLevelAttempt
-                    .earnedLives +=
-                    amount;
+                    .earnedLives += addedLives;
             }
 
             progressService.NotifyChanged();
@@ -334,11 +364,57 @@ namespace ZenMatch.Runtime.PlayerProgress
             if (logDebug)
             {
                 Debug.Log(
-                    $"[PlayerWalletService] " +
-                    $"Lives added: {amount}. " +
+                    $"[PlayerWalletService] Lives added: {addedLives}. " +
                     $"Total: {progressService.Data.lives}",
                     this);
             }
+        }
+
+        public bool AbandonActiveLevelAttempt()
+        {
+            if (!HasProgress())
+                return false;
+
+            int beforeLives =
+                progressService.Data.lives;
+
+            bool result =
+                progressService.AbandonActiveLevelAttempt();
+
+            if (!result)
+                return false;
+
+            if (progressService.Data.lives != beforeLives)
+            {
+                OnLivesChanged?.Invoke(
+                    progressService.Data.lives);
+            }
+
+            return true;
+        }
+
+        public bool SpendLifeForActiveAttempt()
+        {
+            if (!HasProgress())
+                return false;
+
+            int beforeLives =
+                progressService.Data.lives;
+
+            bool result =
+                progressService
+                    .SpendLifeForActiveAttempt();
+
+            if (!result)
+                return false;
+
+            if (progressService.Data.lives != beforeLives)
+            {
+                OnLivesChanged?.Invoke(
+                    progressService.Data.lives);
+            }
+
+            return true;
         }
 
         public bool TrySpendLives(

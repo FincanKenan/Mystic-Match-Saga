@@ -86,6 +86,15 @@ namespace ZenMatch.UI
         private int _lastDisplayedAmount =
             int.MinValue;
 
+        private bool _tutorialLockActive;
+        private bool _tutorialAllowed = true;
+
+        public BoosterType BoosterType =>
+            boosterType;
+
+        public RectTransform RectTransform =>
+            transform as RectTransform;
+
         // =========================================================
         // UNITY
         // =========================================================
@@ -350,6 +359,12 @@ namespace ZenMatch.UI
 
         private void OnClicked()
         {
+            if (_tutorialLockActive &&
+                !_tutorialAllowed)
+            {
+                return;
+            }
+
             RebindServices();
 
             if (boosterManager == null)
@@ -446,12 +461,50 @@ namespace ZenMatch.UI
                         amount);
             }
 
-            if (_button != null &&
-                disableButtonWhenCountIsZero)
+            RefreshButtonInteractable(
+                amount);
+        }
+
+        public void SetTutorialLock(
+            bool active,
+            bool allowed)
+        {
+            _tutorialLockActive = active;
+            _tutorialAllowed = allowed;
+
+            int amount =
+                walletService != null &&
+                !string.IsNullOrWhiteSpace(
+                    _boosterId)
+                    ? walletService
+                        .GetBoosterAmount(
+                            _boosterId)
+                    : Mathf.Max(
+                        0,
+                        _lastDisplayedAmount);
+
+            RefreshButtonInteractable(
+                amount);
+        }
+
+        private void RefreshButtonInteractable(
+            int amount)
+        {
+            if (_button == null)
+                return;
+
+            bool interactable =
+                !disableButtonWhenCountIsZero ||
+                amount > 0;
+
+            if (_tutorialLockActive &&
+                !_tutorialAllowed)
             {
-                _button.interactable =
-                    amount > 0;
+                interactable = false;
             }
+
+            _button.interactable =
+                interactable;
         }
     }
 }

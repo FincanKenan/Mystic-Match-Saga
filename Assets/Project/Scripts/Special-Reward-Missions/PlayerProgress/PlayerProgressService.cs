@@ -12,6 +12,9 @@ namespace ZenMatch.Runtime.PlayerProgress
         { get; private set; }
 
         private const int CurrentSaveVersion = 2;
+        private const int MaxLives = 5;
+        private const double LifeRegenMinutes = 30.0;
+        private const float LifeRegenCheckInterval = 1f;
 
         [Header("Lifetime")]
         [SerializeField]
@@ -26,17 +29,23 @@ namespace ZenMatch.Runtime.PlayerProgress
         [SerializeField]
         private int debugCoinGrantAmount = 100;
 
+        [Min(1)]
+        [SerializeField]
+        private int debugLifeGrantAmount = 1;
+
         [Header("Debug Level Skip")]
         [Min(1)]
         [SerializeField]
         private int debugLevelSkipAmount = 1;
 
-        [Min(1)]
-        [SerializeField]
-        private int debugLifeGrantAmount = 1;
-
         private IPlayerProgressStorage
             _storage;
+
+        private float
+            _nextLifeRegenCheckTime;
+
+        private int
+            _freeEntryLevelNumber = -1;
 
         public PlayerProgressData
             Data
@@ -67,8 +76,6 @@ namespace ZenMatch.Runtime.PlayerProgress
             Data != null
                 ? Data.score
                 : 0;
-
-        private int _freeEntryLevelNumber = -1;
 
         public bool HasActiveLevelAttempt =>
             Data != null &&
@@ -102,6 +109,39 @@ namespace ZenMatch.Runtime.PlayerProgress
             LoadOrCreate();
         }
 
+        private void Update()
+        {
+            if (Time.unscaledTime <
+                _nextLifeRegenCheckTime)
+            {
+                return;
+            }
+
+            _nextLifeRegenCheckTime =
+                Time.unscaledTime +
+                LifeRegenCheckInterval;
+
+            ProcessLifeRegeneration();
+        }
+
+        private void OnApplicationFocus(
+            bool hasFocus)
+        {
+            if (hasFocus)
+            {
+                ProcessLifeRegeneration();
+            }
+        }
+
+        private void OnApplicationPause(
+            bool paused)
+        {
+            if (!paused)
+            {
+                ProcessLifeRegeneration();
+            }
+        }
+
         // =========================================================
         // LOAD / SAVE
         // =========================================================
@@ -127,14 +167,15 @@ namespace ZenMatch.Runtime.PlayerProgress
                     PlayerProgressData
                         .CreateNew();
 
+                RefreshLifeRegenSchedule();
+
                 Save();
 
                 if (logDebug)
                 {
                     Debug.Log(
-                        $"[PlayerProgressService] " +
-                        $"New local player created. " +
-                        $"PlayerId: {Data.playerId}",
+                        "[PlayerProgressService] " +
+                        "Yeni local progress oluşturuldu.",
                         this);
                 }
             }
@@ -171,32 +212,29 @@ namespace ZenMatch.Runtime.PlayerProgress
                     needsSave = true;
                 }
 
-                // =================================================
-                // CRASH / FORCE-CLOSE RECOVERY
-                // =================================================
-                //
-                // Önceki oyun oturumundan aktif bir
-                // level attempt kaldıysa bölüm tamamlanmamıştır.
-                //
-                // O attempt sırasında kazanılan level ödülleri
-                // otomatik olarak geri alınır.
-                //
-                // Bölüme girişte harcanan can GERİ VERİLMEZ.
-                // =================================================
-
-                if (RollbackActiveLevelAttemptInternal())
+                if (ProcessLifeRegenerationInternal())
                 {
                     needsSave = true;
+                }
 
-                    if (logDebug)
+                if (Data.activeLevelAttempt != null &&
+                    Data.activeLevelAttempt.isActive)
+                {
+                    if (AbandonActiveLevelAttemptInternal())
                     {
-                        Debug.Log(
-                            "[PlayerProgressService] " +
-                            "Interrupted level attempt detected. " +
-                            "Earned level rewards rolled back.",
-                            this);
+                        needsSave = true;
+
+                        if (logDebug)
+                        {
+                            Debug.Log(
+                                "[PlayerProgressService] " +
+                                "Yarım kalan level attempt kapatıldı.",
+                                this);
+                        }
                     }
                 }
+
+                RefreshLifeRegenSchedule();
 
                 if (needsSave)
                 {
@@ -206,9 +244,8 @@ namespace ZenMatch.Runtime.PlayerProgress
                 if (logDebug)
                 {
                     Debug.Log(
-                        $"[PlayerProgressService] " +
-                        $"Progress loaded. " +
-                        $"PlayerId: {Data.playerId}",
+                        "[PlayerProgressService] " +
+                        "Progress yüklendi.",
                         this);
                 }
             }
@@ -232,7 +269,6 @@ namespace ZenMatch.Runtime.PlayerProgress
             }
 
             Data.EnsureCollections();
-
             Data.Touch();
 
             _storage.Save(
@@ -248,99 +284,259 @@ namespace ZenMatch.Runtime.PlayerProgress
             Data.EnsureCollections();
 
             if (saveImmediately)
+            {
                 Save();
+            }
 
             OnProgressChanged?.Invoke(
                 Data);
         }
 
         // =========================================================
-        // LEVEL ATTEMPT - BEGIN
+        // LIFE REGEN
         // =========================================================
 
-        /// <summary>
-        /// Yeni bölüm denemesi başlatır.
-        ///
-        /// 1) Eski açık attempt varsa güvenlik için rollback eder.
-        /// 2) Can kontrolü yapar.
-        /// 3) 1 can harcar.
-        /// 4) Yeni transaction açar.
-        ///
-        /// Life spend + transaction start TEK SAVE içinde yapılır.
-        /// </summary>
+        public void RefreshLifeRegenSchedule()
+        {
+            if (Data == null)
+                return;
+
+            Data.lives =
+                Mathf.Clamp(
+                    Data.lives,
+                    0,
+                    MaxLives);
+
+            if (Data.lives >= MaxLives)
+            {
+                Data.nextLifeRegenUtc =
+                    string.Empty;
+
+                return;
+            }
+
+            DateTime now =
+                DateTime.UtcNow;
+
+            if (TryGetNextLifeRegenUtc(
+                    out DateTime nextUtc))
+            {
+                if (nextUtc <= now)
+                {
+                    ProcessLifeRegenerationInternal();
+
+                    if (Data.lives < MaxLives &&
+                        string.IsNullOrWhiteSpace(
+                            Data.nextLifeRegenUtc))
+                    {
+                        SetNextLifeRegenUtc(
+                            now.AddMinutes(
+                                LifeRegenMinutes));
+                    }
+                }
+
+                return;
+            }
+
+            SetNextLifeRegenUtc(
+                now.AddMinutes(
+                    LifeRegenMinutes));
+        }
+
+        public void ProcessLifeRegeneration()
+        {
+            if (Data == null)
+                return;
+
+            bool changed =
+                ProcessLifeRegenerationInternal();
+
+            if (!changed)
+                return;
+
+            NotifyChanged(true);
+        }
+
+        private bool ProcessLifeRegenerationInternal()
+        {
+            if (Data == null)
+                return false;
+
+            bool changed = false;
+
+            int clampedLives =
+                Mathf.Clamp(
+                    Data.lives,
+                    0,
+                    MaxLives);
+
+            if (clampedLives !=
+                Data.lives)
+            {
+                Data.lives =
+                    clampedLives;
+
+                changed = true;
+            }
+
+            if (Data.lives >= MaxLives)
+            {
+                if (!string.IsNullOrWhiteSpace(
+                        Data.nextLifeRegenUtc))
+                {
+                    Data.nextLifeRegenUtc =
+                        string.Empty;
+
+                    changed = true;
+                }
+
+                return changed;
+            }
+
+            DateTime now =
+                DateTime.UtcNow;
+
+            if (!TryGetNextLifeRegenUtc(
+                    out DateTime nextUtc))
+            {
+                SetNextLifeRegenUtc(
+                    now.AddMinutes(
+                        LifeRegenMinutes));
+
+                return true;
+            }
+
+            while (Data.lives < MaxLives &&
+                   now >= nextUtc)
+            {
+                Data.lives++;
+
+                changed = true;
+
+                if (Data.lives >= MaxLives)
+                {
+                    Data.lives =
+                        MaxLives;
+
+                    Data.nextLifeRegenUtc =
+                        string.Empty;
+
+                    return true;
+                }
+
+                nextUtc =
+                    nextUtc.AddMinutes(
+                        LifeRegenMinutes);
+            }
+
+            string normalized =
+                nextUtc.ToUniversalTime()
+                    .ToString("O");
+
+            if (!string.Equals(
+                    Data.nextLifeRegenUtc,
+                    normalized,
+                    StringComparison.Ordinal))
+            {
+                Data.nextLifeRegenUtc =
+                    normalized;
+
+                changed = true;
+            }
+
+            return changed;
+        }
+
+        private bool TryGetNextLifeRegenUtc(
+            out DateTime nextUtc)
+        {
+            nextUtc =
+                default;
+
+            if (Data == null ||
+                string.IsNullOrWhiteSpace(
+                    Data.nextLifeRegenUtc))
+            {
+                return false;
+            }
+
+            if (!DateTime.TryParse(
+                    Data.nextLifeRegenUtc,
+                    out DateTime parsed))
+            {
+                return false;
+            }
+
+            nextUtc =
+                parsed.Kind == DateTimeKind.Utc
+                    ? parsed
+                    : parsed.ToUniversalTime();
+
+            return true;
+        }
+
+        private void SetNextLifeRegenUtc(
+            DateTime utc)
+        {
+            if (Data == null)
+                return;
+
+            Data.nextLifeRegenUtc =
+                utc.ToUniversalTime()
+                    .ToString("O");
+        }
+
+        // =========================================================
+        // LEVEL ATTEMPT
+        // =========================================================
+
         public bool TryBeginLevelAttempt(
-    int levelNumber)
+            int levelNumber)
         {
             if (Data == null)
                 return false;
 
             Data.EnsureCollections();
 
-            bool staleAttemptRolledBack =
-                RollbackActiveLevelAttemptInternal();
+            ProcessLifeRegenerationInternal();
+
+            if (Data.activeLevelAttempt != null &&
+                Data.activeLevelAttempt.isActive)
+            {
+                AbandonActiveLevelAttemptInternal();
+            }
 
             levelNumber =
                 Mathf.Max(
                     1,
                     levelNumber);
 
-            // =========================================================
-            // FREE ENTRY AFTER WIN
-            // =========================================================
-
             bool useFreeEntry =
                 _freeEntryLevelNumber ==
                 levelNumber;
 
-            // Hak tek kullanımlık.
-            // Attempt başlarken hemen tüketiyoruz.
             if (useFreeEntry)
             {
                 _freeEntryLevelNumber = -1;
             }
 
-            // =========================================================
-            // NORMAL ENTRY LIFE CHECK
-            // =========================================================
-
-            if (!useFreeEntry &&
-                Data.lives <= 0)
+            // Bölüme giriş can harcamaz.
+            // Ancak oyuncunun en az 1 canı olmalı.
+            if (Data.lives <= 0)
             {
-                if (staleAttemptRolledBack)
-                {
-                    NotifyChanged(true);
-                }
+                NotifyChanged(true);
 
                 if (logDebug)
                 {
                     Debug.LogWarning(
                         "[PlayerProgressService] " +
-                        "Level attempt başlatılamadı. " +
-                        "Can yok.",
+                        "Level attempt başlatılamadı. Can yok.",
                         this);
                 }
 
                 return false;
             }
 
-            // =========================================================
-            // ENTRY LIFE COST
-            // =========================================================
-
-            // Yalnızca normal girişte can harcanır.
-            //
-            // Win → Next Level akışında
-            // useFreeEntry = true olur.
-            if (!useFreeEntry)
-            {
-                Data.lives =
-                    Mathf.Max(
-                        0,
-                        Data.lives - 1);
-            }
-
-            // Yeni level transaction'ı her iki durumda
-            // da açılmalıdır.
             Data.activeLevelAttempt.Begin(
                 levelNumber);
 
@@ -353,9 +549,8 @@ namespace ZenMatch.Runtime.PlayerProgress
             {
                 Debug.Log(
                     $"[PlayerProgressService] " +
-                    $"Level attempt started. " +
+                    $"Level attempt başladı. " +
                     $"Level: {levelNumber} | " +
-                    $"FreeEntry: {useFreeEntry} | " +
                     $"Lives: {Data.lives}",
                     this);
             }
@@ -363,18 +558,244 @@ namespace ZenMatch.Runtime.PlayerProgress
             return true;
         }
 
-        // =========================================================
-        // LEVEL ATTEMPT - COMMIT
-        // =========================================================
+        public bool SpendLifeForActiveAttempt()
+        {
+            if (Data == null)
+                return false;
 
-        /// <summary>
-        /// Bölüm başarıyla tamamlandığında
-        /// attempt içindeki kazanımlar kalıcı olur.
-        ///
-        /// saveImmediately=false kullanımı SetWin içinde
-        /// level completion ile transaction commit'i
-        /// aynı Save'e koymak içindir.
-        /// </summary>
+            Data.EnsureCollections();
+
+            PlayerLevelAttemptData attempt =
+                Data.activeLevelAttempt;
+
+            if (attempt == null ||
+                !attempt.isActive)
+            {
+                return false;
+            }
+
+            if (attempt.lifeSpent)
+            {
+                return true;
+            }
+
+            if (Data.lives <= 0)
+            {
+                return false;
+            }
+
+            Data.lives =
+                Mathf.Max(
+                    0,
+                    Data.lives - 1);
+
+            attempt.lifeSpent = true;
+
+            RefreshLifeRegenSchedule();
+
+            NotifyChanged(true);
+
+            if (logDebug)
+            {
+                Debug.Log(
+                    $"[PlayerProgressService] " +
+                    $"Attempt canı harcandı. " +
+                    $"Kalan can: {Data.lives}",
+                    this);
+            }
+
+            return true;
+        }
+
+        public bool AbandonActiveLevelAttempt()
+        {
+            if (Data == null)
+                return false;
+
+            Data.EnsureCollections();
+
+            bool changed =
+                AbandonActiveLevelAttemptInternal();
+
+            if (!changed)
+                return false;
+
+            RefreshLifeRegenSchedule();
+            NotifyChanged(true);
+
+            if (logDebug)
+            {
+                Debug.Log(
+                    "[PlayerProgressService] " +
+                    "Active level attempt terk edildi.",
+                    this);
+            }
+
+            return true;
+        }
+
+        private bool AbandonActiveLevelAttemptInternal()
+        {
+            if (Data == null)
+                return false;
+
+            Data.EnsureCollections();
+
+            PlayerLevelAttemptData attempt =
+                Data.activeLevelAttempt;
+
+            if (attempt == null ||
+                !attempt.isActive)
+            {
+                return false;
+            }
+
+            if (!attempt.lifeSpent &&
+                Data.lives > 0)
+            {
+                Data.lives =
+                    Mathf.Max(
+                        0,
+                        Data.lives - 1);
+
+                attempt.lifeSpent = true;
+            }
+
+            RollbackAttemptRewards(
+                attempt);
+
+            attempt.Clear();
+
+            RefreshLifeRegenSchedule();
+
+            return true;
+        }
+
+        public bool RollbackActiveLevelAttempt()
+        {
+            if (Data == null)
+                return false;
+
+            Data.EnsureCollections();
+
+            bool rolledBack =
+                RollbackActiveLevelAttemptInternal();
+
+            if (!rolledBack)
+                return false;
+
+            NotifyChanged(true);
+
+            if (logDebug)
+            {
+                Debug.Log(
+                    "[PlayerProgressService] " +
+                    "Level attempt rollback edildi.",
+                    this);
+            }
+
+            return true;
+        }
+
+        private bool RollbackActiveLevelAttemptInternal()
+        {
+            if (Data == null)
+                return false;
+
+            Data.EnsureCollections();
+
+            PlayerLevelAttemptData attempt =
+                Data.activeLevelAttempt;
+
+            if (attempt == null ||
+                !attempt.isActive)
+            {
+                return false;
+            }
+
+            RollbackAttemptRewards(
+                attempt);
+
+            attempt.Clear();
+
+            return true;
+        }
+
+        private void RollbackAttemptRewards(
+            PlayerLevelAttemptData attempt)
+        {
+            if (Data == null ||
+                attempt == null)
+            {
+                return;
+            }
+
+            attempt.EnsureCollections();
+
+            if (attempt.earnedCoins > 0)
+            {
+                Data.coins =
+                    Math.Max(
+                        0,
+                        Data.coins -
+                        attempt.earnedCoins);
+            }
+
+            if (attempt.earnedLives > 0)
+            {
+                Data.lives =
+                    Math.Max(
+                        0,
+                        Data.lives -
+                        attempt.earnedLives);
+            }
+
+            if (attempt.earnedScore > 0)
+            {
+                Data.score =
+                    Math.Max(
+                        0,
+                        Data.score -
+                        attempt.earnedScore);
+            }
+
+            for (int i = 0;
+                 i < attempt.earnedBoosters.Count;
+                 i++)
+            {
+                PlayerLevelAttemptBoosterReward
+                    boosterReward =
+                        attempt
+                            .earnedBoosters[i];
+
+                if (boosterReward == null)
+                    continue;
+
+                if (string.IsNullOrWhiteSpace(
+                        boosterReward.boosterId))
+                {
+                    continue;
+                }
+
+                if (boosterReward.amount <= 0)
+                    continue;
+
+                int current =
+                    Data.GetBoosterAmount(
+                        boosterReward.boosterId);
+
+                int newAmount =
+                    Math.Max(
+                        0,
+                        current -
+                        boosterReward.amount);
+
+                Data.SetBoosterAmount(
+                    boosterReward.boosterId,
+                    newAmount);
+            }
+        }
+
         public bool CommitActiveLevelAttempt(
             bool saveImmediately = true)
         {
@@ -404,7 +825,7 @@ namespace ZenMatch.Runtime.PlayerProgress
             {
                 Debug.Log(
                     $"[PlayerProgressService] " +
-                    $"Level attempt COMMITTED. " +
+                    $"Level attempt commit edildi. " +
                     $"Level: {levelNumber}",
                     this);
             }
@@ -412,135 +833,13 @@ namespace ZenMatch.Runtime.PlayerProgress
             return true;
         }
 
-        // =========================================================
-        // LEVEL ATTEMPT - ROLLBACK
-        // =========================================================
-
-        public bool RollbackActiveLevelAttempt()
+        public void AllowFreeEntryForLevel(
+            int levelNumber)
         {
-            if (Data == null)
-                return false;
-
-            Data.EnsureCollections();
-
-            bool rolledBack =
-                RollbackActiveLevelAttemptInternal();
-
-            if (!rolledBack)
-                return false;
-
-            NotifyChanged(true);
-
-            if (logDebug)
-            {
-                Debug.Log(
-                    "[PlayerProgressService] " +
-                    "Level attempt ROLLED BACK.",
-                    this);
-            }
-
-            return true;
-        }
-
-        private bool RollbackActiveLevelAttemptInternal()
-        {
-            if (Data == null)
-                return false;
-
-            Data.EnsureCollections();
-
-            PlayerLevelAttemptData attempt =
-                Data.activeLevelAttempt;
-
-            if (attempt == null ||
-                !attempt.isActive)
-            {
-                return false;
-            }
-
-            attempt.EnsureCollections();
-
-            // =====================================================
-            // COINS
-            // =====================================================
-
-            if (attempt.earnedCoins > 0)
-            {
-                Data.coins =
-                    Math.Max(
-                        0,
-                        Data.coins -
-                        attempt.earnedCoins);
-            }
-
-            // =====================================================
-            // LIVES
-            // =====================================================
-
-            if (attempt.earnedLives > 0)
-            {
-                Data.lives =
-                    Math.Max(
-                        0,
-                        Data.lives -
-                        attempt.earnedLives);
-            }
-
-            // =====================================================
-            // SCORE
-            // =====================================================
-
-            if (attempt.earnedScore > 0)
-            {
-                Data.score =
-                    Math.Max(
-                        0,
-                        Data.score -
-                        attempt.earnedScore);
-            }
-
-            // =====================================================
-            // BOOSTERS / POWERUPS
-            // =====================================================
-
-            for (int i = 0;
-                 i < attempt.earnedBoosters.Count;
-                 i++)
-            {
-                PlayerLevelAttemptBoosterReward
-                    boosterReward =
-                        attempt.earnedBoosters[i];
-
-                if (boosterReward == null)
-                    continue;
-
-                if (string.IsNullOrWhiteSpace(
-                        boosterReward.boosterId))
-                {
-                    continue;
-                }
-
-                if (boosterReward.amount <= 0)
-                    continue;
-
-                int current =
-                    Data.GetBoosterAmount(
-                        boosterReward.boosterId);
-
-                int newAmount =
-                    Math.Max(
-                        0,
-                        current -
-                        boosterReward.amount);
-
-                Data.SetBoosterAmount(
-                    boosterReward.boosterId,
-                    newAmount);
-            }
-
-            attempt.Clear();
-
-            return true;
+            _freeEntryLevelNumber =
+                Mathf.Max(
+                    1,
+                    levelNumber);
         }
 
         // =========================================================
@@ -563,6 +862,8 @@ namespace ZenMatch.Runtime.PlayerProgress
                 PlayerProgressData
                     .CreateNew();
 
+            RefreshLifeRegenSchedule();
+
             Save();
 
             OnProgressLoaded?.Invoke(
@@ -575,13 +876,13 @@ namespace ZenMatch.Runtime.PlayerProgress
             {
                 Debug.Log(
                     "[PlayerProgressService] " +
-                    "Local progress deleted and recreated.",
+                    "Local progress sıfırlandı.",
                     this);
             }
         }
 
         // =========================================================
-        // DEBUG TEST GRANTS
+        // DEBUG
         // =========================================================
 
         [ContextMenu("Debug/Add Test Coins")]
@@ -600,15 +901,6 @@ namespace ZenMatch.Runtime.PlayerProgress
             Data.coins += amount;
 
             NotifyChanged(true);
-
-            if (logDebug)
-            {
-                Debug.Log(
-                    $"[PlayerProgressService] " +
-                    $"DEBUG +{amount} Coin | " +
-                    $"Total: {Data.coins}",
-                    this);
-            }
         }
 
         [ContextMenu("Debug/Add Test Life")]
@@ -624,18 +916,15 @@ namespace ZenMatch.Runtime.PlayerProgress
                     1,
                     debugLifeGrantAmount);
 
-            Data.lives += amount;
+            Data.lives =
+                Mathf.Clamp(
+                    Data.lives + amount,
+                    0,
+                    MaxLives);
+
+            RefreshLifeRegenSchedule();
 
             NotifyChanged(true);
-
-            if (logDebug)
-            {
-                Debug.Log(
-                    $"[PlayerProgressService] " +
-                    $"DEBUG +{amount} Life | " +
-                    $"Total: {Data.lives}",
-                    this);
-            }
         }
 
         [ContextMenu("Debug/Skip Level")]
@@ -666,8 +955,8 @@ namespace ZenMatch.Runtime.PlayerProgress
                      level < targetLevel;
                      level++)
                 {
-                    if (!Data.completedLevels.Contains(
-                            level))
+                    if (!Data.completedLevels
+                        .Contains(level))
                     {
                         Data.completedLevels.Add(
                             level);
@@ -684,15 +973,6 @@ namespace ZenMatch.Runtime.PlayerProgress
                     targetLevel);
 
             NotifyChanged(true);
-
-            if (logDebug)
-            {
-                Debug.Log(
-                    $"[PlayerProgressService] " +
-                    $"DEBUG Level Skip | " +
-                    $"{currentLevel} → {targetLevel}",
-                    this);
-            }
         }
 
         private void EnsureDataAvailableForDebug()
@@ -719,6 +999,7 @@ namespace ZenMatch.Runtime.PlayerProgress
             }
 
             Data.EnsureCollections();
+            RefreshLifeRegenSchedule();
         }
 
         // =========================================================
@@ -736,24 +1017,8 @@ namespace ZenMatch.Runtime.PlayerProgress
                 newStorage;
 
             if (loadAfterReplace)
-                LoadOrCreate();
-        }
-
-        public void AllowFreeEntryForLevel(
-    int levelNumber)
-        {
-            _freeEntryLevelNumber =
-                Mathf.Max(
-                    1,
-                    levelNumber);
-
-            if (logDebug)
             {
-                Debug.Log(
-                    $"[PlayerProgressService] " +
-                    $"Free level entry prepared. " +
-                    $"Level: {_freeEntryLevelNumber}",
-                    this);
+                LoadOrCreate();
             }
         }
     }

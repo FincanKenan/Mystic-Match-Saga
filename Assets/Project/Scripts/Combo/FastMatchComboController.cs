@@ -769,10 +769,10 @@ namespace ZenMatch.Runtime.LevelRewards
                         comboMaxPitch);
             }
 
-            audio.PlaySfx(
-                GameSoundEvent.FastMatchCombo,
-                volume,
-                pitch);
+            audio.PlayRestartableSfx(
+    GameSoundEvent.FastMatchCombo,
+    volume,
+    pitch);
         }
 
         private void PlayBoosterRewardSound()

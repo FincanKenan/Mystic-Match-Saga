@@ -86,6 +86,8 @@ namespace ZenMatch.Gameplay
         private bool _levelAttemptStarted;
 
         private LastMoveRecord _lastMove;
+        private int _activeTileFlights;
+        private bool _endStatePending;
 
         // =========================================================
         // PUBLIC
@@ -98,7 +100,11 @@ namespace ZenMatch.Gameplay
             _gameState;
 
         public bool IsMoveInProgress =>
-            _isMoveInProgress;
+    _isMoveInProgress ||
+    _activeTileFlights > 0 ||
+    (trayController != null &&
+     trayController.View != null &&
+     trayController.View.IsAnimating);
 
         public bool IsInputEnabled =>
             _inputEnabled;
@@ -540,7 +546,7 @@ namespace ZenMatch.Gameplay
 
         public bool TryUndoLastMove()
         {
-            if (_isMoveInProgress)
+            if (IsMoveInProgress)
                 return false;
 
             if (_lastMove == null ||
@@ -703,28 +709,19 @@ namespace ZenMatch.Gameplay
         }
 
         public bool TryHandleTileClick(
-            string pointId,
-            int tileIndex,
-            Vector3 sourceWorldPosition)
+    string pointId,
+    int tileIndex,
+    Vector3 sourceWorldPosition)
         {
-            if (_gameState !=
-                LevelGameState.Playing)
-            {
+            if (_gameState != LevelGameState.Playing)
                 return false;
-            }
 
             if (!_inputEnabled)
                 return false;
 
+            // Undo / booster gibi özel işlem çalışıyorsa bekle.
             if (_isMoveInProgress)
                 return false;
-
-            if (trayController != null &&
-                trayController.View != null &&
-                trayController.View.IsAnimating)
-            {
-                return false;
-            }
 
             if (boardSpawner == null ||
                 trayController == null)
@@ -735,18 +732,37 @@ namespace ZenMatch.Gameplay
             if (trayController.State == null)
                 trayController.Initialize();
 
+            // Tray gerçekten doluysa boarddan taş alma.
+            if (!trayController.State.CanAdd())
+                return false;
+
             List<TileTypeSO> trayBeforeSnapshot =
-                trayController.State != null
-                    ? trayController.State
-                        .CreateSnapshot()
-                    : new List<TileTypeSO>();
+                trayController.State.CreateSnapshot();
 
             RewardGiftControllerSnapshot
                 rewardGiftSnapshotBefore =
                     rewardGiftController != null
-                        ? rewardGiftController
-                            .CaptureSnapshot()
+                        ? rewardGiftController.CaptureSnapshot()
                         : null;
+
+            int targetSlotIndex =
+                trayController.State.Count;
+
+            Vector3 targetWorldPosition =
+                Vector3.zero;
+
+            if (trayController.View != null)
+            {
+                targetWorldPosition =
+                    trayController.View.GetSlotWorldPosition(
+                        targetSlotIndex);
+            }
+
+            Vector3 startWorldPosition =
+                sourceWorldPosition;
+
+            if (startWorldPosition == Vector3.zero)
+                startWorldPosition = targetWorldPosition;
 
             if (!boardSpawner.TryTakeTile(
                     pointId,
@@ -757,47 +773,253 @@ namespace ZenMatch.Gameplay
                 return false;
             }
 
+            bool unlockedTraySlot =
+                boardSpawner.IsTraySlotUnlockPoint(
+                    pointId) &&
+                boardSpawner.IsPointCompleted(
+                    pointId);
+
+            bool addedSuccessfully =
+                trayController.TryAddTileDeferredVisual(
+                    removedTile.TileType,
+                    out _,
+                    out TrayVisualTransition transition);
+
+            if (!addedSuccessfully)
+            {
+                bool restored =
+                    boardSpawner.TryRestoreTile(
+                        pointId,
+                        removedIndex,
+                        removedTile);
+
+                if (restored &&
+                    unlockedTraySlot)
+                {
+                    trayController.RelockOneSlot();
+
+                    boardSpawner
+                        .RestoreTraySlotRewardVisual(
+                            pointId);
+                }
+
+                return false;
+            }
+
             GameAudioService.Instance?.PlaySfx(
                 GameSoundEvent.TileSelect);
 
-            int targetSlotIndex =
-                trayController.State != null
-                    ? trayController.State.Count
-                    : 0;
-
-            Vector3 targetWorldPosition =
-                Vector3.zero;
-
-            Vector3 startWorldPosition =
-                sourceWorldPosition;
-
-            if (trayController.View != null)
+            if (boosterManager != null)
             {
-                targetWorldPosition =
-                    trayController.View
-                        .GetSlotWorldPosition(
-                            targetSlotIndex);
+                boosterManager
+                    .NotifyTileAddedToTray();
             }
 
-            if (startWorldPosition ==
-                Vector3.zero)
+            if (rewardGiftController != null)
             {
-                startWorldPosition =
-                    targetWorldPosition;
+                rewardGiftController
+                    .NotifySuccessfulTileSelection(
+                        pointId,
+                        removedTile);
             }
 
-            StartCoroutine(
-                HandleMoveRoutine(
-                    removedTile,
-                    startWorldPosition,
-                    targetWorldPosition,
-                    true,
-                    pointId,
-                    removedIndex,
-                    trayBeforeSnapshot,
-                    rewardGiftSnapshotBefore));
+            boardSpawner
+                .NotifySuccessfulTileSelectionForTrayRisk(
+                    pointId);
+
+            _lastMove =
+                new LastMoveRecord
+                {
+                    PointId =
+                        pointId,
+
+                    TileIndex =
+                        removedIndex,
+
+                    RemovedTile =
+                        removedTile,
+
+                    TrayBeforeSlots =
+                        new List<TileTypeSO>(
+                            trayBeforeSnapshot),
+
+                    TileSprite =
+                        removedTile.TileType != null
+                            ? removedTile.TileType.Icon
+                            : null,
+
+                    UnlockedTraySlot =
+                        unlockedTraySlot,
+
+                    RewardGiftSnapshotBefore =
+                        rewardGiftSnapshotBefore,
+
+                    IsValid =
+                        true
+                };
+
+            if (logTrayStateAfterEachMove &&
+                trayController.State != null)
+            {
+                Debug.Log(
+                    trayController.State
+                        .GetDebugSummary(),
+                    this);
+            }
+
+            if (logBoardStateAfterEachMove &&
+                boardSpawner != null)
+            {
+                Debug.Log(
+                    boardSpawner
+                        .GetRemainingStacksSummary(),
+                    this);
+            }
+
+            StartPlayerTileFlight(
+                removedTile,
+                startWorldPosition,
+                targetWorldPosition,
+                transition);
+
+            CheckTerminalStateAfterLogicalMove();
 
             return true;
+        }
+
+        private void StartPlayerTileFlight(
+    BoardTileInstance removedTile,
+    Vector3 startWorldPosition,
+    Vector3 targetWorldPosition,
+    TrayVisualTransition transition)
+        {
+            if (tileFlyAnimator == null ||
+                removedTile == null ||
+                removedTile.TileType == null)
+            {
+                trayController?.PlayVisualTransition(
+                    transition);
+
+                TryResolvePendingEndState();
+                return;
+            }
+
+            _activeTileFlights++;
+
+            tileFlyAnimator.Play(
+                sprite:
+                    removedTile.TileType.Icon,
+
+                worldStart:
+                    startWorldPosition,
+
+                worldTarget:
+                    targetWorldPosition,
+
+                visualParent:
+                    null,
+
+                sortingOrder:
+                    9999,
+
+                sortingLayerName:
+                    "FlyingTile",
+
+                onComplete:
+                    () =>
+                    {
+                        HandlePlayerTileArrived(
+                            transition);
+                    });
+        }
+
+        private void HandlePlayerTileArrived(
+            TrayVisualTransition transition)
+        {
+            if (trayController != null)
+            {
+                trayController.PlayVisualTransition(
+                    transition);
+            }
+
+            _activeTileFlights =
+                Mathf.Max(
+                    0,
+                    _activeTileFlights - 1);
+
+            TryResolvePendingEndState();
+        }
+
+        private void CheckTerminalStateAfterLogicalMove()
+        {
+            if (boardSpawner == null ||
+                trayController == null)
+            {
+                return;
+            }
+
+            bool boardEmpty =
+                !boardSpawner.HasAnyRemainingTiles();
+
+            bool trayFull =
+                trayController.IsFull;
+
+            if (!boardEmpty &&
+                !trayFull)
+            {
+                return;
+            }
+
+            // Son taşların uçuşunu bitirmesine izin ver.
+            _endStatePending = true;
+            _inputEnabled = false;
+
+            TryResolvePendingEndState();
+        }
+
+        private void TryResolvePendingEndState()
+        {
+            if (!_endStatePending)
+                return;
+
+            if (_activeTileFlights > 0)
+                return;
+
+            if (_gameState !=
+                LevelGameState.Playing)
+            {
+                return;
+            }
+
+            _endStatePending = false;
+
+            bool boardEmpty =
+                boardSpawner != null &&
+                !boardSpawner.HasAnyRemainingTiles();
+
+            bool trayEmpty =
+                trayController == null ||
+                trayController.State == null ||
+                trayController.State.Count == 0;
+
+            if (boardEmpty)
+            {
+                if (trayEmpty)
+                    SetWin();
+                else
+                    SetLose();
+
+                return;
+            }
+
+            if (trayController != null &&
+                trayController.IsFull)
+            {
+                SetLose();
+                return;
+            }
+
+            _inputEnabled = true;
         }
 
         // =========================================================
@@ -814,7 +1036,7 @@ namespace ZenMatch.Gameplay
                 return;
             }
 
-            if (_isMoveInProgress)
+            if (IsMoveInProgress)
                 return;
 
             if (removedTile == null ||
@@ -1227,6 +1449,8 @@ namespace ZenMatch.Gameplay
 
             _inputEnabled = true;
             _isMoveInProgress = false;
+            _activeTileFlights = 0;
+            _endStatePending = false;
             _lastMove = null;
 
             Debug.Log(
@@ -1247,41 +1471,40 @@ namespace ZenMatch.Gameplay
 
         private void SetLose()
         {
-            if (_gameState !=
-                LevelGameState.Playing)
-            {
+            if (_gameState != LevelGameState.Playing)
                 return;
-            }
 
-            _gameState =
-                LevelGameState.Lose;
-
+            _gameState = LevelGameState.Lose;
             _inputEnabled = false;
             _lastMove = null;
 
-            // =====================================================
-            // IMPORTANT
-            // =====================================================
-            //
-            // LOSE ANINDA:
-            //
-            // - can harcanmaz
-            // - transaction rollback edilmez
-            //
-            // Çünkü oyuncu rewarded +1 slot ile
-            // AYNI attempt'ten devam edebilir.
-            //
-            // Retry veya Main Menu seçerse
-            // UI controller rollback yapacaktır.
-            // =====================================================
+            ResolveReferences();
+
+            bool lifeHandled = false;
+
+            if (walletService != null)
+            {
+                lifeHandled =
+                    walletService.SpendLifeForActiveAttempt();
+            }
+            else if (progressService != null)
+            {
+                lifeHandled =
+                    progressService.SpendLifeForActiveAttempt();
+            }
+
+            if (!lifeHandled)
+            {
+                Debug.LogWarning(
+                    "[LevelController] Lose sırasında can işlemi yapılamadı.",
+                    this);
+            }
 
             LevelLost?.Invoke();
 
             Debug.Log(
-                "[LevelController] LOSE - " +
-                "Attempt hâlâ açık. " +
-                "Rewarded Continue / Retry / " +
-                "Main Menu kararı bekleniyor.",
+                $"[LevelController] LOSE | Can: " +
+                $"{(walletService != null ? walletService.Lives : 0)}",
                 this);
         }
     }

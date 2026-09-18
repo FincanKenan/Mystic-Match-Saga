@@ -154,6 +154,12 @@ namespace ZenMatch.Runtime.PlayerProgress
                 progressService.OnProgressLoaded += HandleProgressLoaded;
                 
             }
+
+            if (progressService != null)
+            {
+                progressService.OnProgressLoaded += HandleProgressLoaded;
+                progressService.OnProgressChanged += HandleProgressChanged;
+            }
         }
 
         private void Unsubscribe()
@@ -168,6 +174,12 @@ namespace ZenMatch.Runtime.PlayerProgress
             {
                 progressService.OnProgressLoaded -= HandleProgressLoaded;
                 
+            }
+
+            if (progressService != null)
+            {
+                progressService.OnProgressLoaded -= HandleProgressLoaded;
+                progressService.OnProgressChanged -= HandleProgressChanged;
             }
         }
 
@@ -192,7 +204,16 @@ namespace ZenMatch.Runtime.PlayerProgress
             RefreshAllImmediate();
         }
 
-        
+        private void HandleProgressChanged(PlayerProgressData data)
+        {
+            if (data == null)
+                return;
+
+            SetCoinsAnimated(data.coins);
+            RefreshLives(data.lives);
+        }
+
+
 
         // =========================================================
         // REFRESH

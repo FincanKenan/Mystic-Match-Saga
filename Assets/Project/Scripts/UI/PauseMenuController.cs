@@ -11,6 +11,7 @@ namespace ZenMatch.Runtime.UI
         [Header("UI References")]
         [SerializeField] private GameObject pausePanel;
         [SerializeField] private GameObject pauseButton;
+        [SerializeField] private GameObject leaveConfirmPanel;
 
         [Header("Progress")]
         [SerializeField] private PlayerProgressService progressService;
@@ -20,17 +21,13 @@ namespace ZenMatch.Runtime.UI
         [SerializeField] private string mainMenuSceneName = "MainMenu";
 
         private bool isPaused;
+        private bool quitAfterConfirm;
 
         public bool IsPaused => isPaused;
-
-        // =========================================================
-        // UNITY
-        // =========================================================
 
         private void Awake()
         {
             Time.timeScale = 1f;
-
             isPaused = false;
 
             ResolveReferences();
@@ -40,44 +37,27 @@ namespace ZenMatch.Runtime.UI
 
             if (pauseButton != null)
                 pauseButton.SetActive(true);
-        }
 
-        // =========================================================
-        // REFERENCES
-        // =========================================================
+            if (leaveConfirmPanel != null)
+                leaveConfirmPanel.SetActive(false);
+        }
 
         private void ResolveReferences()
         {
             if (progressService == null)
-            {
-                progressService =
-                    PlayerProgressService.Instance;
-            }
+                progressService = PlayerProgressService.Instance;
 
             if (progressService == null)
-            {
                 progressService =
-                    FindFirstObjectByType<
-                        PlayerProgressService>();
-            }
+                    FindFirstObjectByType<PlayerProgressService>();
 
             if (walletService == null)
-            {
-                walletService =
-                    PlayerWalletService.Instance;
-            }
+                walletService = PlayerWalletService.Instance;
 
             if (walletService == null)
-            {
                 walletService =
-                    FindFirstObjectByType<
-                        PlayerWalletService>();
-            }
+                    FindFirstObjectByType<PlayerWalletService>();
         }
-
-        // =========================================================
-        // PAUSE
-        // =========================================================
 
         public void PauseGame()
         {
@@ -92,17 +72,19 @@ namespace ZenMatch.Runtime.UI
             if (pauseButton != null)
                 pauseButton.SetActive(false);
 
+            if (leaveConfirmPanel != null)
+                leaveConfirmPanel.SetActive(false);
+
             Time.timeScale = 0f;
         }
-
-        // =========================================================
-        // RESUME
-        // =========================================================
 
         public void ResumeGame()
         {
             if (!isPaused)
                 return;
+
+            if (leaveConfirmPanel != null)
+                leaveConfirmPanel.SetActive(false);
 
             Time.timeScale = 1f;
             isPaused = false;
@@ -114,17 +96,62 @@ namespace ZenMatch.Runtime.UI
                 pauseButton.SetActive(true);
         }
 
-        // =========================================================
-        // MAIN MENU
-        // =========================================================
-
         public void ReturnToMainMenu()
         {
-            // Oyuncu leveli yarýda býrakýyor.
-            // Attempt sýrasýnda kazanýlan tüm
-            // level ödüllerini geri al.
+            quitAfterConfirm = false;
 
-            RollbackActiveAttempt();
+            if (leaveConfirmPanel != null)
+            {
+                leaveConfirmPanel.SetActive(true);
+                return;
+            }
+
+            ExecuteReturnToMainMenu();
+        }
+
+        public void ContinueFromLeaveConfirm()
+        {
+            if (leaveConfirmPanel != null)
+                leaveConfirmPanel.SetActive(false);
+
+            ResumeGame();
+        }
+
+        public void CloseLeaveConfirm()
+        {
+            if (leaveConfirmPanel != null)
+                leaveConfirmPanel.SetActive(false);
+        }
+
+        
+
+        public void QuitGame()
+        {
+            quitAfterConfirm = true;
+
+            if (leaveConfirmPanel != null)
+            {
+                leaveConfirmPanel.SetActive(true);
+                return;
+            }
+
+            ExecuteQuitGame();
+        }
+
+        public void ConfirmLeave()
+        {
+            if (leaveConfirmPanel != null)
+                leaveConfirmPanel.SetActive(false);
+
+            if (quitAfterConfirm)
+                ExecuteQuitGame();
+            else
+                ExecuteReturnToMainMenu();
+        }
+
+        private void ExecuteReturnToMainMenu()
+        {
+            AbandonActiveAttempt();
 
             Time.timeScale = 1f;
             isPaused = false;
@@ -141,20 +168,9 @@ namespace ZenMatch.Runtime.UI
             }
         }
 
-        // =========================================================
-        // QUIT
-        // =========================================================
-
-        public void QuitGame()
+        private void ExecuteQuitGame()
         {
-            // Pause menüsünden bilinçli çýkýþta
-            // hemen rollback.
-            //
-            // Force-close / crash için ayrýca
-            // save'deki active transaction
-            // sonraki açýlýþta rollback edilir.
-
-            RollbackActiveAttempt();
+            AbandonActiveAttempt();
 
             Time.timeScale = 1f;
             isPaused = false;
@@ -162,31 +178,22 @@ namespace ZenMatch.Runtime.UI
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else
-            Application.Quit();
+    Application.Quit();
 #endif
         }
 
-        // =========================================================
-        // ROLLBACK
-        // =========================================================
-
-        private void RollbackActiveAttempt()
+        private void AbandonActiveAttempt()
         {
             ResolveReferences();
 
             if (walletService != null)
             {
-                walletService
-                    .RollbackActiveLevelAttempt();
-
+                walletService.AbandonActiveLevelAttempt();
                 return;
             }
 
             if (progressService != null)
-            {
-                progressService
-                    .RollbackActiveLevelAttempt();
-            }
+                progressService.AbandonActiveLevelAttempt();
         }
 
         private void OnDestroy()

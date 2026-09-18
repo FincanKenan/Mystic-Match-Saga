@@ -34,11 +34,24 @@ namespace ZenMatch.Gameplay.Boosters
         private int _pendingExtraSlotMovesRemaining;
         private bool _shuffleInProgress;
 
+        private bool _tutorialBoosterLockActive;
+        private BoosterType _tutorialAllowedBooster;
+
+        public event Action<BoosterType> BoosterUsed;
+
         public bool HasPendingExtraSlotUse =>
             _pendingExtraSlotMovesRemaining > 0;
 
         public int PendingExtraSlotMovesRemaining =>
             _pendingExtraSlotMovesRemaining;
+
+        public void SetTutorialBoosterLock(
+            bool active,
+            BoosterType allowedBooster)
+        {
+            _tutorialBoosterLockActive = active;
+            _tutorialAllowedBooster = allowedBooster;
+        }
 
         private TrayState TrayState
         {
@@ -81,6 +94,12 @@ namespace ZenMatch.Gameplay.Boosters
         public void UseBooster(BoosterType boosterType)
         {
             ResolveReferences();
+
+            if (_tutorialBoosterLockActive &&
+                boosterType != _tutorialAllowedBooster)
+            {
+                return;
+            }
 
             if (levelController != null &&
                 levelController.IsMoveInProgress)
@@ -131,6 +150,9 @@ namespace ZenMatch.Gameplay.Boosters
                                 boosterId))
                         {
                             PlayBoosterUseSound();
+
+                            BoosterUsed?.Invoke(
+                                boosterType);
                         }
 
                         break;
@@ -150,6 +172,9 @@ namespace ZenMatch.Gameplay.Boosters
                                 boosterId))
                         {
                             PlayBoosterUseSound();
+
+                            BoosterUsed?.Invoke(
+                                boosterType);
                         }
 
                         break;
@@ -182,6 +207,9 @@ namespace ZenMatch.Gameplay.Boosters
                                 boosterId))
                         {
                             PlayBoosterUseSound();
+
+                            BoosterUsed?.Invoke(
+                                boosterType);
                         }
 
                         break;
@@ -555,9 +583,10 @@ namespace ZenMatch.Gameplay.Boosters
                 yield break;
             }
 
-            SpendBoosterRight(
-                boosterType,
-                boosterId);
+            bool spent =
+                SpendBoosterRight(
+                    boosterType,
+                    boosterId);
 
             Debug.Log(
                 "[BoosterManager] ShuffleBoard çalýþtý.",
@@ -567,6 +596,12 @@ namespace ZenMatch.Gameplay.Boosters
                 levelController.SetInputEnabled(true);
 
             _shuffleInProgress = false;
+
+            if (spent)
+            {
+                BoosterUsed?.Invoke(
+                    boosterType);
+            }
         }
 
         private IEnumerator PlayShuffleFxRoutine(

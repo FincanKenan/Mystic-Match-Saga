@@ -7,6 +7,18 @@ using ZenMatch.Runtime.Audio;
 
 namespace ZenMatch.Gameplay
 {
+    public sealed class TrayVisualTransition
+    {
+        public bool IsMatch;
+        public List<TileTypeSO> BeforeSlots;
+        public List<TileTypeSO> AfterSlots;
+        public List<int> MatchedSlotIndices;
+
+        public int CurrentCapacity;
+        public int MaxVisualCapacity;
+        public int LockedSlots;
+    }
+
     [DisallowMultipleComponent]
     public sealed class TrayController : MonoBehaviour
     {
@@ -205,7 +217,33 @@ namespace ZenMatch.Gameplay
             TileTypeSO tileType,
             out bool clearedAny)
         {
+            return TryAddTileInternal(
+                tileType,
+                true,
+                out clearedAny,
+                out _);
+        }
+
+        public bool TryAddTileDeferredVisual(
+            TileTypeSO tileType,
+            out bool clearedAny,
+            out TrayVisualTransition transition)
+        {
+            return TryAddTileInternal(
+                tileType,
+                false,
+                out clearedAny,
+                out transition);
+        }
+
+        private bool TryAddTileInternal(
+            TileTypeSO tileType,
+            bool playVisualImmediately,
+            out bool clearedAny,
+            out TrayVisualTransition transition)
+        {
             clearedAny = false;
+            transition = null;
 
             if (_state == null)
                 Initialize();
@@ -224,32 +262,20 @@ namespace ZenMatch.Gameplay
 
             _state.Add(tileType);
 
-            // Yeni taþ görsel olarak en sona
-            // eklenmiþ gibi baþlar.
             List<TileTypeSO> visualStartSlots =
-                new List<TileTypeSO>(
-                    startSlots);
+                new List<TileTypeSO>(startSlots);
 
             if (tileType != null)
-            {
-                visualStartSlots.Add(
-                    tileType);
-            }
+                visualStartSlots.Add(tileType);
 
             _state.GroupSameTiles();
-
-            // =====================================================
-            // TRIPLE MATCH
-            // =====================================================
 
             if (_state.FindTripleIndices(
                     out List<int> matchedSlotIndices))
             {
                 clearedAny = true;
 
-                // Hýzlý eþleþtirme / combo sistemi
-                // baþarýlý üçlüyü buradan öðrenir.
-                TripleMatched?.Invoke();
+                
 
                 List<TileTypeSO> beforeSlots =
                     new List<TileTypeSO>(
@@ -264,52 +290,105 @@ namespace ZenMatch.Gameplay
                     new List<TileTypeSO>(
                         _state.Slots);
 
-                GameAudioService.Instance?.PlaySfx(
-                    GameSoundEvent.TripleMatch);
+                transition =
+                    new TrayVisualTransition
+                    {
+                        IsMatch = true,
 
-                if (trayView != null)
-                {
-                    trayView.PlayMatchResolveSequence(
-                        beforeSlots,
-                        matchedSlotIndices,
-                        afterSlots,
-                        _state.CurrentCapacity,
-                        _state.MaxVisualCapacity,
-                        _state.LockedSlots);
-                }
-                else
-                {
-                    RefreshView();
-                }
+                        BeforeSlots =
+                            beforeSlots,
+
+                        AfterSlots =
+                            afterSlots,
+
+                        MatchedSlotIndices =
+                            new List<int>(
+                                matchedSlotIndices),
+
+                        CurrentCapacity =
+                            _state.CurrentCapacity,
+
+                        MaxVisualCapacity =
+                            _state.MaxVisualCapacity,
+
+                        LockedSlots =
+                            _state.LockedSlots
+                    };
+
+                if (playVisualImmediately)
+                    PlayVisualTransition(transition);
 
                 return true;
             }
 
-            // =====================================================
-            // NORMAL ADD
-            // =====================================================
+            transition =
+                new TrayVisualTransition
+                {
+                    IsMatch = false,
 
-            if (trayView != null)
-            {
-                trayView.PlayReorderSequence(
-                    visualStartSlots,
-                    new List<TileTypeSO>(
-                        _state.Slots),
-                    _state.CurrentCapacity,
-                    _state.MaxVisualCapacity,
-                    _state.LockedSlots);
-            }
-            else
-            {
-                RefreshView();
-            }
+                    BeforeSlots =
+                        visualStartSlots,
+
+                    AfterSlots =
+                        new List<TileTypeSO>(
+                            _state.Slots),
+
+                    MatchedSlotIndices =
+                        null,
+
+                    CurrentCapacity =
+                        _state.CurrentCapacity,
+
+                    MaxVisualCapacity =
+                        _state.MaxVisualCapacity,
+
+                    LockedSlots =
+                        _state.LockedSlots
+                };
+
+            if (playVisualImmediately)
+                PlayVisualTransition(transition);
 
             return true;
         }
 
-        // =========================================================
-        // VIEW
-        // =========================================================
+        public void PlayVisualTransition(
+            TrayVisualTransition transition)
+        {
+            if (transition == null)
+                return;
+
+            if (trayView == null)
+            {
+                RefreshView();
+                return;
+            }
+
+            if (transition.IsMatch)
+            {
+                TripleMatched?.Invoke();
+
+                GameAudioService.Instance?.PlaySfx(
+                    GameSoundEvent.TripleMatch);
+
+                trayView.PlayMatchResolveSequence(
+                    transition.BeforeSlots,
+                    transition.MatchedSlotIndices,
+                    transition.AfterSlots,
+                    transition.CurrentCapacity,
+                    transition.MaxVisualCapacity,
+                    transition.LockedSlots);
+
+                return;
+            }
+
+            trayView.PlayReorderSequence(
+                transition.BeforeSlots,
+                transition.AfterSlots,
+                transition.CurrentCapacity,
+                transition.MaxVisualCapacity,
+                transition.LockedSlots);
+        }
 
         public void RefreshView()
         {

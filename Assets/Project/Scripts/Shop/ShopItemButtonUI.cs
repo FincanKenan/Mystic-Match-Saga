@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using ZenMatch.Runtime.PlayerProgress;
 
 namespace ZenMatch.Runtime.Shop
 {
@@ -10,9 +11,12 @@ namespace ZenMatch.Runtime.Shop
         [Header("Shop")]
         [SerializeField] private ShopItemSO item;
         [SerializeField] private ShopPurchaseService purchaseService;
+        [SerializeField] private PlayerWalletService walletService;
+        [SerializeField] private ShopPurchaseFeedbackUI feedbackUI;
 
         [Header("Button")]
         [SerializeField] private Button purchaseButton;
+        [SerializeField] private CanvasGroup canvasGroup;
 
         [Header("Text UI")]
         [SerializeField] private TMP_Text titleText;
@@ -26,6 +30,10 @@ namespace ZenMatch.Runtime.Shop
         [Header("Format")]
         [SerializeField] private string priceFormat = "{0}";
         [SerializeField] private string amountFormat = "x{0}";
+
+        [Header("Unavailable")]
+        [Range(0.1f, 1f)]
+        [SerializeField] private float unavailableAlpha = 0.45f;
 
         [Header("Debug")]
         [SerializeField] private bool logDebug = true;
@@ -64,15 +72,42 @@ namespace ZenMatch.Runtime.Shop
                 purchaseButton = GetComponent<Button>();
 
             if (purchaseService == null)
-                purchaseService = FindFirstObjectByType<ShopPurchaseService>();
+                purchaseService =
+                    FindFirstObjectByType<ShopPurchaseService>();
+
+            if (walletService == null)
+                walletService = PlayerWalletService.Instance;
+
+            if (walletService == null)
+                walletService =
+                    FindFirstObjectByType<PlayerWalletService>();
+
+            if (feedbackUI == null)
+                feedbackUI =
+                    FindFirstObjectByType<ShopPurchaseFeedbackUI>();
+
+            if (canvasGroup == null)
+                canvasGroup = GetComponent<CanvasGroup>();
+
+            if (canvasGroup == null)
+                canvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
 
         private void Subscribe()
         {
             if (purchaseService != null)
             {
-                purchaseService.OnPurchaseSucceeded += HandlePurchaseSucceeded;
-                purchaseService.OnPurchaseFailed += HandlePurchaseFailed;
+                purchaseService.OnPurchaseSucceeded +=
+                    HandlePurchaseSucceeded;
+
+                purchaseService.OnPurchaseFailed +=
+                    HandlePurchaseFailed;
+            }
+
+            if (walletService != null)
+            {
+                walletService.OnCoinsChanged += HandleWalletChanged;
+                walletService.OnLivesChanged += HandleWalletChanged;
             }
         }
 
@@ -80,9 +115,23 @@ namespace ZenMatch.Runtime.Shop
         {
             if (purchaseService != null)
             {
-                purchaseService.OnPurchaseSucceeded -= HandlePurchaseSucceeded;
-                purchaseService.OnPurchaseFailed -= HandlePurchaseFailed;
+                purchaseService.OnPurchaseSucceeded -=
+                    HandlePurchaseSucceeded;
+
+                purchaseService.OnPurchaseFailed -=
+                    HandlePurchaseFailed;
             }
+
+            if (walletService != null)
+            {
+                walletService.OnCoinsChanged -= HandleWalletChanged;
+                walletService.OnLivesChanged -= HandleWalletChanged;
+            }
+        }
+
+        private void HandleWalletChanged(int value)
+        {
+            Refresh();
         }
 
         private void HandleClicked()
@@ -90,67 +139,158 @@ namespace ZenMatch.Runtime.Shop
             ResolveReferences();
 
             if (item == null)
-            {
-                Debug.LogWarning("[ShopItemButtonUI] Shop item atanmadý.", this);
                 return;
-            }
 
             if (purchaseService == null)
-            {
-                Debug.LogWarning("[ShopItemButtonUI] ShopPurchaseService bulunamadý.", this);
                 return;
-            }
 
             purchaseService.TryPurchase(item);
         }
 
-        private void HandlePurchaseSucceeded(ShopItemSO purchasedItem)
+        private void HandlePurchaseSucceeded(
+            ShopItemSO purchasedItem)
         {
             if (purchasedItem != item)
                 return;
 
-            if (logDebug)
-                Debug.Log($"[ShopItemButtonUI] Satýn alma baþarýlý: {item.DisplayName}", this);
-
             Refresh();
+
+            if (logDebug)
+            {
+                Debug.Log(
+                    $"[ShopItemButtonUI] Satýn alma baþarýlý: " +
+                    $"{item.DisplayName}",
+                    this);
+            }
         }
 
-        private void HandlePurchaseFailed(ShopItemSO failedItem, ShopPurchaseFailReason reason)
+        private void HandlePurchaseFailed(
+            ShopItemSO failedItem,
+            ShopPurchaseFailReason reason)
         {
             if (failedItem != item)
                 return;
 
-            if (logDebug)
-                Debug.Log($"[ShopItemButtonUI] Satýn alma baþarýsýz: {item.DisplayName}, Sebep: {reason}", this);
-
+            ShowFailMessage(reason);
             Refresh();
+
+            if (logDebug)
+            {
+                Debug.Log(
+                    $"[ShopItemButtonUI] Satýn alma baþarýsýz: " +
+                    $"{item.DisplayName}, Sebep: {reason}",
+                    this);
+            }
+        }
+
+        private void ShowFailMessage(
+            ShopPurchaseFailReason reason)
+        {
+            if (feedbackUI == null)
+                return;
+
+            switch (reason)
+            {
+                case ShopPurchaseFailReason.NotEnoughCoins:
+
+                    feedbackUI.Show(
+                        "Yeterli altýnýn yok.");
+
+                    break;
+
+                case ShopPurchaseFailReason.LifeLimitReached:
+
+                    if (item != null &&
+                        item.RewardType == ShopRewardType.Life &&
+                        item.RewardAmount == 5)
+                    {
+                        feedbackUI.Show(
+                            "5 Can Paketi yalnýzca canýn 0 iken alýnabilir.");
+                    }
+                    else
+                    {
+                        feedbackUI.Show(
+                            "Maksimum can miktarý 5. Daha fazla can alamazsýn.");
+                    }
+
+                    break;
+
+                default:
+
+                    feedbackUI.Show(
+                        "Bu ürün þu anda satýn alýnamýyor.");
+
+                    break;
+            }
         }
 
         public void Refresh()
         {
+            ResolveReferences();
+
             if (item == null)
             {
                 SetTexts("-", 0, 0);
                 SetIcon(null);
+                SetAvailableVisual(false);
                 return;
             }
 
-            string title = string.IsNullOrWhiteSpace(item.DisplayName) ? item.name : item.DisplayName;
+            string title =
+                string.IsNullOrWhiteSpace(item.DisplayName)
+                    ? item.name
+                    : item.DisplayName;
 
-            SetTexts(title, item.CoinPrice, item.RewardAmount);
+            SetTexts(
+                title,
+                item.CoinPrice,
+                item.RewardAmount);
+
             SetIcon(item.Icon);
+
+            bool available =
+                purchaseService != null &&
+                purchaseService.CanPurchase(item);
+
+            SetAvailableVisual(available);
         }
 
-        private void SetTexts(string title, int price, int amount)
+        private void SetAvailableVisual(bool available)
+        {
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha =
+                    available
+                        ? 1f
+                        : unavailableAlpha;
+
+                canvasGroup.blocksRaycasts = true;
+                canvasGroup.interactable = true;
+            }
+
+            if (purchaseButton != null)
+                purchaseButton.interactable = true;
+        }
+
+        private void SetTexts(
+            string title,
+            int price,
+            int amount)
         {
             if (titleText != null)
                 titleText.text = title;
 
             if (priceText != null)
-                priceText.text = string.Format(priceFormat, price);
+                priceText.text =
+                    string.Format(
+                        priceFormat,
+                        price);
 
             if (amountText != null)
-                amountText.text = string.Format(amountFormat, amount);
+                amountText.text =
+                    string.Format(
+                        amountFormat,
+                        amount);
         }
 
         private void SetIcon(Sprite icon)

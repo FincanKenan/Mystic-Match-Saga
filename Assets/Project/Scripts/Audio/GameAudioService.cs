@@ -20,6 +20,8 @@ namespace ZenMatch.Runtime.Audio
         [Header("Audio Sources")]
         [SerializeField] private AudioSource musicSource;
         [SerializeField] private AudioSource sfxSource;
+        private AudioSource restartableSfxSource;
+        private Coroutine _restartableSfxDelayRoutine;
 
         [Header("Settings")]
         [SerializeField] private bool dontDestroyOnLoad = true;
@@ -439,6 +441,174 @@ namespace ZenMatch.Runtime.Audio
             {
                 musicSource.volume =
                     Mathf.Clamp01(volume);
+            }
+        }
+
+        public void PlayRestartableSfx(
+    GameSoundEvent soundEvent,
+    float volumeMultiplier,
+    float pitchMultiplier)
+        {
+            if (soundDatabase == null)
+                return;
+
+            if (!soundDatabase.TryGetSound(
+                    soundEvent,
+                    out GameSoundEntry sound))
+            {
+                if (logMissingSounds)
+                {
+                    Debug.LogWarning(
+                        $"[GameAudioService] Database içinde " +
+                        $"{soundEvent} bulunamadý.",
+                        this);
+                }
+
+                return;
+            }
+
+            if (sound == null ||
+                sound.Clip == null)
+            {
+                return;
+            }
+
+            EnsureRestartableSfxSource();
+
+            if (restartableSfxSource == null)
+                return;
+
+            if (_restartableSfxDelayRoutine != null)
+            {
+                StopCoroutine(
+                    _restartableSfxDelayRoutine);
+
+                _restartableSfxDelayRoutine = null;
+            }
+
+            // Önceki ayný kanal sesini hemen kes.
+            restartableSfxSource.Stop();
+
+            volumeMultiplier =
+                Mathf.Max(
+                    0f,
+                    volumeMultiplier);
+
+            pitchMultiplier =
+                Mathf.Clamp(
+                    pitchMultiplier,
+                    0.5f,
+                    2f);
+
+            if (sound.Delay > 0f)
+            {
+                _restartableSfxDelayRoutine =
+                    StartCoroutine(
+                        PlayRestartableSfxDelayedRoutine(
+                            sound,
+                            volumeMultiplier,
+                            pitchMultiplier));
+
+                return;
+            }
+
+            PlayRestartableSfxNow(
+                sound,
+                volumeMultiplier,
+                pitchMultiplier);
+        }
+
+        private IEnumerator
+            PlayRestartableSfxDelayedRoutine(
+                GameSoundEntry sound,
+                float volumeMultiplier,
+                float pitchMultiplier)
+        {
+            yield return
+                new WaitForSecondsRealtime(
+                    sound.Delay);
+
+            _restartableSfxDelayRoutine = null;
+
+            PlayRestartableSfxNow(
+                sound,
+                volumeMultiplier,
+                pitchMultiplier);
+        }
+
+        private void PlayRestartableSfxNow(
+            GameSoundEntry sound,
+            float volumeMultiplier,
+            float pitchMultiplier)
+        {
+            EnsureRestartableSfxSource();
+
+            if (restartableSfxSource == null ||
+                sound == null ||
+                sound.Clip == null)
+            {
+                return;
+            }
+
+            restartableSfxSource.Stop();
+
+            restartableSfxSource.clip =
+                sound.Clip;
+
+            float baseVolume =
+                sfxSource != null
+                    ? sfxSource.volume
+                    : 1f;
+
+            restartableSfxSource.volume =
+                baseVolume *
+                Mathf.Clamp(
+                    sound.Volume *
+                    volumeMultiplier,
+                    0f,
+                    2f);
+
+            restartableSfxSource.pitch =
+                Mathf.Clamp(
+                    sound.Pitch *
+                    pitchMultiplier,
+                    0.5f,
+                    2f);
+
+            restartableSfxSource.Play();
+        }
+
+        private void EnsureRestartableSfxSource()
+        {
+            if (restartableSfxSource != null)
+                return;
+
+            GameObject go =
+                new GameObject(
+                    "RestartableSfxSource");
+
+            go.transform.SetParent(
+                transform,
+                false);
+
+            restartableSfxSource =
+                go.AddComponent<AudioSource>();
+
+            restartableSfxSource.playOnAwake =
+                false;
+
+            restartableSfxSource.loop =
+                false;
+
+            restartableSfxSource.spatialBlend =
+                0f;
+
+            if (sfxSource != null)
+            {
+                restartableSfxSource
+                    .outputAudioMixerGroup =
+                        sfxSource
+                            .outputAudioMixerGroup;
             }
         }
     }

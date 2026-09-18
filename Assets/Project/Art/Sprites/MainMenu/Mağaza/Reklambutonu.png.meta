@@ -160,7 +160,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Reklambutonu_0: 4482643806787006649
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

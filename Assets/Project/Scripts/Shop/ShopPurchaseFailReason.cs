@@ -6,6 +6,7 @@ namespace ZenMatch.Runtime.Shop
         InvalidItem = 1,
         MissingWalletService = 2,
         NotEnoughCoins = 3,
-        InvalidReward = 4
+        InvalidReward = 4,
+        LifeLimitReached = 5
     }
 }

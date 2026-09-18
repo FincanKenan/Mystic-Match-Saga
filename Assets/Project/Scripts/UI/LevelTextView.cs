@@ -13,18 +13,12 @@ namespace ZenMatch.Runtime
         [Header("Text")]
         [SerializeField] private string textFormat = "Level {0}";
 
-        [Header("Position")]
-        [SerializeField] private bool applyAnchoredPosition = false;
-        [SerializeField] private RectTransform targetRect;
-        [SerializeField] private Vector2 anchoredPosition;
-
         [Header("Behaviour")]
         [SerializeField] private bool refreshOnEnable = true;
 
         private void OnEnable()
         {
             ResolveReferences();
-            ApplyPosition();
 
             if (refreshOnEnable)
                 Refresh();
@@ -33,7 +27,6 @@ namespace ZenMatch.Runtime
         private void Start()
         {
             ResolveReferences();
-            ApplyPosition();
             Refresh();
         }
 
@@ -43,10 +36,10 @@ namespace ZenMatch.Runtime
                 boardSpawner = FindFirstObjectByType<BoardSpawner>();
 
             if (levelText == null)
-                levelText = GetComponentInChildren<TMP_Text>();
+                levelText = GetComponent<TMP_Text>();
 
-            if (targetRect == null && levelText != null)
-                targetRect = levelText.rectTransform;
+            if (levelText == null)
+                levelText = GetComponentInChildren<TMP_Text>();
         }
 
         public void Refresh()
@@ -56,7 +49,11 @@ namespace ZenMatch.Runtime
             if (levelText == null)
                 return;
 
-            int levelNumber = boardSpawner != null ? boardSpawner.CurrentLevel : 1;
+            int levelNumber =
+                boardSpawner != null
+                    ? boardSpawner.CurrentLevel
+                    : 1;
+
             SetLevel(levelNumber);
         }
 
@@ -65,26 +62,8 @@ namespace ZenMatch.Runtime
             if (levelText == null)
                 return;
 
-            levelText.text = string.Format(textFormat, levelNumber);
-        }
-
-        private void ApplyPosition()
-        {
-            if (!applyAnchoredPosition)
-                return;
-
-            if (targetRect == null)
-                return;
-
-            targetRect.anchorMin = new Vector2(0.5f, 0.5f);
-            targetRect.anchorMax = new Vector2(0.5f, 0.5f);
-            targetRect.pivot = new Vector2(0.5f, 0.5f);
-            targetRect.anchoredPosition = anchoredPosition;
-        }
-
-        private void OnRectTransformDimensionsChange()
-        {
-            ApplyPosition();
+            levelText.text =
+                string.Format(textFormat, levelNumber);
         }
     }
 }

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 458729016283936850}
   - component: {fileID: 2242810009191024451}
+  - component: {fileID: 4760354294929439092}
   m_Layer: 0
   m_Name: GameServices
   m_TagString: Untagged
@@ -50,6 +51,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shopPanel: {fileID: 0}
+--- !u!114 &4760354294929439092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361746698471963828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a89995c3b685bb643884b2249d8e9309, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1358963576039989328
 GameObject:
   m_ObjectHideFlags: 0

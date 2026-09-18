@@ -134,6 +134,7 @@ MonoBehaviour:
       trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - St_Line_V-Back_2
+      - Plus_Hori_Front_2
       minStackHeight: 1
       maxStackHeight: 1
       isSpecialTile: 0
@@ -237,6 +238,7 @@ MonoBehaviour:
       trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - St_Line_V-Back_2
+      - Plus_Ver_Back_1
       minStackHeight: 1
       maxStackHeight: 1
       isSpecialTile: 0
@@ -297,6 +299,7 @@ MonoBehaviour:
       trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - St_Line_H-Front_1
+      - St_Line_V-Front_1
       minStackHeight: 1
       maxStackHeight: 1
       isSpecialTile: 0

@@ -14,7 +14,6 @@ namespace ZenMatch.Runtime.Ads
         public event Action AdsInitialized;
         public event Action ConsentFlowCompleted;
 
-
         public bool IsMobileAdsInitialized { get; private set; }
 
         public bool CanRequestAds =>
@@ -24,41 +23,53 @@ namespace ZenMatch.Runtime.Ads
             ConsentInformation.PrivacyOptionsRequirementStatus ==
             PrivacyOptionsRequirementStatus.Required;
 
-
         private bool _initializationStarted;
-
 
         private void Awake()
         {
+            Debug.Log("[Ads] GoogleAdsConsentService Awake.");
+
             if (Instance != null && Instance != this)
             {
+                Debug.Log(
+                    "[Ads] Duplicate GoogleAdsConsentService bulundu, yok ediliyor.");
+
                 Destroy(gameObject);
                 return;
             }
 
             Instance = this;
 
-            // GameServices prefabý altýnda editörde düzenli durabilir.
-            // Runtime'da DontDestroyOnLoad için root objeye çýkar.
-            transform.SetParent(null, true);
+            // ÖNEMLÝ:
+            // UMP callbacklerinden önce main-thread executor hazýr olsun.
+            MobileAdsEventExecutor.Initialize();
 
+            transform.SetParent(null, true);
             DontDestroyOnLoad(gameObject);
         }
 
-
         private void Start()
         {
+            Debug.Log("[Ads] GoogleAdsConsentService Start.");
+
 #if UNITY_EDITOR
-            Debug.Log("[Ads] Unity Editor: UMP gerçek rýza akýþý atlandý.");
+            Debug.Log(
+                "[Ads] Unity Editor: UMP gerçek rýza akýþý atlandý.");
+
             TryInitializeMobileAds();
 #else
-    RequestConsent();
+            Debug.Log(
+                "[Ads] Android: UMP rýza akýþý baþlatýlýyor.");
+
+            RequestConsent();
 #endif
         }
 
-
         private void RequestConsent()
         {
+            Debug.Log(
+                "[Ads] ConsentInformation.Update çaðrýlýyor.");
+
             ConsentRequestParameters requestParameters =
                 new ConsentRequestParameters();
 
@@ -67,9 +78,12 @@ namespace ZenMatch.Runtime.Ads
                 OnConsentInformationUpdated);
         }
 
-
-        private void OnConsentInformationUpdated(FormError updateError)
+        private void OnConsentInformationUpdated(
+            FormError updateError)
         {
+            Debug.Log(
+                "[Ads] ConsentInformation.Update callback döndü.");
+
             if (updateError != null)
             {
                 Debug.LogWarning(
@@ -80,53 +94,86 @@ namespace ZenMatch.Runtime.Ads
                 return;
             }
 
+            Debug.Log(
+                $"[Ads] Consent bilgisi güncellendi. " +
+                $"CanRequestAds: {ConsentInformation.CanRequestAds()}, " +
+                $"ConsentStatus: {ConsentInformation.ConsentStatus}, " +
+                $"PrivacyOptions: " +
+                $"{ConsentInformation.PrivacyOptionsRequirementStatus}");
+
+            Debug.Log(
+                "[Ads] LoadAndShowConsentFormIfRequired çaðrýlýyor.");
+
             ConsentForm.LoadAndShowConsentFormIfRequired(
                 OnConsentFormFinished);
         }
 
-
-        private void OnConsentFormFinished(FormError formError)
+        private void OnConsentFormFinished(
+            FormError formError)
         {
+            Debug.Log(
+                "[Ads] Consent form callback döndü.");
+
             if (formError != null)
             {
                 Debug.LogWarning(
-                    $"[Ads] Rýza formu hatasý: {formError.Message}");
+                    $"[Ads] Rýza formu hatasý: " +
+                    $"{formError.Message}");
             }
+
+            Debug.Log(
+                $"[Ads] Consent flow sonrasý " +
+                $"CanRequestAds: {ConsentInformation.CanRequestAds()}");
 
             FinishConsentFlow();
         }
 
-
         private void FinishConsentFlow()
         {
+            Debug.Log(
+                "[Ads] FinishConsentFlow çaðrýldý.");
+
             MobileAdsEventExecutor.ExecuteInUpdate(() =>
             {
+                Debug.Log(
+                    "[Ads] FinishConsentFlow main thread callback.");
+
                 ConsentFlowCompleted?.Invoke();
 
                 TryInitializeMobileAds();
             });
         }
 
-
         private void TryInitializeMobileAds()
         {
+            Debug.Log(
+                $"[Ads] TryInitializeMobileAds çaðrýldý. " +
+                $"InitializationStarted: {_initializationStarted}, " +
+                $"CanRequestAds: {ConsentInformation.CanRequestAds()}");
+
             if (_initializationStarted)
                 return;
 
 #if !UNITY_EDITOR
-    if (!ConsentInformation.CanRequestAds())
-    {
-        Debug.Log(
-            "[Ads] Reklam isteði için gerekli izin durumu oluþmadý.");
+            if (!ConsentInformation.CanRequestAds())
+            {
+                Debug.LogWarning(
+                    "[Ads] Reklam isteði için gerekli izin durumu oluþmadý.");
 
-        return;
-    }
+                return;
+            }
 #endif
 
             _initializationStarted = true;
 
+            Debug.Log(
+                "[Ads] MobileAds.Initialize çaðrýlýyor.");
+
             MobileAds.Initialize(initializationStatus =>
             {
+                Debug.Log(
+                    "[Ads] MobileAds.Initialize callback döndü.");
+
                 if (initializationStatus == null)
                 {
                     Debug.LogError(
@@ -148,7 +195,6 @@ namespace ZenMatch.Runtime.Ads
             });
         }
 
-
         public void ShowPrivacyOptions()
         {
             ConsentForm.ShowPrivacyOptionsForm(formError =>
@@ -162,9 +208,11 @@ namespace ZenMatch.Runtime.Ads
             });
         }
 
-
         private void OnDestroy()
         {
+            Debug.Log(
+                "[Ads] GoogleAdsConsentService OnDestroy.");
+
             if (Instance == this)
                 Instance = null;
         }
