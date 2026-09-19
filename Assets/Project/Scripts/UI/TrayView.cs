@@ -51,7 +51,7 @@ namespace ZenMatch.UI
         private readonly List<GameObject> _tileVisuals = new();
         private readonly List<GameObject> _tempAnimationVisuals = new();
 
-        
+
 
         private Coroutine _activeAnimation;
         private int _currentCapacity = 0;
@@ -68,6 +68,8 @@ namespace ZenMatch.UI
 
         public void Rebuild(TrayState trayState)
         {
+            StopActiveAnimation();
+
             _lastTrayState = trayState;
 
             if (trayState == null)
@@ -93,6 +95,41 @@ namespace ZenMatch.UI
             Rebuild(_lastTrayState);
         }
 
+        public void RefreshLockedSlots(
+    TrayState trayState)
+        {
+            if (trayState == null)
+                return;
+
+            _lastTrayState = trayState;
+
+            SyncLockedSlotsFromCurrentState();
+        }
+
+        private void SyncLockedSlotsFromCurrentState()
+        {
+            if (_lastTrayState == null)
+                return;
+
+            _currentCapacity =
+                _lastTrayState.CurrentCapacity;
+
+            _maxVisualCapacity =
+                Mathf.Max(
+                    _lastTrayState.MaxVisualCapacity,
+                    _lastTrayState.CurrentCapacity);
+
+            _lockedSlots =
+                _lastTrayState.LockedSlots;
+
+            EnsureBaseSlots(
+                _maxVisualCapacity);
+
+            RefreshLockedSlotVisuals(
+                _currentCapacity,
+                _maxVisualCapacity);
+        }
+
         public void PlayMatchBurst(List<int> slotIndices)
         {
             if (matchBurstEffect == null || slotIndices == null || slotIndices.Count == 0)
@@ -114,31 +151,55 @@ namespace ZenMatch.UI
         }
 
         public void PlayMatchResolveSequence(
-            List<TileTypeSO> beforeSlots,
-            List<int> matchedSlotIndices,
-            List<TileTypeSO> afterSlots,
-            int currentCapacity,
-            int maxVisualCapacity,
-            int lockedSlots)
+    List<TileTypeSO> beforeSlots,
+    List<int> matchedSlotIndices,
+    List<TileTypeSO> afterSlots,
+    int currentCapacity,
+    int maxVisualCapacity,
+    int lockedSlots)
         {
             StopActiveAnimation();
 
-            _currentCapacity = currentCapacity;
+            if (_lastTrayState != null)
+            {
+                _currentCapacity =
+                    _lastTrayState.CurrentCapacity;
 
-            _maxVisualCapacity =
-                Mathf.Max(
-                    maxVisualCapacity,
-                    currentCapacity);
+                _maxVisualCapacity =
+                    Mathf.Max(
+                        _lastTrayState.MaxVisualCapacity,
+                        _lastTrayState.CurrentCapacity);
 
-            _lockedSlots = lockedSlots;
+                _lockedSlots =
+                    _lastTrayState.LockedSlots;
+            }
+            else
+            {
+                _currentCapacity =
+                    currentCapacity;
 
-            EnsureBaseSlots(_maxVisualCapacity);
-            RefreshLockedSlotVisuals(_currentCapacity, _maxVisualCapacity);
+                _maxVisualCapacity =
+                    Mathf.Max(
+                        maxVisualCapacity,
+                        currentCapacity);
 
-            _activeAnimation = StartCoroutine(PlayMatchResolveSequenceRoutine(
-                beforeSlots,
-                matchedSlotIndices,
-                afterSlots));
+                _lockedSlots =
+                    lockedSlots;
+            }
+
+            EnsureBaseSlots(
+                _maxVisualCapacity);
+
+            RefreshLockedSlotVisuals(
+                _currentCapacity,
+                _maxVisualCapacity);
+
+            _activeAnimation =
+                StartCoroutine(
+                    PlayMatchResolveSequenceRoutine(
+                        beforeSlots,
+                        matchedSlotIndices,
+                        afterSlots));
         }
 
         public Vector3 GetSlotWorldPosition(int slotIndex)
@@ -260,17 +321,48 @@ namespace ZenMatch.UI
         {
             StopActiveAnimation();
 
-            _currentCapacity = currentCapacity;
-            _maxVisualCapacity = maxVisualCapacity;
-            _lockedSlots = lockedSlots;
+            if (_lastTrayState != null)
+            {
+                _currentCapacity =
+                    _lastTrayState.CurrentCapacity;
 
-            EnsureBaseSlots(_maxVisualCapacity);
-            RefreshLockedSlotVisuals(_currentCapacity, _maxVisualCapacity);
+                _maxVisualCapacity =
+                    Mathf.Max(
+                        _lastTrayState.MaxVisualCapacity,
+                        _lastTrayState.CurrentCapacity);
 
-            _activeAnimation = StartCoroutine(PlayReorderSequenceRoutine(startSlots, targetSlots));
+                _lockedSlots =
+                    _lastTrayState.LockedSlots;
+            }
+            else
+            {
+                _currentCapacity =
+                    currentCapacity;
+
+                _maxVisualCapacity =
+                    Mathf.Max(
+                        maxVisualCapacity,
+                        currentCapacity);
+
+                _lockedSlots =
+                    lockedSlots;
+            }
+
+            EnsureBaseSlots(
+                _maxVisualCapacity);
+
+            RefreshLockedSlotVisuals(
+                _currentCapacity,
+                _maxVisualCapacity);
+
+            _activeAnimation =
+                StartCoroutine(
+                    PlayReorderSequenceRoutine(
+                        startSlots,
+                        targetSlots));
         }
 
-       
+
 
         private IEnumerator PlayReorderSequenceRoutine(
     List<TileTypeSO> startSlots,
@@ -283,6 +375,9 @@ namespace ZenMatch.UI
             if (visuals.Count == 0)
             {
                 RebuildTileVisualsFromSnapshot(targetSlots);
+
+                SyncLockedSlotsFromCurrentState();
+
                 _activeAnimation = null;
                 yield break;
             }
@@ -337,6 +432,8 @@ namespace ZenMatch.UI
             ClearTempVisuals(visuals);
             RebuildTileVisualsFromSnapshot(targetSlots);
 
+            SyncLockedSlotsFromCurrentState();
+
             _activeAnimation = null;
         }
 
@@ -362,7 +459,7 @@ namespace ZenMatch.UI
             return result;
         }
 
-        
+
 
         private IEnumerator PlayMatchResolveSequenceRoutine(
             List<TileTypeSO> beforeSlots,
@@ -392,6 +489,8 @@ namespace ZenMatch.UI
 
             ClearTempVisuals(visuals);
             RebuildTileVisualsFromSnapshot(afterSlots);
+
+            SyncLockedSlotsFromCurrentState();
 
             _activeAnimation = null;
         }
@@ -538,6 +637,7 @@ namespace ZenMatch.UI
 
         public void ClearAllVisuals()
         {
+            StopActiveAnimation();
             ClearBaseSlots();
             ClearLockIcons();
             ClearTileVisuals();
@@ -569,8 +669,13 @@ namespace ZenMatch.UI
         {
             for (int i = _tileVisuals.Count - 1; i >= 0; i--)
             {
-                if (_tileVisuals[i] != null)
-                    DestroySafe(_tileVisuals[i]);
+                GameObject go = _tileVisuals[i];
+
+                if (go == null)
+                    continue;
+
+                go.SetActive(false);
+                DestroySafe(go);
             }
 
             _tileVisuals.Clear();

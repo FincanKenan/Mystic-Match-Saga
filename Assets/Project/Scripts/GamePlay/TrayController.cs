@@ -275,7 +275,7 @@ namespace ZenMatch.Gameplay
             {
                 clearedAny = true;
 
-                
+
 
                 List<TileTypeSO> beforeSlots =
                     new List<TileTypeSO>(

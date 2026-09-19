@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layoutId: Level_11
   category: 0
+  useSpecialTraySettings: 0
+  startingActiveTrayCapacity: 7
   groups:
   - groupId: Group_01
     role: 0
@@ -26,22 +28,36 @@ MonoBehaviour:
       stackOpenDirection: 1
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 12
       maxStackHeight: 12
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: T11-N1-Point_2
       stackDirection: 2
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 2
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - T11-N1-Point_1
-      - T11-N1-Point_5
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
+      requiredCompletedPointIds: []
       minStackHeight: 12
       maxStackHeight: 12
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: T11-N1-Point_3
       stackDirection: 3
@@ -50,22 +66,36 @@ MonoBehaviour:
       stackOpenDirection: 4
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 12
       maxStackHeight: 12
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: T11-N1-Point_4
       stackDirection: 2
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 4
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - T11-N1-Point_3
-      - T11-N1-Point_6
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
+      requiredCompletedPointIds: []
       minStackHeight: 12
       maxStackHeight: 12
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: T11-N1-Point_5
       stackDirection: 3
@@ -74,9 +104,17 @@ MonoBehaviour:
       stackOpenDirection: 3
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 12
       maxStackHeight: 12
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: T11-N1-Point_6
       stackDirection: 3
@@ -85,7 +123,17 @@ MonoBehaviour:
       stackOpenDirection: 2
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds: []
       minStackHeight: 12
       maxStackHeight: 12
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
+  rewardGifts: []
+  specialStoneRewards: []

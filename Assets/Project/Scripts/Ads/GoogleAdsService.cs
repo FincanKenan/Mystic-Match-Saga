@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using GoogleMobileAds.Api;
 using GoogleMobileAds.Common;
 using UnityEngine;
@@ -9,8 +10,8 @@ namespace ZenMatch.Runtime.Ads
     [RequireComponent(typeof(GoogleAdsConsentService))]
     public sealed class GoogleAdsService : MonoBehaviour
     {
-        private const string LastFullScreenAdTimeKey =
-            "MysticMatch_Ads_LastFullScreenUnix";
+        private const string LastInterstitialAdTimeKey =
+            "MysticMatch_Ads_LastInterstitialUnix";
 
         private const string LastInterstitialLevelKey =
             "MysticMatch_Ads_LastInterstitialLevel";
@@ -22,6 +23,19 @@ namespace ZenMatch.Runtime.Ads
         [Header("Config")]
         [SerializeField]
         private AdMobConfigSO config;
+
+        [Header("Retry")]
+        [Min(1f)]
+        [SerializeField]
+        private float rewardedRetrySeconds = 5f;
+
+        [Min(1f)]
+        [SerializeField]
+        private float interstitialRetrySeconds = 5f;
+
+        [Min(0.5f)]
+        [SerializeField]
+        private float interstitialWaitTimeout = 3f;
 
 
         public event Action<bool> RewardedLifeAvailabilityChanged;
@@ -40,6 +54,7 @@ namespace ZenMatch.Runtime.Ads
 
         private Action _pendingInterstitialFinished;
         private int _pendingInterstitialLevel;
+        private Coroutine _pendingInterstitialWaitRoutine;
 
 
         public bool IsRewardedLifeReady =>
@@ -118,26 +133,33 @@ namespace ZenMatch.Runtime.Ads
                 request,
                 (RewardedAd ad, LoadAdError error) =>
                 {
-                    _rewardedLoading = false;
-
-                    if (error != null || ad == null)
+                    ExecuteOnMainThread(() =>
                     {
-                        Debug.LogWarning(
-                            "[Ads] Ödüllü reklam yüklenemedi: " +
-                            error?.GetMessage());
+                        _rewardedLoading = false;
 
-                        SetRewardedAvailability(false);
-                        return;
-                    }
+                        if (error != null || ad == null)
+                        {
+                            Debug.LogWarning(
+                                "[Ads] Ödüllü reklam yüklenemedi: " +
+                                error?.GetMessage());
 
-                    _rewardedLifeAd = ad;
+                            SetRewardedAvailability(false);
+                            ScheduleRewardedRetry();
+                            return;
+                        }
 
-                    RegisterRewardedEvents(ad);
+                        CancelInvoke(
+                            nameof(LoadRewardedLifeAd));
 
-                    Debug.Log(
-                        "[Ads] Ödüllü can reklamý hazýr.");
+                        _rewardedLifeAd = ad;
 
-                    SetRewardedAvailability(true);
+                        RegisterRewardedEvents(ad);
+
+                        Debug.Log(
+                            "[Ads] Ödüllü can reklamý hazýr.");
+
+                        SetRewardedAvailability(true);
+                    });
                 });
         }
 
@@ -189,8 +211,6 @@ namespace ZenMatch.Runtime.Ads
             {
                 ExecuteOnMainThread(() =>
                 {
-                    MarkFullScreenAdShown();
-
                     FullScreenAdOpened?.Invoke();
                 });
             };
@@ -234,6 +254,17 @@ namespace ZenMatch.Runtime.Ads
                     LoadRewardedLifeAd();
                 });
             };
+        }
+
+
+        private void ScheduleRewardedRetry()
+        {
+            CancelInvoke(
+                nameof(LoadRewardedLifeAd));
+
+            Invoke(
+                nameof(LoadRewardedLifeAd),
+                rewardedRetrySeconds);
         }
 
 
@@ -290,23 +321,30 @@ namespace ZenMatch.Runtime.Ads
                 request,
                 (InterstitialAd ad, LoadAdError error) =>
                 {
-                    _interstitialLoading = false;
-
-                    if (error != null || ad == null)
+                    ExecuteOnMainThread(() =>
                     {
-                        Debug.LogWarning(
-                            "[Ads] Geçiþ reklamý yüklenemedi: " +
-                            error?.GetMessage());
+                        _interstitialLoading = false;
 
-                        return;
-                    }
+                        if (error != null || ad == null)
+                        {
+                            Debug.LogWarning(
+                                "[Ads] Geçiþ reklamý yüklenemedi: " +
+                                error?.GetMessage());
 
-                    _interstitialAd = ad;
+                            ScheduleInterstitialRetry();
+                            return;
+                        }
 
-                    RegisterInterstitialEvents(ad);
+                        CancelInvoke(
+                            nameof(LoadInterstitialAd));
 
-                    Debug.Log(
-                        "[Ads] Bölüm sonu geçiþ reklamý hazýr.");
+                        _interstitialAd = ad;
+
+                        RegisterInterstitialEvents(ad);
+
+                        Debug.Log(
+                            "[Ads] Bölüm sonu geçiþ reklamý hazýr.");
+                    });
                 });
         }
 
@@ -315,38 +353,124 @@ namespace ZenMatch.Runtime.Ads
             int completedLevelNumber,
             Action onFinished)
         {
-            if (!ShouldShowInterstitial(completedLevelNumber))
+            if (!ShouldShowInterstitial(
+                    completedLevelNumber))
             {
                 onFinished?.Invoke();
                 return;
             }
 
+            if (_pendingInterstitialFinished != null)
+            {
+                Debug.LogWarning(
+                    "[Ads] Zaten bekleyen bir geçiþ reklamý akýþý var.");
+
+                onFinished?.Invoke();
+                return;
+            }
+
+            _pendingInterstitialFinished =
+                onFinished;
+
+            _pendingInterstitialLevel =
+                completedLevelNumber;
+
+            if (IsInterstitialReady)
+            {
+                ShowPendingInterstitial();
+                return;
+            }
+
+            Debug.Log(
+                "[Ads] Geçiþ reklamý sýrasý geldi. " +
+                "Reklam henüz hazýr deðil, kýsa süre beklenecek.");
+
+            LoadInterstitialAd();
+
+            if (_pendingInterstitialWaitRoutine != null)
+            {
+                StopCoroutine(
+                    _pendingInterstitialWaitRoutine);
+            }
+
+            _pendingInterstitialWaitRoutine =
+                StartCoroutine(
+                    WaitForPendingInterstitial());
+        }
+
+
+        private IEnumerator WaitForPendingInterstitial()
+        {
+            float elapsed = 0f;
+
+            while (elapsed <
+                   interstitialWaitTimeout)
+            {
+                if (IsInterstitialReady)
+                {
+                    _pendingInterstitialWaitRoutine =
+                        null;
+
+                    ShowPendingInterstitial();
+                    yield break;
+                }
+
+                elapsed +=
+                    Time.unscaledDeltaTime;
+
+                yield return null;
+            }
+
+            _pendingInterstitialWaitRoutine =
+                null;
+
+            Debug.LogWarning(
+                "[Ads] Geçiþ reklamý bekleme süresinde " +
+                "hazýr olmadý. Oyun akýþý devam edecek.");
+
+            Action callback =
+                _pendingInterstitialFinished;
+
+            _pendingInterstitialFinished = null;
+            _pendingInterstitialLevel = 0;
+
+            callback?.Invoke();
+
+            ScheduleInterstitialRetry();
+        }
+
+
+        private void ShowPendingInterstitial()
+        {
             if (!IsInterstitialReady)
-            {
-                Debug.Log(
-                    "[Ads] Geçiþ reklamý sýrasý geldi ancak reklam hazýr deðil.");
-
-                LoadInterstitialAd();
-
-                onFinished?.Invoke();
                 return;
-            }
 
-            _pendingInterstitialFinished = onFinished;
-            _pendingInterstitialLevel = completedLevelNumber;
+            Debug.Log(
+                $"[Ads] Geçiþ reklamý gösteriliyor. " +
+                $"Level: {_pendingInterstitialLevel}");
 
             _interstitialAd.Show();
         }
 
 
-        private bool ShouldShowInterstitial(int completedLevel)
+        private bool ShouldShowInterstitial(
+            int completedLevel)
         {
             if (config == null)
+            {
+                Debug.LogWarning(
+                    "[Ads] AdMobConfig atanmadý.");
+
                 return false;
+            }
 
             if (completedLevel <=
                 config.NoInterstitialThroughLevel)
             {
+                Debug.Log(
+                    $"[Ads] Geçiþ reklamý yok. " +
+                    $"Korunan level: {completedLevel}");
+
                 return false;
             }
 
@@ -357,6 +481,10 @@ namespace ZenMatch.Runtime.Ads
             if (levelsSinceProtectedPeriod %
                 config.InterstitialEveryLevels != 0)
             {
+                Debug.Log(
+                    $"[Ads] Geçiþ reklamý sýrasý deðil. " +
+                    $"Level: {completedLevel}");
+
                 return false;
             }
 
@@ -368,11 +496,25 @@ namespace ZenMatch.Runtime.Ads
             if (lastInterstitialLevel ==
                 completedLevel)
             {
+                Debug.Log(
+                    $"[Ads] Bu level için geçiþ reklamý " +
+                    $"zaten gösterildi: {completedLevel}");
+
                 return false;
             }
 
-            if (!HasFullScreenCooldownExpired())
+            if (!HasInterstitialCooldownExpired())
+            {
+                Debug.Log(
+                    "[Ads] Geçiþ reklamý cooldown süresi " +
+                    "henüz dolmadý.");
+
                 return false;
+            }
+
+            Debug.Log(
+                $"[Ads] Geçiþ reklamý koþullarý uygun. " +
+                $"Level: {completedLevel}");
 
             return true;
         }
@@ -385,7 +527,7 @@ namespace ZenMatch.Runtime.Ads
             {
                 ExecuteOnMainThread(() =>
                 {
-                    MarkFullScreenAdShown();
+                    MarkInterstitialShown();
 
                     PlayerPrefs.SetInt(
                         LastInterstitialLevelKey,
@@ -443,6 +585,17 @@ namespace ZenMatch.Runtime.Ads
         }
 
 
+        private void ScheduleInterstitialRetry()
+        {
+            CancelInvoke(
+                nameof(LoadInterstitialAd));
+
+            Invoke(
+                nameof(LoadInterstitialAd),
+                interstitialRetrySeconds);
+        }
+
+
         private void DestroyInterstitialAd()
         {
             if (_interstitialAd == null)
@@ -457,34 +610,42 @@ namespace ZenMatch.Runtime.Ads
         // FULL SCREEN COOLDOWN
         // =========================================================
 
-        private bool HasFullScreenCooldownExpired()
+        private bool HasInterstitialCooldownExpired()
         {
             string saved =
                 PlayerPrefs.GetString(
-                    LastFullScreenAdTimeKey,
+                    LastInterstitialAdTimeKey,
                     string.Empty);
 
-            if (!long.TryParse(saved, out long lastUnix))
+            if (!long.TryParse(
+                    saved,
+                    out long lastUnix))
+            {
                 return true;
+            }
 
             long nowUnix =
-                DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                DateTimeOffset.UtcNow
+                    .ToUnixTimeSeconds();
 
             long elapsed =
-                nowUnix - lastUnix;
+                nowUnix -
+                lastUnix;
 
             return elapsed >=
-                   config.MinimumSecondsBetweenFullScreenAds;
+                   config
+                       .MinimumSecondsBetweenFullScreenAds;
         }
 
 
-        private void MarkFullScreenAdShown()
+        private void MarkInterstitialShown()
         {
             long nowUnix =
-                DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                DateTimeOffset.UtcNow
+                    .ToUnixTimeSeconds();
 
             PlayerPrefs.SetString(
-                LastFullScreenAdTimeKey,
+                LastInterstitialAdTimeKey,
                 nowUnix.ToString());
 
             PlayerPrefs.Save();
@@ -504,6 +665,16 @@ namespace ZenMatch.Runtime.Ads
 
         private void OnDestroy()
         {
+            CancelInvoke();
+
+            if (_pendingInterstitialWaitRoutine != null)
+            {
+                StopCoroutine(
+                    _pendingInterstitialWaitRoutine);
+
+                _pendingInterstitialWaitRoutine = null;
+            }
+
             if (_consentService != null)
             {
                 _consentService.AdsInitialized -=

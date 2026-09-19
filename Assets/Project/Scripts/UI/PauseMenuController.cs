@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using ZenMatch.UI;
 using ZenMatch.Runtime.PlayerProgress;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace ZenMatch.Runtime.UI
 {
@@ -12,6 +14,7 @@ namespace ZenMatch.Runtime.UI
         [SerializeField] private GameObject pausePanel;
         [SerializeField] private GameObject pauseButton;
         [SerializeField] private GameObject leaveConfirmPanel;
+        [SerializeField] private Button leaveButton;
 
         [Header("Progress")]
         [SerializeField] private PlayerProgressService progressService;
@@ -103,6 +106,9 @@ namespace ZenMatch.Runtime.UI
             if (leaveConfirmPanel != null)
             {
                 leaveConfirmPanel.SetActive(true);
+
+                RefreshLeaveButton();
+
                 return;
             }
 
@@ -123,7 +129,7 @@ namespace ZenMatch.Runtime.UI
                 leaveConfirmPanel.SetActive(false);
         }
 
-        
+
 
         public void QuitGame()
         {
@@ -132,6 +138,9 @@ namespace ZenMatch.Runtime.UI
             if (leaveConfirmPanel != null)
             {
                 leaveConfirmPanel.SetActive(true);
+
+                RefreshLeaveButton();
+
                 return;
             }
 
@@ -199,6 +208,15 @@ namespace ZenMatch.Runtime.UI
         private void OnDestroy()
         {
             Time.timeScale = 1f;
+        }
+
+        private void RefreshLeaveButton()
+        {
+            if (leaveButton != null)
+                leaveButton.interactable = true;
+
+            if (EventSystem.current != null)
+                EventSystem.current.SetSelectedGameObject(null);
         }
     }
 }

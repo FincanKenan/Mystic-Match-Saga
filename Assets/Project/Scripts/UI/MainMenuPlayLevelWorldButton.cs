@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using ZenMatch.Runtime.PlayerProgress;
+using UnityEngine.UI;
 
 namespace ZenMatch.UI
 {
@@ -62,9 +63,17 @@ namespace ZenMatch.UI
         [SerializeField]
         private bool requireLifeToPlay = true;
 
+
         [Tooltip("Can yoksa açýlacak panel.")]
         [SerializeField]
         private GameObject noLivesPanel;
+
+        [Header("No Life Shop Redirect")]
+        [SerializeField]
+        private Button shopButton;
+
+        [SerializeField]
+        private ShopEntryMessageController shopEntryMessageController;
 
         // =========================================================
         // CLICK BLOCKING
@@ -611,21 +620,33 @@ namespace ZenMatch.UI
             }
 
             if (requireLifeToPlay &&
-                walletService != null &&
-                walletService.Lives <= 0)
+    walletService != null &&
+    walletService.Lives <= 0)
             {
                 if (logDebug)
                 {
                     Debug.Log(
                         "[MainMenuPlayLevelWorldButton] " +
-                        "Can yok. Bölüme geçiþ engellendi.",
+                        "Can yok. Oyuncu maðazaya yönlendiriliyor.",
                         this);
                 }
 
-                if (noLivesPanel != null)
+                if (shopButton != null)
                 {
-                    noLivesPanel.SetActive(
-                        true);
+                    shopButton.onClick.Invoke();
+                }
+                else
+                {
+                    Debug.LogWarning(
+                        "[MainMenuPlayLevelWorldButton] " +
+                        "Shop Button atanmadý.",
+                        this);
+                }
+
+                if (shopEntryMessageController != null)
+                {
+                    shopEntryMessageController
+                        .ShowNoLifeMessage();
                 }
 
                 return;

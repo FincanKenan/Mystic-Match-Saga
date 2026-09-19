@@ -647,10 +647,13 @@ namespace ZenMatch.UI
                 return;
             }
 
-            int nextLevel =
+            int completedLevel =
                 Mathf.Max(
                     1,
-                    levelController.CurrentLevel + 1);
+                    levelController.CurrentLevel);
+
+            int nextLevel =
+                completedLevel + 1;
 
             if (progressService != null &&
                 progressService.Data != null)
@@ -658,35 +661,52 @@ namespace ZenMatch.UI
                 progressService.Data.lastPlayedLevel =
                     nextLevel;
 
-                // =====================================================
-                // WIN → NEXT LEVEL = FREE ENTRY
-                // =====================================================
-                //
-                // Oyuncu bölümü kazandığı için sonraki bölüme
-                // geçerken yeni bir can harcanmayacak.
-                //
-                // Bu hak yalnızca bu oyun oturumunda ve
-                // yalnızca belirtilen level için geçerlidir.
-                // =====================================================
-
                 progressService.AllowFreeEntryForLevel(
                     nextLevel);
 
                 progressService.NotifyChanged();
             }
 
-            Time.timeScale = 1f;
+            void ContinueToNextLevel()
+            {
+                Time.timeScale = 1f;
+
+                Debug.Log(
+                    $"[LevelEndUIController] " +
+                    $"Sonraki bölüm yükleniyor: " +
+                    $"{nextLevel}",
+                    this);
+
+                SceneManager.LoadScene(
+                    gameSceneName);
+            }
+
+            TryBindAdsService();
+
+            if (_adsService == null)
+            {
+                Debug.LogWarning(
+                    "[LevelEndUIController] " +
+                    "GoogleAdsService bulunamadı. " +
+                    "Reklamsız devam ediliyor.",
+                    this);
+
+                ContinueToNextLevel();
+                return;
+            }
 
             Debug.Log(
                 $"[LevelEndUIController] " +
-                $"Sonraki bölüm yükleniyor: " +
-                $"{nextLevel} | " +
-                $"Win sonrası giriş ücretsiz.",
+                $"Level {completedLevel} için " +
+                $"geçiş reklamı kontrol ediliyor.",
                 this);
 
-            SceneManager.LoadScene(
-                gameSceneName);
+            _adsService
+                .TryShowLevelCompleteInterstitial(
+                    completedLevel,
+                    ContinueToNextLevel);
         }
+
 
         // =========================================================
         // RETRY

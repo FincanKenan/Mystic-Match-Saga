@@ -443,11 +443,38 @@ namespace ZenMatch.Runtime
         {
             for (int i = _spawnedVisuals.Count - 1; i >= 0; i--)
             {
-                if (_spawnedVisuals[i] != null)
-                    DestroySafe(_spawnedVisuals[i]);
+                GameObject visual = _spawnedVisuals[i];
+
+                if (visual == null)
+                    continue;
+
+                visual.SetActive(false);
+                DestroySafe(visual);
             }
 
             _spawnedVisuals.Clear();
+
+            if (visualsRoot == null)
+                return;
+
+            for (int i = visualsRoot.childCount - 1; i >= 0; i--)
+            {
+                Transform child = visualsRoot.GetChild(i);
+
+                if (child == null)
+                    continue;
+
+                GameObject go = child.gameObject;
+
+                if (!go.activeSelf)
+                    continue;
+
+                if (!go.name.StartsWith("Tile_"))
+                    continue;
+
+                go.SetActive(false);
+                DestroySafe(go);
+            }
         }
 
         public void CollectActiveTileTransforms(List<Transform> results)

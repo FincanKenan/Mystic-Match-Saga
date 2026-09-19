@@ -491,7 +491,7 @@ namespace ZenMatch.Runtime.PlayerProgress
         // =========================================================
 
         public bool TryBeginLevelAttempt(
-            int levelNumber)
+    int levelNumber)
         {
             if (Data == null)
                 return false;
@@ -515,14 +515,11 @@ namespace ZenMatch.Runtime.PlayerProgress
                 _freeEntryLevelNumber ==
                 levelNumber;
 
-            if (useFreeEntry)
-            {
-                _freeEntryLevelNumber = -1;
-            }
-
-            // Bölüme giriş can harcamaz.
-            // Ancak oyuncunun en az 1 canı olmalı.
-            if (Data.lives <= 0)
+            // Normal girişte en az 1 can gerekir.
+            // Win sonrası ücretsiz girişte 0 canla da
+            // sonraki bölüm başlatılabilir.
+            if (!useFreeEntry &&
+                Data.lives <= 0)
             {
                 NotifyChanged(true);
 
@@ -535,6 +532,11 @@ namespace ZenMatch.Runtime.PlayerProgress
                 }
 
                 return false;
+            }
+
+            if (useFreeEntry)
+            {
+                _freeEntryLevelNumber = -1;
             }
 
             Data.activeLevelAttempt.Begin(
@@ -551,7 +553,8 @@ namespace ZenMatch.Runtime.PlayerProgress
                     $"[PlayerProgressService] " +
                     $"Level attempt başladı. " +
                     $"Level: {levelNumber} | " +
-                    $"Lives: {Data.lives}",
+                    $"Lives: {Data.lives} | " +
+                    $"FreeEntry: {useFreeEntry}",
                     this);
             }
 

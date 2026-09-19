@@ -292,7 +292,9 @@ namespace ZenMatch.Runtime.RewardMissions
                 Debug.Log($"[RewardGiftController] RewardGiftAnchor map oluþturuldu. Count: {_anchorById.Count}", this);
         }
 
-        public void NotifySuccessfulTileSelection(string sourcePointId, BoardTileInstance removedTile)
+        public void NotifySuccessfulTileSelection(
+     string sourcePointId,
+     BoardTileInstance removedTile)
         {
             if (!_initialized)
                 return;
@@ -300,15 +302,25 @@ namespace ZenMatch.Runtime.RewardMissions
             if (_runtimeGifts.Count == 0)
                 return;
 
+            // Board taþý bu noktaya gelmeden önce zaten alýnmýþ durumda.
+            // Önce bu seçim hediyeyi tamamladý mý kontrol et.
+            // Böylece son 1 hakla hedefi tamamlayan oyuncu
+            // hediyeyi kaybetmez.
+            TryCollectEligibleGifts();
+
             _successfulTileSelections++;
 
             for (int i = 0; i < _runtimeGifts.Count; i++)
             {
-                RewardGiftRuntime gift = _runtimeGifts[i];
-                gift?.ApplySelectionCount(_successfulTileSelections);
-            }
+                RewardGiftRuntime gift =
+                    _runtimeGifts[i];
 
-            TryCollectEligibleGifts();
+                if (gift == null)
+                    continue;
+
+                gift.ApplySelectionCount(
+                    _successfulTileSelections);
+            }
         }
 
         public void TryCollectEligibleGifts()

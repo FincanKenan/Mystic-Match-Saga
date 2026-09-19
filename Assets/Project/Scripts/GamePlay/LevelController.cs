@@ -460,7 +460,7 @@ namespace ZenMatch.Gameplay
         // =========================================================
 
         private void HandleTraySlotUnlockPointCompleted(
-            string pointId)
+    string pointId)
         {
             if (trayController == null)
                 return;
@@ -471,6 +471,15 @@ namespace ZenMatch.Gameplay
 
             if (unlocked)
             {
+                // Slot durumu değiştiği anda görseli yenile.
+                if (trayController.View != null &&
+                    trayController.State != null)
+                {
+                    trayController.View
+                        .RefreshLockedSlots(
+                            trayController.State);
+                }
+
                 if (trayController.View != null &&
                     unlockedSlotIndex >= 0)
                 {
@@ -506,7 +515,7 @@ namespace ZenMatch.Gameplay
         // =========================================================
 
         private void HandleTraySlotProtectionExpired(
-            string pointId)
+    string pointId)
         {
             if (trayController == null)
                 return;
@@ -517,6 +526,14 @@ namespace ZenMatch.Gameplay
 
             if (locked)
             {
+                if (trayController.View != null &&
+                    trayController.State != null)
+                {
+                    trayController.View
+                        .RefreshLockedSlots(
+                            trayController.State);
+                }
+
                 GameAudioService.Instance?.PlaySfx(
                     GameSoundEvent.TraySlotRiskLock);
 

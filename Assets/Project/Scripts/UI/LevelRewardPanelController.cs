@@ -341,22 +341,14 @@ namespace ZenMatch.UI
                 coinRewardRow.SetActive(true);
             }
 
-            // =====================================================
-            // 1. BÖLÜM İÇİNDE KAZANILAN GOLD
-            // =====================================================
-
-            int extraCoins =
+            int currentInLevelGold =
                 sessionTracker != null
                     ? Mathf.Max(
                         0,
                         sessionTracker.Coins)
                     : 0;
 
-            // =====================================================
-            // 2. BÖLÜM TAMAMLAMA GOLD
-            // =====================================================
-
-            int levelCompleteGold = 0;
+            int currentLevelCompleteGold = 0;
 
             if (boardSpawner != null)
             {
@@ -366,11 +358,11 @@ namespace ZenMatch.UI
                 bool found =
                     boardSpawner.TryGetLevelCompleteGold(
                         levelNumber,
-                        out levelCompleteGold);
+                        out currentLevelCompleteGold);
 
                 if (!found)
                 {
-                    levelCompleteGold = 0;
+                    currentLevelCompleteGold = 0;
 
                     if (logDebug)
                     {
@@ -382,37 +374,39 @@ namespace ZenMatch.UI
                     }
                 }
             }
-            else
+            else if (logDebug)
             {
-                if (logDebug)
-                {
-                    Debug.LogWarning(
-                        "[LevelRewardPanelController] " +
-                        "BoardSpawner bulunamadı. " +
-                        "Base Level Gold okunamadı.",
-                        this);
-                }
+                Debug.LogWarning(
+                    "[LevelRewardPanelController] " +
+                    "BoardSpawner bulunamadı. " +
+                    "Base Level Gold okunamadı.",
+                    this);
             }
 
-            levelCompleteGold =
+            currentLevelCompleteGold =
                 Mathf.Max(
                     0,
-                    levelCompleteGold);
+                    currentLevelCompleteGold);
 
-            _baseLevelCompleteGold =
-                levelCompleteGold;
+            // 2X uygulanmadan önce bölümün gerçek ödülünü sakla.
+            // Reklam bonusu RewardGrantService üzerinden verildiğinde
+            // sessionTracker.Coins artabileceği için bundan sonra
+            // toplamı tekrar tracker üzerinden hesaplamıyoruz.
+            if (!_doubleRewardApplied)
+            {
+                _baseLevelCompleteGold =
+                    currentLevelCompleteGold;
 
-            // =====================================================
-            // 3. NORMAL TOPLAM
-            // =====================================================
+                _originalCoinRewardTotal =
+                    currentInLevelGold +
+                    _baseLevelCompleteGold;
+            }
 
-            _originalCoinRewardTotal =
-                extraCoins +
-                levelCompleteGold;
-
-            // =====================================================
-            // 4. 2X BONUS
-            // =====================================================
+            int inLevelGoldForDisplay =
+                Mathf.Max(
+                    0,
+                    _originalCoinRewardTotal -
+                    _baseLevelCompleteGold);
 
             int doubleBonus =
                 _doubleRewardApplied
@@ -423,16 +417,12 @@ namespace ZenMatch.UI
                 _originalCoinRewardTotal +
                 doubleBonus;
 
-            // =====================================================
-            // UI
-            // =====================================================
-
             if (inLevelGoldAmountText != null)
             {
                 inLevelGoldAmountText.text =
                     string.Format(
                         coinFormat,
-                        extraCoins);
+                        inLevelGoldForDisplay);
             }
 
             if (levelCompleteGoldAmountText != null)
@@ -440,11 +430,11 @@ namespace ZenMatch.UI
                 levelCompleteGoldAmountText.text =
                     string.Format(
                         coinFormat,
-                        levelCompleteGold);
+                        _baseLevelCompleteGold);
             }
 
             bool showDoubleBonus =
-     _doubleRewardApplied;
+                _doubleRewardApplied;
 
             if (doubleBonusRow != null)
             {
@@ -473,8 +463,8 @@ namespace ZenMatch.UI
             {
                 Debug.Log(
                     $"[LevelRewardPanelController] Coin Summary | " +
-                    $"InLevel: {extraCoins} | " +
-                    $"LevelComplete: {levelCompleteGold} | " +
+                    $"InLevel: {inLevelGoldForDisplay} | " +
+                    $"LevelComplete: {_baseLevelCompleteGold} | " +
                     $"DoubleBonus: {doubleBonus} | " +
                     $"Total: {displayedTotal}",
                     this);

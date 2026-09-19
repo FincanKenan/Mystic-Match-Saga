@@ -358,9 +358,11 @@ namespace ZenMatch.Runtime
 
             if (useProgressionDatabase && progressionDatabase != null)
             {
-                if (progressionDatabase.TryResolveLevel(currentLevel, out LevelProgressionResolvedLevel resolved) &&
-                    resolved != null &&
-                    resolved.IsValid)
+                if (progressionDatabase.TryResolveLevel(
+        currentLevel,
+        out LevelProgressionResolvedLevel resolved) &&
+    resolved != null &&
+    resolved.IsValid)
                 {
                     SpawnResolvedProgressionLevel(resolved, rng);
                     return;
