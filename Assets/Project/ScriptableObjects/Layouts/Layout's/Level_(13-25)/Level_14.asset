@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layoutId: 'Level_14 '
   category: 0
+  useSpecialTraySettings: 0
+  startingActiveTrayCapacity: 7
   groups:
   - groupId: Group_01
     role: 0
@@ -26,10 +28,13 @@ MonoBehaviour:
       stackOpenDirection: 3
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - L14-N1-Point_6
-      minStackHeight: 6
-      maxStackHeight: 8
+      minStackHeight: 4
+      maxStackHeight: 6
       isSpecialTile: 0
       specialTile: {fileID: 0}
       specialBehaviorType: 0
@@ -43,10 +48,13 @@ MonoBehaviour:
       stackOpenDirection: 4
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - L14-N1-Point_6
-      minStackHeight: 6
-      maxStackHeight: 8
+      minStackHeight: 4
+      maxStackHeight: 6
       isSpecialTile: 0
       specialTile: {fileID: 0}
       specialBehaviorType: 0
@@ -60,10 +68,13 @@ MonoBehaviour:
       stackOpenDirection: 2
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - 
-      minStackHeight: 6
-      maxStackHeight: 8
+      minStackHeight: 3
+      maxStackHeight: 3
       isSpecialTile: 0
       specialTile: {fileID: 0}
       specialBehaviorType: 0
@@ -77,10 +88,12 @@ MonoBehaviour:
       stackOpenDirection: 1
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - 
-      minStackHeight: 6
-      maxStackHeight: 8
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 3
+      trayProtectionFadeSelectionCount: 3
+      requiredCompletedPointIds: []
+      minStackHeight: 3
+      maxStackHeight: 3
       isSpecialTile: 0
       specialTile: {fileID: 0}
       specialBehaviorType: 0
@@ -94,11 +107,13 @@ MonoBehaviour:
       stackOpenDirection: 2
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 5
+      trayProtectionFadeSelectionCount: 3
       requiredCompletedPointIds:
       - L14-N1-Point_5
-      - L14-N1-Point_4
-      minStackHeight: 6
-      maxStackHeight: 8
+      minStackHeight: 4
+      maxStackHeight: 6
       isSpecialTile: 0
       specialTile: {fileID: 0}
       specialBehaviorType: 0
@@ -106,3 +121,4 @@ MonoBehaviour:
       specialRewardTurnLimit: 0
       note: 
   rewardGifts: []
+  specialStoneRewards: []

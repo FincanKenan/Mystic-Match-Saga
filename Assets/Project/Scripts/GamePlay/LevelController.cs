@@ -179,6 +179,7 @@ namespace ZenMatch.Gameplay
             if (!TryBeginLevelAttempt())
             {
                 _inputEnabled = false;
+                StopGameplayMusic();
 
                 Debug.LogWarning(
                     "[LevelController] " +
@@ -256,10 +257,16 @@ namespace ZenMatch.Gameplay
             }
 
             InitializeRewardGiftsForCurrentLayout();
+
+            StartGameplayMusic();
         }
 
         private void OnDestroy()
         {
+            // GameAudioService sahneler arasında kalıcı olduğu için
+            // GameScene'den herhangi bir şekilde çıkılırsa gameplay müziğini kapat.
+            StopGameplayMusic();
+
             if (boardSpawner != null)
             {
                 boardSpawner
@@ -355,6 +362,21 @@ namespace ZenMatch.Gameplay
                     FindFirstObjectByType<
                         MissionProgressService>();
             }
+        }
+
+        // =========================================================
+        // GAMEPLAY MUSIC
+        // =========================================================
+
+        private void StartGameplayMusic()
+        {
+            GameAudioService.Instance?.PlayMusic(
+                GameSoundEvent.GameMusic);
+        }
+
+        private void StopGameplayMusic()
+        {
+            GameAudioService.Instance?.StopMusic();
         }
 
         // =========================================================
@@ -1328,6 +1350,8 @@ namespace ZenMatch.Gameplay
             _inputEnabled = false;
             _lastMove = null;
 
+            StopGameplayMusic();
+
             int completedLevel =
                 CurrentLevel;
 
@@ -1470,6 +1494,8 @@ namespace ZenMatch.Gameplay
             _endStatePending = false;
             _lastMove = null;
 
+            StartGameplayMusic();
+
             Debug.Log(
                 $"[LevelController] " +
                 $"Rewarded Continue başarılı. " +
@@ -1494,6 +1520,8 @@ namespace ZenMatch.Gameplay
             _gameState = LevelGameState.Lose;
             _inputEnabled = false;
             _lastMove = null;
+
+            StopGameplayMusic();
 
             ResolveReferences();
 

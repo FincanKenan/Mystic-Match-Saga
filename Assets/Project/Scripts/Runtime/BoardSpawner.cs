@@ -1423,6 +1423,56 @@ namespace ZenMatch.Runtime
             return true;
         }
 
+        public bool TryGetRewardGiftPlacement(
+    string pointId,
+    out Transform parent,
+    out Vector3 worldPosition,
+    out string giftSortingLayerName,
+    out int giftSortingOrder)
+        {
+            parent = null;
+            worldPosition = Vector3.zero;
+            giftSortingLayerName = sortingLayerName;
+            giftSortingOrder = 0;
+
+            if (string.IsNullOrWhiteSpace(pointId))
+                return false;
+
+            if (!_stackByPointId.TryGetValue(
+                    pointId,
+                    out BoardStack stack) ||
+                stack == null)
+            {
+                return false;
+            }
+
+            if (!_viewByPointId.TryGetValue(
+                    pointId,
+                    out BoardStackView view) ||
+                view == null)
+            {
+                return false;
+            }
+
+            int renderPriority =
+                stack.Anchor != null
+                    ? stack.Anchor.RenderPriority
+                    : 0;
+
+            parent = view.transform;
+            worldPosition = stack.GetWorldBasePosition();
+
+            giftSortingLayerName = sortingLayerName;
+
+            giftSortingOrder =
+                baseSortingOrder +
+                (renderPriority *
+                 sortingOrderStepPerRenderPriority) -
+                1;
+
+            return true;
+        }
+
         public bool HasAnyRemainingTiles()
         {
             for (int i = 0; i < _runtimeStacks.Count; i++)

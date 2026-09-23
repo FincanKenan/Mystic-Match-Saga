@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -35,23 +36,58 @@ namespace ZenMatch.Runtime.Shop
         [Range(0.1f, 1f)]
         [SerializeField] private float unavailableAlpha = 0.45f;
 
+        [Header("UI Sync")]
+        [Min(0.05f)]
+        [SerializeField] private float safetyRefreshInterval = 0.25f;
+
         [Header("Debug")]
         [SerializeField] private bool logDebug = true;
+
+        private PlayerWalletService _subscribedWalletService;
+        private ShopPurchaseService _subscribedPurchaseService;
+
+        private float _nextSafetyRefreshTime;
 
         private void Awake()
         {
             ResolveReferences();
 
             if (purchaseButton != null)
-                purchaseButton.onClick.AddListener(HandleClicked);
+            {
+                purchaseButton.onClick.AddListener(
+                    HandleClicked);
+            }
 
             Refresh();
         }
 
         private void OnEnable()
         {
-            ResolveReferences();
-            Subscribe();
+            RebindServices();
+
+            Refresh();
+
+            StartCoroutine(
+                DelayedRefreshRoutine());
+
+            _nextSafetyRefreshTime =
+                Time.unscaledTime +
+                safetyRefreshInterval;
+        }
+
+        private void Update()
+        {
+            if (Time.unscaledTime <
+                _nextSafetyRefreshTime)
+            {
+                return;
+            }
+
+            _nextSafetyRefreshTime =
+                Time.unscaledTime +
+                safetyRefreshInterval;
+
+            RebindServices();
             Refresh();
         }
 
@@ -62,87 +98,208 @@ namespace ZenMatch.Runtime.Shop
 
         private void OnDestroy()
         {
+            Unsubscribe();
+
             if (purchaseButton != null)
-                purchaseButton.onClick.RemoveListener(HandleClicked);
+            {
+                purchaseButton.onClick.RemoveListener(
+                    HandleClicked);
+            }
+        }
+
+        private IEnumerator DelayedRefreshRoutine()
+        {
+            yield return null;
+
+            RebindServices();
+            Refresh();
+
+            yield return
+                new WaitForSecondsRealtime(0.1f);
+
+            RebindServices();
+            Refresh();
         }
 
         private void ResolveReferences()
         {
             if (purchaseButton == null)
-                purchaseButton = GetComponent<Button>();
-
-            if (purchaseService == null)
-                purchaseService =
-                    FindFirstObjectByType<ShopPurchaseService>();
-
-            if (walletService == null)
-                walletService = PlayerWalletService.Instance;
-
-            if (walletService == null)
-                walletService =
-                    FindFirstObjectByType<PlayerWalletService>();
-
-            if (feedbackUI == null)
-                feedbackUI =
-                    FindFirstObjectByType<ShopPurchaseFeedbackUI>();
-
-            if (canvasGroup == null)
-                canvasGroup = GetComponent<CanvasGroup>();
-
-            if (canvasGroup == null)
-                canvasGroup = gameObject.AddComponent<CanvasGroup>();
-        }
-
-        private void Subscribe()
-        {
-            if (purchaseService != null)
             {
-                purchaseService.OnPurchaseSucceeded +=
-                    HandlePurchaseSucceeded;
-
-                purchaseService.OnPurchaseFailed +=
-                    HandlePurchaseFailed;
+                purchaseButton =
+                    GetComponent<Button>();
             }
 
-            if (walletService != null)
+            if (purchaseService == null)
             {
-                walletService.OnCoinsChanged += HandleWalletChanged;
-                walletService.OnLivesChanged += HandleWalletChanged;
+                purchaseService =
+                    FindFirstObjectByType<
+                        ShopPurchaseService>();
+            }
+
+            if (walletService == null)
+            {
+                walletService =
+                    PlayerWalletService.Instance;
+            }
+
+            if (walletService == null)
+            {
+                walletService =
+                    FindFirstObjectByType<
+                        PlayerWalletService>();
+            }
+
+            if (feedbackUI == null)
+            {
+                feedbackUI =
+                    FindFirstObjectByType<
+                        ShopPurchaseFeedbackUI>();
+            }
+
+            if (canvasGroup == null)
+            {
+                canvasGroup =
+                    GetComponent<CanvasGroup>();
+            }
+
+            if (canvasGroup == null)
+            {
+                canvasGroup =
+                    gameObject.AddComponent<
+                        CanvasGroup>();
+            }
+        }
+
+        private void RebindServices()
+        {
+            PlayerWalletService newWallet =
+                PlayerWalletService.Instance;
+
+            if (newWallet == null)
+            {
+                newWallet =
+                    FindFirstObjectByType<
+                        PlayerWalletService>();
+            }
+
+            ShopPurchaseService newPurchaseService =
+                purchaseService;
+
+            if (newPurchaseService == null)
+            {
+                newPurchaseService =
+                    FindFirstObjectByType<
+                        ShopPurchaseService>();
+            }
+
+            if (_subscribedWalletService !=
+                newWallet)
+            {
+                if (_subscribedWalletService != null)
+                {
+                    _subscribedWalletService
+                        .OnCoinsChanged -=
+                        HandleWalletChanged;
+
+                    _subscribedWalletService
+                        .OnLivesChanged -=
+                        HandleWalletChanged;
+                }
+
+                _subscribedWalletService =
+                    newWallet;
+
+                walletService =
+                    newWallet;
+
+                if (_subscribedWalletService != null)
+                {
+                    _subscribedWalletService
+                        .OnCoinsChanged +=
+                        HandleWalletChanged;
+
+                    _subscribedWalletService
+                        .OnLivesChanged +=
+                        HandleWalletChanged;
+                }
+            }
+
+            if (_subscribedPurchaseService !=
+                newPurchaseService)
+            {
+                if (_subscribedPurchaseService != null)
+                {
+                    _subscribedPurchaseService
+                        .OnPurchaseSucceeded -=
+                        HandlePurchaseSucceeded;
+
+                    _subscribedPurchaseService
+                        .OnPurchaseFailed -=
+                        HandlePurchaseFailed;
+                }
+
+                _subscribedPurchaseService =
+                    newPurchaseService;
+
+                purchaseService =
+                    newPurchaseService;
+
+                if (_subscribedPurchaseService != null)
+                {
+                    _subscribedPurchaseService
+                        .OnPurchaseSucceeded +=
+                        HandlePurchaseSucceeded;
+
+                    _subscribedPurchaseService
+                        .OnPurchaseFailed +=
+                        HandlePurchaseFailed;
+                }
             }
         }
 
         private void Unsubscribe()
         {
-            if (purchaseService != null)
+            if (_subscribedPurchaseService != null)
             {
-                purchaseService.OnPurchaseSucceeded -=
+                _subscribedPurchaseService
+                    .OnPurchaseSucceeded -=
                     HandlePurchaseSucceeded;
 
-                purchaseService.OnPurchaseFailed -=
+                _subscribedPurchaseService
+                    .OnPurchaseFailed -=
                     HandlePurchaseFailed;
             }
 
-            if (walletService != null)
+            if (_subscribedWalletService != null)
             {
-                walletService.OnCoinsChanged -= HandleWalletChanged;
-                walletService.OnLivesChanged -= HandleWalletChanged;
+                _subscribedWalletService
+                    .OnCoinsChanged -=
+                    HandleWalletChanged;
+
+                _subscribedWalletService
+                    .OnLivesChanged -=
+                    HandleWalletChanged;
             }
+
+            _subscribedPurchaseService = null;
+            _subscribedWalletService = null;
         }
 
-        private void HandleWalletChanged(int value)
+        private void HandleWalletChanged(
+            int value)
         {
             Refresh();
         }
 
         private void HandleClicked()
         {
-            ResolveReferences();
+            RebindServices();
 
-            if (item == null)
+            if (item == null ||
+                purchaseService == null)
+            {
                 return;
-
-            if (purchaseService == null)
-                return;
+            }
 
             purchaseService.TryPurchase(item);
         }
@@ -150,15 +307,16 @@ namespace ZenMatch.Runtime.Shop
         private void HandlePurchaseSucceeded(
             ShopItemSO purchasedItem)
         {
+            Refresh();
+
             if (purchasedItem != item)
                 return;
-
-            Refresh();
 
             if (logDebug)
             {
                 Debug.Log(
-                    $"[ShopItemButtonUI] Satýn alma baþarýlý: " +
+                    $"[ShopItemButtonUI] " +
+                    $"Satýn alma baþarýlý: " +
                     $"{item.DisplayName}",
                     this);
             }
@@ -177,8 +335,10 @@ namespace ZenMatch.Runtime.Shop
             if (logDebug)
             {
                 Debug.Log(
-                    $"[ShopItemButtonUI] Satýn alma baþarýsýz: " +
-                    $"{item.DisplayName}, Sebep: {reason}",
+                    $"[ShopItemButtonUI] " +
+                    $"Satýn alma baþarýsýz: " +
+                    $"{item.DisplayName}, " +
+                    $"Sebep: {reason}",
                     this);
             }
         }
@@ -201,16 +361,19 @@ namespace ZenMatch.Runtime.Shop
                 case ShopPurchaseFailReason.LifeLimitReached:
 
                     if (item != null &&
-                        item.RewardType == ShopRewardType.Life &&
+                        item.RewardType ==
+                        ShopRewardType.Life &&
                         item.RewardAmount == 5)
                     {
                         feedbackUI.Show(
-                            "5 Can Paketi yalnýzca canýn 0 iken alýnabilir.");
+                            "5 Can Paketi yalnýzca " +
+                            "canýn 0 iken alýnabilir.");
                     }
                     else
                     {
                         feedbackUI.Show(
-                            "Maksimum can miktarý 5. Daha fazla can alamazsýn.");
+                            "Maksimum can miktarý 5. " +
+                            "Daha fazla can alamazsýn.");
                     }
 
                     break;
@@ -218,7 +381,8 @@ namespace ZenMatch.Runtime.Shop
                 default:
 
                     feedbackUI.Show(
-                        "Bu ürün þu anda satýn alýnamýyor.");
+                        "Bu ürün þu anda " +
+                        "satýn alýnamýyor.");
 
                     break;
             }
@@ -237,7 +401,8 @@ namespace ZenMatch.Runtime.Shop
             }
 
             string title =
-                string.IsNullOrWhiteSpace(item.DisplayName)
+                string.IsNullOrWhiteSpace(
+                    item.DisplayName)
                     ? item.name
                     : item.DisplayName;
 
@@ -255,7 +420,8 @@ namespace ZenMatch.Runtime.Shop
             SetAvailableVisual(available);
         }
 
-        private void SetAvailableVisual(bool available)
+        private void SetAvailableVisual(
+            bool available)
         {
             if (canvasGroup != null)
             {
@@ -264,12 +430,17 @@ namespace ZenMatch.Runtime.Shop
                         ? 1f
                         : unavailableAlpha;
 
+                // Týklama açýk kalýyor.
+                // Böylece kullanýcý neden alamadýðýný
+                // mesaj olarak görebilir.
                 canvasGroup.blocksRaycasts = true;
                 canvasGroup.interactable = true;
             }
 
             if (purchaseButton != null)
+            {
                 purchaseButton.interactable = true;
+            }
         }
 
         private void SetTexts(
@@ -278,22 +449,30 @@ namespace ZenMatch.Runtime.Shop
             int amount)
         {
             if (titleText != null)
-                titleText.text = title;
+            {
+                titleText.text =
+                    title;
+            }
 
             if (priceText != null)
+            {
                 priceText.text =
                     string.Format(
                         priceFormat,
                         price);
+            }
 
             if (amountText != null)
+            {
                 amountText.text =
                     string.Format(
                         amountFormat,
                         amount);
+            }
         }
 
-        private void SetIcon(Sprite icon)
+        private void SetIcon(
+            Sprite icon)
         {
             if (iconImage == null)
                 return;
@@ -301,7 +480,10 @@ namespace ZenMatch.Runtime.Shop
             if (icon == null)
             {
                 if (hideIconWhenEmpty)
-                    iconImage.gameObject.SetActive(false);
+                {
+                    iconImage.gameObject
+                        .SetActive(false);
+                }
 
                 return;
             }

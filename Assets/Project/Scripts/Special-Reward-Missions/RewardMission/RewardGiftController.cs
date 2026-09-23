@@ -100,35 +100,37 @@ namespace ZenMatch.Runtime.RewardMissions
                 // =========================================================
 
                 if (reference.HasTargetPoint() &&
-                    boardSpawner != null)
+    boardSpawner != null)
                 {
                     string targetPointId =
                         reference.GetTargetPointId();
 
-                    if (boardSpawner.TryGetPointWorldPosition(
+                    if (boardSpawner.TryGetRewardGiftPlacement(
                             targetPointId,
-                            out Vector3 pointWorldPosition))
+                            out Transform giftParent,
+                            out Vector3 pointWorldPosition,
+                            out string giftSortingLayer,
+                            out int giftSortingOrder))
                     {
                         view =
                             RewardGiftView.CreateWorldLocked(
                                 reference.giftId,
-                                giftsRoot,
+                                giftParent,
                                 reference.giftSprite,
                                 pointWorldPosition,
                                 reference.spriteOffset,
                                 reference.spriteScale,
-                                sortingLayerName,
-                                baseSortingOrder +
-                                (i * sortingOrderStep));
+                                giftSortingLayer,
+                                giftSortingOrder);
 
                         if (logDebug)
                         {
                             Debug.Log(
                                 $"[RewardGiftController] " +
-                                $"Gift Board Point'e yerleþtirildi. " +
+                                $"Gift stack'e baðlandý. " +
                                 $"Gift: {reference.giftId} | " +
                                 $"Point: {targetPointId} | " +
-                                $"WorldPos: {pointWorldPosition}",
+                                $"SortingOrder: {giftSortingOrder}",
                                 this);
                         }
                     }
@@ -136,7 +138,7 @@ namespace ZenMatch.Runtime.RewardMissions
                     {
                         Debug.LogWarning(
                             $"[RewardGiftController] " +
-                            $"Target Board Point bulunamadý. " +
+                            $"Gift için target stack bulunamadý. " +
                             $"Gift: {reference.giftId} | " +
                             $"Point: {targetPointId}",
                             this);

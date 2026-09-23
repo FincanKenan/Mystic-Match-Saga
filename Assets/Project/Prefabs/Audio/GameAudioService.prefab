@@ -51,6 +51,10 @@ MonoBehaviour:
   musicSource: {fileID: 3959296007425680146}
   sfxSource: {fileID: 7934459301251623270}
   dontDestroyOnLoad: 1
+  playBackgroundMusicOnStart: 1
+  backgroundMusicEvent: 0
+  musicBaseVolume: 0.05
+  logMissingSounds: 1
 --- !u!82 &3959296007425680146
 AudioSource:
   m_ObjectHideFlags: 0
@@ -257,6 +261,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d23f7d5a7ef781e478b01f2057772e8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonClickSoundId: button_click
   autoRegisterSceneButtons: 1
   logDebug: 0

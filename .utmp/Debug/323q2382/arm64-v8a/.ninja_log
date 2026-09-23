@@ -1,0 +1,23 @@
+# ninja log v5
+55	251	8118375173186936	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	6eaf844cf35a42ed
+18	1299	8118375183638557	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	1320a3d98e6c0253
+252	420	8118375174827849	C:/Work/Unity/AdvancedBlockGame_V2_CLEAN/AdvancedPuzzleGame/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/323q2382/obj/arm64-v8a/libswappywrapper.so	851a756ca01e31e1
+38	1176	8118375182383494	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	76d1d7a922fe8998
+11	1179	8118375182439279	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	784304d758702d89
+49	1346	8118375184108043	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	a2cd033ea1aa9857
+23	1178	8118375182408683	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	9d1deff8af873222
+33	1181	8118375182469422	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	d65817093b8d48e0
+28	1200	8118375182677156	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	84d291499adcad4e
+43	1271	8118375183364084	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	c4e25608d5257863
+1346	1445	8118375185104614	C:/Work/Unity/AdvancedBlockGame_V2_CLEAN/AdvancedPuzzleGame/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/323q2382/obj/arm64-v8a/libgame.so	9dead8255f7d5182
+52	178	8118397566222568	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	6eaf844cf35a42ed
+179	372	8118397567855888	C:/Work/Unity/AdvancedBlockGame_V2_CLEAN/AdvancedPuzzleGame/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/323q2382/obj/arm64-v8a/libswappywrapper.so	851a756ca01e31e1
+24	997	8118397574368694	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	9d1deff8af873222
+7	1000	8118397574358717	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	784304d758702d89
+34	1001	8118397574432395	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	76d1d7a922fe8998
+40	1004	8118397574454903	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	d65817093b8d48e0
+17	1047	8118397574871840	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	84d291499adcad4e
+45	1078	8118397575204103	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	a2cd033ea1aa9857
+29	1128	8118397575683908	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	c4e25608d5257863
+12	1162	8118397576003341	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	1320a3d98e6c0253
+1162	1246	8118397576881221	C:/Work/Unity/AdvancedBlockGame_V2_CLEAN/AdvancedPuzzleGame/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/323q2382/obj/arm64-v8a/libgame.so	9dead8255f7d5182

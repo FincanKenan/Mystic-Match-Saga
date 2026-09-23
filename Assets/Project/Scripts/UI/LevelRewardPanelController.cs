@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -47,6 +48,9 @@ namespace ZenMatch.UI
         [SerializeField] private TMP_Text doubleBonusAmountText;
 
         [SerializeField] private TMP_Text totalGoldAmountText;
+
+        [Header("Gold Collect Animation")]
+        [SerializeField] private GoldRewardCollectAnimator goldRewardCollectAnimator;
 
         // =========================================================
         // MISSION REWARD
@@ -152,6 +156,8 @@ namespace ZenMatch.UI
         private bool _doubleRewardEarned;
         private bool _doubleRewardApplied;
 
+        private bool _collectFlowActive;
+
         // =========================================================
         // UNITY
         // =========================================================
@@ -255,6 +261,14 @@ namespace ZenMatch.UI
                 _walletService =
                     FindFirstObjectByType<
                         PlayerWalletService>();
+            }
+
+            if (goldRewardCollectAnimator == null)
+            {
+                goldRewardCollectAnimator =
+                    FindFirstObjectByType<
+                        GoldRewardCollectAnimator>(
+                            FindObjectsInactive.Include);
             }
         }
 
@@ -1040,7 +1054,8 @@ namespace ZenMatch.UI
 
                     doubleRewardButton.interactable =
                         adReady &&
-                        !_doubleRewardFlowActive;
+                        !_doubleRewardFlowActive &&
+                        !_collectFlowActive;
                 }
             }
 
@@ -1049,7 +1064,8 @@ namespace ZenMatch.UI
             if (continueButton != null)
             {
                 continueButton.interactable =
-                    !_doubleRewardFlowActive;
+                    !_doubleRewardFlowActive &&
+                    !_collectFlowActive;
             }
 
             if (doubleRewardIconAnimator != null)
@@ -1059,7 +1075,8 @@ namespace ZenMatch.UI
                     _adsService != null &&
                     _adsService
                         .IsRewardedLifeReady &&
-                    !_doubleRewardFlowActive;
+                    !_doubleRewardFlowActive &&
+                    !_collectFlowActive;
 
                 doubleRewardIconAnimator.enabled =
                     animate;
@@ -1072,8 +1089,11 @@ namespace ZenMatch.UI
 
         private void HandleContinueClicked()
         {
-            if (_doubleRewardFlowActive)
+            if (_doubleRewardFlowActive ||
+                _collectFlowActive)
+            {
                 return;
+            }
 
             if (logDebug)
             {
@@ -1085,111 +1105,139 @@ namespace ZenMatch.UI
 
             ResolveReferences();
 
-            // =====================================================
-            // BASE LEVEL COMPLETE GOLD
-            // =====================================================
-
-            if (!_baseLevelCompleteGoldCollected &&
-                _baseLevelCompleteGold > 0)
+            // Toplanacak bekleyen bölüm Gold'u yoksa
+            // mevcut akışa doğrudan devam et.
+            if (_baseLevelCompleteGoldCollected ||
+                _baseLevelCompleteGold <= 0)
             {
-                if (rewardGrantService == null)
-                {
-                    Debug.LogError(
-                        "[LevelRewardPanelController] " +
-                        "RewardGrantService bulunamadı. " +
-                        "Bölüm Gold'u verilemedi.",
-                        this);
+                ContinueRequested?.Invoke();
+                return;
+            }
 
-                    // Ödül verilmeden ekrandan çıkma.
+            if (rewardGrantService == null)
+            {
+                Debug.LogError(
+                    "[LevelRewardPanelController] " +
+                    "RewardGrantService bulunamadı. " +
+                    "Bölüm Gold'u verilemedi.",
+                    this);
+
+                return;
+            }
+
+            StartCoroutine(
+                CollectGoldAndContinueRoutine());
+        }
+
+        private IEnumerator CollectGoldAndContinueRoutine()
+        {
+            _collectFlowActive = true;
+
+            RefreshDoubleRewardButton();
+
+            int rewardAmount =
+                Mathf.Max(
+                    0,
+                    _baseLevelCompleteGold);
+
+            int currentLevel =
+                boardSpawner != null
+                    ? boardSpawner.CurrentLevel
+                    : -1;
+
+            RewardContext context =
+                new RewardContext(
+                    sourceType:
+                        RewardSourceType.LevelComplete,
+
+                    levelNumber:
+                        currentLevel,
+
+                    sourceId:
+                        "level_complete_gold",
+
+                    sourceDisplayName:
+                        "Bölüm Tamamlama Altını",
+
+                    tags:
+                        new[]
+                        {
+                            "level_complete",
+                            "level_complete_gold"
+                        });
+
+            Sprite rewardIcon =
+                coinRewardIcon != null
+                    ? coinRewardIcon.sprite
+                    : null;
+
+            RewardEntry reward =
+                new RewardEntry(
+                    RewardType.Coins,
+                    rewardAmount,
+                    rewardId:
+                        "level_complete_gold",
+                    displayName:
+                        "Bölüm Altını",
+                    icon:
+                        rewardIcon);
+
+            // Çift tıklama / ikinci coroutine ihtimaline karşı
+            // ödülü daha animasyon başlamadan "toplanıyor" olarak kilitle.
+            _baseLevelCompleteGoldCollected =
+                true;
+
+            bool rewardGranted = false;
+
+            void GrantGoldAtHud()
+            {
+                if (rewardGranted)
                     return;
-                }
 
-                int currentLevel =
-                    boardSpawner != null
-                        ? boardSpawner.CurrentLevel
-                        : -1;
-
-                RewardContext context =
-                    new RewardContext(
-                        sourceType:
-                            RewardSourceType.LevelComplete,
-
-                        levelNumber:
-                            currentLevel,
-
-                        sourceId:
-                            "level_complete_gold",
-
-                        sourceDisplayName:
-                            "Bölüm Tamamlama Altını",
-
-                        tags:
-                            new[]
-                            {
-                                "level_complete",
-                                "level_complete_gold"
-                            });
-
-                Sprite rewardIcon =
-                    coinRewardIcon != null
-                        ? coinRewardIcon.sprite
-                        : null;
-
-                RewardEntry reward =
-                    new RewardEntry(
-                        RewardType.Coins,
-                        _baseLevelCompleteGold,
-                        rewardId:
-                            "level_complete_gold",
-                        displayName:
-                            "Bölüm Altını",
-                        icon:
-                            rewardIcon);
-
-                // Çift tıklamada ikinci kez
-                // Gold verilmesini engelle.
-                _baseLevelCompleteGoldCollected =
-                    true;
-
-                if (continueButton != null)
-                {
-                    continueButton.interactable =
-                        false;
-                }
-
-                // =================================================
-                // BURASI ARTIK TAM REWARD FEEDBACK ZİNCİRİ
-                //
-                // Wallet'a gerçek Gold ekler
-                // +
-                // RewardEvents
-                // +
-                // RewardPopup
-                // +
-                // CoinFlyFeedback
-                // +
-                // HUD count-up
-                // +
-                // HUD pulse
-                // =================================================
+                rewardGranted = true;
 
                 rewardGrantService.GrantReward(
                     reward,
                     context);
-
-                if (logDebug)
-                {
-                    Debug.Log(
-                        $"[LevelRewardPanelController] " +
-                        $"Base bölüm Gold'u toplandı: " +
-                        $"+{_baseLevelCompleteGold}",
-                        this);
-                }
             }
 
-            // Mevcut akış:
-            // RewardPanel kapanır
-            // WinPanel açılır.
+            // Büyük coin:
+            // merkezde belirir -> +Gold gösterir ->
+            // HUD coin ikonuna uçar.
+            //
+            // Gerçek wallet artışı TAM HUD'a ulaştığı anda yapılır.
+            if (goldRewardCollectAnimator != null)
+            {
+                yield return
+                    goldRewardCollectAnimator
+                        .Play(
+                            rewardAmount,
+                            rewardIcon,
+                            GrantGoldAtHud);
+            }
+            else
+            {
+                // Animator atanmadıysa ödül kaybolmasın.
+                GrantGoldAtHud();
+            }
+
+            if (!rewardGranted)
+            {
+                GrantGoldAtHud();
+            }
+
+            if (logDebug)
+            {
+                Debug.Log(
+                    $"[LevelRewardPanelController] " +
+                    $"Base bölüm Gold'u animasyonla toplandı: " +
+                    $"+{rewardAmount}",
+                    this);
+            }
+
+            _collectFlowActive = false;
+
+            // RewardPanel kapanır, WinPanel açılır.
             ContinueRequested?.Invoke();
         }
 

@@ -161,6 +161,9 @@ namespace ZenMatch.Runtime.PlayerProgress
         // Ýleride leaderboard / event / profil puaný.
         public int score;
 
+        // Oyuncunun tüm zamanlardaki en yüksek hýzlý eþleþme X rekoru.
+        public int bestFastMatchCombo;
+
         public int highestUnlockedLevel = 1;
         public int lastPlayedLevel = 1;
 
@@ -212,6 +215,7 @@ namespace ZenMatch.Runtime.PlayerProgress
                 lives = 5,
                 nextLifeRegenUtc = string.Empty,
                 score = 0,
+                bestFastMatchCombo = 0,
 
                 highestUnlockedLevel = 1,
                 lastPlayedLevel = 1,
@@ -555,6 +559,31 @@ namespace ZenMatch.Runtime.PlayerProgress
                 completedBoosterTutorialIds.Add(
                     tutorialId);
             }
+        }
+
+        // =========================================================
+        // FAST MATCH RECORD
+        // =========================================================
+
+        public bool TrySetBestFastMatchCombo(
+            int combo)
+        {
+            combo =
+                Math.Max(
+                    0,
+                    combo);
+
+            if (combo <= bestFastMatchCombo)
+            {
+                return false;
+            }
+
+            bestFastMatchCombo =
+                combo;
+
+            Touch();
+
+            return true;
         }
 
         // =========================================================

@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layoutId: Normal_1
   category: 0
+  useSpecialTraySettings: 0
+  startingActiveTrayCapacity: 7
   groups:
   - groupId: Group_01
     role: 0
@@ -26,10 +28,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - St_R-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Back_1-2.
       stackDirection: 0
@@ -38,10 +48,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: 2_St_Line_H-Back_1
       stackDirection: 0
@@ -50,10 +68,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - 2_St_Line_H-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Back_1-3.
       stackDirection: 0
@@ -62,10 +88,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-3.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: 2_St_Up-Back_1
       stackDirection: 0
@@ -74,12 +108,20 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - 2_St_Line_H-Back_1
       - 2_St_Line_H-Back_2
       - 2_St_Up-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: 2_St_D-Back_1
       stackDirection: 0
@@ -88,11 +130,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - 2_St_D-Front_1
       - 2_St_Line_H-Back_1-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Back_1-4.
       stackDirection: 0
@@ -101,11 +151,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-4.
       - 2_St_D-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: 2_St_L-Back_1
       stackDirection: 0
@@ -114,10 +172,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - 2_St_L-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: 2_St_R-Back_1
       stackDirection: 0
@@ -126,10 +192,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - 2_St_R-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: 2_St_Line_H-Back_1-2.
       stackDirection: 0
@@ -138,10 +212,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - 2_St_Line_H-Front_1-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_Line_H-Back_1-2.
       stackDirection: 0
@@ -150,10 +232,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - St_Line_H-Front_1-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_1
       stackDirection: 0
@@ -162,11 +252,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Up-Front_1
       - Triangle_Up-Back_3-4.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_Line_H-Back_1
       stackDirection: 0
@@ -175,10 +273,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - St_Line_H-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_1-3.
       stackDirection: 0
@@ -187,10 +293,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Up-Front_1-3.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_Up-Back_1
       stackDirection: 0
@@ -199,12 +313,20 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - St_Line_H-Back_1
       - St_Line_H-Back_2
       - St_Up-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_D-Back_1
       stackDirection: 0
@@ -213,12 +335,20 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - St_Line_H-Back_1-2.
       - St_Line_H-Back_2-2.
       - St_D-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_1-4.
       stackDirection: 0
@@ -227,10 +357,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Up-Front_1-4.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_L-Back_1
       stackDirection: 0
@@ -239,10 +377,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - St_L-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_1-2.
       stackDirection: 0
@@ -251,10 +397,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Up-Front_1-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Back_1
       stackDirection: 0
@@ -263,11 +417,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Down-Front_1
       - Triangle_Down-Back_3-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_2
       stackDirection: 0
@@ -276,11 +438,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Up-Front_1
       - Triangle_Up-Back_3-4.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_2-2.
       stackDirection: 0
@@ -289,11 +459,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Up-Front_1-2.
       - St_Up-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Back_2-4.
       stackDirection: 0
@@ -302,10 +480,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-4.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_2-3.
       stackDirection: 0
@@ -314,11 +500,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Up-Front_1-3.
-      - St_Up-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Back_2-3.
       stackDirection: 0
@@ -327,11 +520,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-3.
       - St_D-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Back_2-2.
       stackDirection: 0
@@ -340,10 +541,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_2-4.
       stackDirection: 0
@@ -352,10 +561,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Up-Front_1-4.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Back_2
       stackDirection: 0
@@ -364,11 +581,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Down-Front_1
       - Triangle_Down-Back_3-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: 2_St_Line_H-Back_2-2.
       stackDirection: 0
@@ -377,10 +602,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - 2_St_Line_H-Front_1-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_Line_H-Back_2
       stackDirection: 0
@@ -389,11 +622,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - St_Line_H-Front_1
       - Triangle_Down-Back_1-3.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_Line_H-Back_2-2.
       stackDirection: 0
@@ -402,10 +643,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - St_Line_H-Front_1-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: 2_St_R-Front_1
       stackDirection: 0
@@ -414,11 +663,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - 2_St_Line_H-Back_2
       - 2_St_Line_H-Back_2-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_D-Front_1
       stackDirection: 0
@@ -427,9 +684,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: 2_St_D-Front_1
       stackDirection: 0
@@ -438,9 +703,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: 2_St_Up-Front_1
       stackDirection: 0
@@ -449,9 +722,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: 2_St_L-Front_1
       stackDirection: 0
@@ -460,11 +741,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - 2_St_Line_H-Back_1-2.
       - 2_St_Line_H-Back_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_Up-Front_1
       stackDirection: 0
@@ -473,9 +762,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: 2_St_Line_H-Back_2
       stackDirection: 0
@@ -484,10 +781,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - 2_St_Line_H-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_R-Front_1
       stackDirection: 0
@@ -496,11 +801,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - St_Line_H-Back_2
       - St_Line_H-Back_2-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_L-Front_1
       stackDirection: 0
@@ -509,11 +822,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - St_Line_H-Back_1
       - St_Line_H-Back_1-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_3-2.
       stackDirection: 0
@@ -522,10 +843,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Up-Front_1-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_3-4.
       stackDirection: 0
@@ -534,10 +863,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Up-Front_1-4.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_Line_H-Front_1
       stackDirection: 0
@@ -546,9 +883,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_3-3.
       stackDirection: 0
@@ -557,10 +902,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Up-Front_1-3.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Back_3
       stackDirection: 0
@@ -569,11 +922,19 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Up-Front_1
       - Triangle_Down-Back_3-3.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: St_Line_H-Front_1-2.
       stackDirection: 0
@@ -582,9 +943,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: 2_St_Line_H-Front_1-2.
       stackDirection: 0
@@ -593,9 +962,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Back_3-4.
       stackDirection: 0
@@ -604,10 +981,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-4.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: 2_St_Line_H-Front_1
       stackDirection: 0
@@ -616,9 +1001,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Back_3-3.
       stackDirection: 0
@@ -627,10 +1020,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-3.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Back_3
       stackDirection: 0
@@ -639,10 +1040,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Down-Front_1
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Back_3-2.
       stackDirection: 0
@@ -651,10 +1060,18 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - Triangle_Down-Front_1-2.
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Front_1-3.
       stackDirection: 0
@@ -663,9 +1080,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Front_1-4.
       stackDirection: 0
@@ -674,9 +1099,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Front_1
       stackDirection: 0
@@ -685,9 +1118,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Front_1-3.
       stackDirection: 0
@@ -696,9 +1137,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Front_1-2.
       stackDirection: 0
@@ -707,9 +1156,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Down-Front_1
       stackDirection: 0
@@ -718,9 +1175,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Front_1-2.
       stackDirection: 0
@@ -729,9 +1194,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
     - pointId: Triangle_Up-Front_1-4.
       stackDirection: 0
@@ -740,7 +1213,17 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 1
       maxStackHeight: 1
+      isSpecialTile: 0
+      specialTile: {fileID: 0}
+      specialBehaviorType: 0
+      specialTileGroupId: 
+      specialRewardTurnLimit: 0
       note: 
+  rewardGifts: []
+  specialStoneRewards: []

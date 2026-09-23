@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3326437300314884490fcbc033477bee, type: 3}
+  m_Name: Mission_Daily_Complete_Level
+  m_EditorClassIdentifier: 
+  missionId: Mission_Daily_Complete_Level
+  displayName: "Bir B\xF6l\xFCm tamamla."
+  description: "Bir b\xF6l\xFCm\xFC ba\u015Far\u0131yla tamamla."
+  category: 10
+  repeatOnClaim: 1
+  requirements:
+  - requirementId: complete_any_level
+    sourceType: 200
+    requiredSourceId: 
+    requiredTag: 
+    requiredCount: 1
+    displayName: Hediye Kutusu
+  rewardOnClaim: {fileID: 11400000, guid: 8cbca57f605751647b05815557f8287a, type: 2}
+  icon: {fileID: -7758987736131382979, guid: 32c77536f63970645baf5577785f3554, type: 3}

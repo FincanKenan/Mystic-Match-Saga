@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
@@ -7,6 +8,7 @@ using UnityEngine.UI;
 using ZenMatch.Runtime.PlayerProgress;
 using ZenMatch.Runtime.Rewards;
 using ZenMatch.Runtime.Audio;
+using ZenMatch.UI;
 
 namespace ZenMatch.Runtime.Missions
 {
@@ -28,6 +30,10 @@ namespace ZenMatch.Runtime.Missions
         [Header("Collect")]
         [SerializeField] private Button collectButton;
         [SerializeField] private TMP_Text collectButtonText;
+
+        [Header("Collect Animation")]
+        [Tooltip("Boþ býrakýlabilir. Sahnedeki GoldRewardCollectAnimator otomatik bulunur.")]
+        [SerializeField] private GoldRewardCollectAnimator goldRewardCollectAnimator;
 
         [Header("State")]
         [SerializeField] private TMP_Text stateText;
@@ -51,10 +57,15 @@ namespace ZenMatch.Runtime.Missions
 
         private float _nextDailyTimerRefreshTime;
 
+        private Coroutine _collectRoutine;
+        private bool _collectInProgress;
+
         private void OnEnable()
         {
             if (collectButton != null)
                 collectButton.onClick.AddListener(HandleCollectClicked);
+
+            ResolveGoldRewardAnimator();
 
             _nextDailyTimerRefreshTime = 0f;
         }
@@ -63,6 +74,14 @@ namespace ZenMatch.Runtime.Missions
         {
             if (collectButton != null)
                 collectButton.onClick.RemoveListener(HandleCollectClicked);
+
+            if (_collectRoutine != null)
+            {
+                StopCoroutine(_collectRoutine);
+                _collectRoutine = null;
+            }
+
+            _collectInProgress = false;
         }
 
         private void Update()
@@ -142,6 +161,47 @@ namespace ZenMatch.Runtime.Missions
 
                 if (progressFillImage != null)
                     progressFillImage.fillAmount = 0f;
+
+                return;
+            }
+            bool isDailyLocked =
+    _mission.Category == MissionCategory.Daily &&
+    progress.isRewardClaimed;
+
+            if (isDailyLocked)
+            {
+                int lockedTotalRequired = 0;
+
+                IReadOnlyList<MissionRequirement> lockedRequirements =
+                    _mission.Requirements;
+
+                if (lockedRequirements != null)
+                {
+                    for (int i = 0;
+                         i < lockedRequirements.Count;
+                         i++)
+                    {
+                        MissionRequirement requirement =
+                            lockedRequirements[i];
+
+                        if (requirement == null)
+                            continue;
+
+                        lockedTotalRequired +=
+                            requirement.RequiredCount;
+                    }
+                }
+
+                if (progressText != null)
+                {
+                    progressText.text =
+                        $"0/{Mathf.Max(1, lockedTotalRequired)}";
+                }
+
+                if (progressFillImage != null)
+                {
+                    progressFillImage.fillAmount = 0f;
+                }
 
                 return;
             }
@@ -275,7 +335,8 @@ namespace ZenMatch.Runtime.Missions
                 collectButton.interactable =
                     isCompleted &&
                     !isRewardClaimed &&
-                    !isDailyLocked;
+                    !isDailyLocked &&
+                    !_collectInProgress;
             }
 
             if (collectButtonText != null)
@@ -377,19 +438,149 @@ namespace ZenMatch.Runtime.Missions
 
         private void HandleCollectClicked()
         {
-            if (_mission == null || _missionService == null)
+            if (_mission == null ||
+                _missionService == null ||
+                _collectInProgress)
+            {
                 return;
+            }
 
-            bool claimed =
-                _missionService.TryClaimMission(_mission.MissionId);
+            if (_collectRoutine != null)
+                StopCoroutine(_collectRoutine);
 
+            _collectRoutine =
+                StartCoroutine(
+                    CollectRewardRoutine());
+        }
+
+        private IEnumerator CollectRewardRoutine()
+        {
+            _collectInProgress = true;
+
+            if (collectButton != null)
+                collectButton.interactable = false;
+
+            ResolveGoldRewardAnimator();
+
+            bool hasCoinReward =
+                TryGetCoinRewardVisual(
+                    out int coinAmount,
+                    out Sprite coinSprite);
+
+            bool claimed = false;
+
+            void ClaimMission()
+            {
+                if (claimed)
+                    return;
+
+                claimed =
+                    _missionService != null &&
+                    _mission != null &&
+                    _missionService.TryClaimMission(
+                        _mission.MissionId);
+
+            }
+
+            // Görev ödülü Gold ise:
+            // önce büyük Gold görünür ve HUD'a uçar,
+            // gerçek görev claim'i / wallet artýþý hedefe vardýðý anda yapýlýr.
+            if (hasCoinReward &&
+                goldRewardCollectAnimator != null)
+            {
+                yield return
+                    goldRewardCollectAnimator.Play(
+                        coinAmount,
+                        coinSprite,
+                        ClaimMission,
+                        PlayMissionClaimSound);
+            }
+            else
+            {
+                // Gold deðilse veya animator bulunamadýysa
+                // eski güvenli claim akýþý devam eder.
+                ClaimMission();
+            }
+
+            // Animator beklenmedik biçimde callback vermediyse
+            // ödül kaybolmasýn.
             if (!claimed)
-                return;
+                ClaimMission();
 
-            GameAudioService.Instance?.PlaySfx(
-                GameSoundEvent.MissionClaim);
+            _collectInProgress = false;
+            _collectRoutine = null;
 
             Refresh();
+        }
+
+        private void PlayMissionClaimSound()
+        {
+            GameAudioService.Instance?.PlaySfx(
+                GameSoundEvent.MissionClaim);
+        }
+
+        private void ResolveGoldRewardAnimator()
+        {
+            if (goldRewardCollectAnimator != null)
+                return;
+
+            goldRewardCollectAnimator =
+                FindFirstObjectByType<
+                    GoldRewardCollectAnimator>(
+                        FindObjectsInactive.Include);
+        }
+
+        private bool TryGetCoinRewardVisual(
+            out int totalCoins,
+            out Sprite coinSprite)
+        {
+            totalCoins = 0;
+            coinSprite = null;
+
+            if (_mission == null)
+                return false;
+
+            RewardPackSO rewardPack =
+                _mission.RewardOnClaim;
+
+            if (rewardPack == null ||
+                rewardPack.Rewards == null)
+            {
+                return false;
+            }
+
+            IReadOnlyList<RewardEntry> rewards =
+                rewardPack.Rewards;
+
+            for (int i = 0;
+                 i < rewards.Count;
+                 i++)
+            {
+                RewardEntry reward =
+                    rewards[i];
+
+                if (reward == null ||
+                    !reward.IsValid() ||
+                    reward.RewardType !=
+                        RewardType.Coins)
+                {
+                    continue;
+                }
+
+                totalCoins +=
+                    Mathf.Max(
+                        0,
+                        reward.Amount);
+
+                if (coinSprite == null &&
+                    reward.Icon != null)
+                {
+                    coinSprite =
+                        reward.Icon;
+                }
+            }
+
+            return totalCoins > 0;
         }
     }
 }

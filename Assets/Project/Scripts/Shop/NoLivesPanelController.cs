@@ -93,8 +93,16 @@ namespace ZenMatch.UI
 
             Time.timeScale = 1f;
 
-            SceneManager.LoadScene(
-                mainMenuSceneName);
+            if (LoadingScreenService.Instance != null)
+            {
+                LoadingScreenService.Instance.LoadScene(
+                    mainMenuSceneName);
+            }
+            else
+            {
+                SceneManager.LoadScene(
+                    mainMenuSceneName);
+            }
         }
 
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ZenMatch.Gameplay;
 using ZenMatch.Runtime.Audio;
+using ZenMatch.Runtime.PlayerProgress;
 using ZenMatch.Runtime.Rewards;
 using ZenMatch.UI;
 
@@ -58,6 +59,9 @@ namespace ZenMatch.Runtime.LevelRewards
 
         [SerializeField]
         private FastMatchComboView comboView;
+
+        [SerializeField]
+        private PlayerProgressService progressService;
 
         // =========================================================
         // COMBO TIMING
@@ -160,6 +164,11 @@ namespace ZenMatch.Runtime.LevelRewards
         public bool BoosterGrantedThisLevel =>
             _boosterGrantedThisLevel;
 
+        public event Action ComboStarted;
+
+        // previousRecord, newRecord
+        public event Action<int, int> NewRecordReached;
+
         // =========================================================
         // UNITY
         // =========================================================
@@ -250,6 +259,19 @@ namespace ZenMatch.Runtime.LevelRewards
                         FastMatchComboView>(
                         FindObjectsInactive.Include);
             }
+
+            if (progressService == null)
+            {
+                progressService =
+                    PlayerProgressService.Instance;
+            }
+
+            if (progressService == null)
+            {
+                progressService =
+                    FindFirstObjectByType<
+                        PlayerProgressService>();
+            }
         }
 
         // =========================================================
@@ -334,9 +356,11 @@ namespace ZenMatch.Runtime.LevelRewards
         {
             SyncTrackedLevel();
 
+            bool startedNewCombo =
+                !_comboActive;
+
             if (!_comboActive)
             {
-                // Ýlk üçlü yalnýzca combo'yu baþlatýr.
                 _currentCombo = 1;
                 _comboActive = true;
             }
@@ -345,9 +369,11 @@ namespace ZenMatch.Runtime.LevelRewards
                 _currentCombo++;
             }
 
-            // Her baþarýlý üçlüde sayaç yeniden dolar.
             _remainingTime =
                 comboDuration;
+
+            TryUpdatePersonalRecord(
+                _currentCombo);
 
             bool boosterReward =
                 GrantCurrentReward(
@@ -363,6 +389,11 @@ namespace ZenMatch.Runtime.LevelRewards
 
             comboView?.SetTimerNormalized(
                 1f);
+
+            if (startedNewCombo)
+            {
+                ComboStarted?.Invoke();
+            }
 
             comboView?.PlayStepFeedback(
                 _currentCombo,
@@ -401,6 +432,54 @@ namespace ZenMatch.Runtime.LevelRewards
                     $"{_currentCombo}X | " +
                     $"BoosterReward: {boosterReward} | " +
                     $"Next: {nextReward}",
+                    this);
+            }
+        }
+
+        // =========================================================
+        // PERSONAL RECORD
+        // =========================================================
+
+        private void TryUpdatePersonalRecord(
+            int combo)
+        {
+            if (combo <= 0)
+                return;
+
+            ResolveReferences();
+
+            if (progressService == null ||
+                progressService.Data == null)
+            {
+                return;
+            }
+
+            int previousRecord =
+                Mathf.Max(
+                    0,
+                    progressService.Data
+                        .bestFastMatchCombo);
+
+            bool newRecord =
+                progressService.Data
+                    .TrySetBestFastMatchCombo(
+                        combo);
+
+            if (!newRecord)
+                return;
+
+            progressService.NotifyChanged();
+
+            NewRecordReached?.Invoke(
+                previousRecord,
+                combo);
+
+            if (logDebug)
+            {
+                Debug.Log(
+                    $"[FastMatchCombo] YENÝ REKOR | " +
+                    $"Eski: {previousRecord}X | " +
+                    $"Yeni: {combo}X",
                     this);
             }
         }

@@ -362,6 +362,69 @@ namespace ZenMatch.Runtime.Missions
             return progressService.Data.GetOrCreateMissionProgress(missionId);
         }
 
+        public bool HasClaimableMission()
+        {
+            ResolveReferences();
+
+            if (progressService == null ||
+                progressService.Data == null)
+            {
+                return false;
+            }
+
+            EnsureMissionProgresses();
+            UnlockExpiredDailyMissions();
+
+            if (missionDefinitions == null ||
+                missionDefinitions.Count == 0)
+            {
+                return false;
+            }
+
+            DateTime nowUtc =
+                DateTime.UtcNow;
+
+            for (int i = 0;
+                 i < missionDefinitions.Count;
+                 i++)
+            {
+                MissionDefinitionSO mission =
+                    missionDefinitions[i];
+
+                if (mission == null ||
+                    !mission.IsValid())
+                {
+                    continue;
+                }
+
+                PlayerMissionProgressData progress =
+                    progressService.Data
+                        .GetOrCreateMissionProgress(
+                            mission.MissionId);
+
+                if (progress == null)
+                {
+                    continue;
+                }
+
+                if (IsMissionLocked(
+                        mission,
+                        progress,
+                        nowUtc))
+                {
+                    continue;
+                }
+
+                if (progress.isCompleted &&
+                    !progress.isRewardClaimed)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public MissionDefinitionSO FindMission(string missionId)
         {
             if (string.IsNullOrWhiteSpace(missionId))

@@ -23,6 +23,7 @@ namespace ZenMatch.Runtime.LevelRewards
         [Header("References")]
         [SerializeField] private LevelController levelController;
         [SerializeField] private MissionProgressService missionProgressService;
+        [SerializeField] private FastMatchComboController fastMatchComboController;
 
         [Header("Debug")]
         [SerializeField] private bool logDebug = true;
@@ -42,6 +43,11 @@ namespace ZenMatch.Runtime.LevelRewards
             _completedMissions = new();
 
         private bool _missionSubscribed;
+        private bool _comboSubscribed;
+
+        private bool _fastMatchRecordBrokenThisLevel;
+        private int _previousBestFastMatchCombo;
+        private int _newBestFastMatchCombo;
 
         public int CurrentLevel => _currentLevel;
 
@@ -56,6 +62,15 @@ namespace ZenMatch.Runtime.LevelRewards
 
         public IReadOnlyList<MissionDefinitionSO>
             CompletedMissions => _completedMissions;
+
+        public bool FastMatchRecordBrokenThisLevel =>
+            _fastMatchRecordBrokenThisLevel;
+
+        public int PreviousBestFastMatchCombo =>
+            _previousBestFastMatchCombo;
+
+        public int NewBestFastMatchCombo =>
+            _newBestFastMatchCombo;
 
         public event Action OnSummaryChanged;
 
@@ -73,6 +88,9 @@ namespace ZenMatch.Runtime.LevelRewards
 
             RewardEvents.OnRewardGranted +=
                 HandleRewardGranted;
+
+            ResolveReferences();
+            SubscribeComboController();
         }
 
         private void Start()
@@ -88,6 +106,7 @@ namespace ZenMatch.Runtime.LevelRewards
             }
 
             SubscribeMissionService();
+            SubscribeComboController();
 
             if (logDebug)
             {
@@ -107,6 +126,7 @@ namespace ZenMatch.Runtime.LevelRewards
                 HandleRewardGranted;
 
             UnsubscribeMissionService();
+            UnsubscribeComboController();
         }
 
         private void ResolveReferences()
@@ -127,6 +147,13 @@ namespace ZenMatch.Runtime.LevelRewards
             {
                 missionProgressService =
                     FindFirstObjectByType<MissionProgressService>();
+            }
+
+            if (fastMatchComboController == null)
+            {
+                fastMatchComboController =
+                    FindFirstObjectByType<
+                        FastMatchComboController>();
             }
         }
 
@@ -160,6 +187,72 @@ namespace ZenMatch.Runtime.LevelRewards
             _missionSubscribed = false;
         }
 
+        private void SubscribeComboController()
+        {
+            ResolveReferences();
+
+            if (_comboSubscribed)
+                return;
+
+            if (fastMatchComboController == null)
+                return;
+
+            fastMatchComboController.NewRecordReached +=
+                HandleFastMatchNewRecord;
+
+            _comboSubscribed = true;
+        }
+
+        private void UnsubscribeComboController()
+        {
+            if (!_comboSubscribed)
+                return;
+
+            if (fastMatchComboController != null)
+            {
+                fastMatchComboController.NewRecordReached -=
+                    HandleFastMatchNewRecord;
+            }
+
+            _comboSubscribed = false;
+        }
+
+        private void HandleFastMatchNewRecord(
+            int previousRecord,
+            int newRecord)
+        {
+            if (newRecord <= 0)
+                return;
+
+            if (!_fastMatchRecordBrokenThisLevel)
+            {
+                _previousBestFastMatchCombo =
+                    Mathf.Max(
+                        0,
+                        previousRecord);
+            }
+
+            _fastMatchRecordBrokenThisLevel =
+                true;
+
+            _newBestFastMatchCombo =
+                Mathf.Max(
+                    _newBestFastMatchCombo,
+                    newRecord);
+
+            if (logDebug)
+            {
+                Debug.Log(
+                    $"[LevelRewardSessionTracker] " +
+                    $"Fast Match rekoru kýrýldý. " +
+                    $"Eski: {_previousBestFastMatchCombo}X | " +
+                    $"Yeni: {_newBestFastMatchCombo}X",
+                    this);
+            }
+
+            OnSummaryChanged?.Invoke();
+        }
+
         public void ResetSession()
         {
             _currentLevel = -1;
@@ -170,6 +263,10 @@ namespace ZenMatch.Runtime.LevelRewards
             _boosters.Clear();
             _specialRewardNames.Clear();
             _completedMissions.Clear();
+
+            _fastMatchRecordBrokenThisLevel = false;
+            _previousBestFastMatchCombo = 0;
+            _newBestFastMatchCombo = 0;
 
             OnSummaryChanged?.Invoke();
 
@@ -413,7 +510,7 @@ namespace ZenMatch.Runtime.LevelRewards
                 }
             }
 
-            
+
         }
     }
 }

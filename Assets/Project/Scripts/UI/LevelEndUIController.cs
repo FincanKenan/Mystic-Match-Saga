@@ -809,18 +809,20 @@ namespace ZenMatch.UI
 
         private void ReturnToMainMenu()
         {
-            // Win durumunda attempt zaten commit edilmiştir
-            // ve bu çağrı hiçbir şeyi silmez.
-            //
-            // Playing / Lose durumunda aktif attempt
-            // varsa bölüm içinde kazanılan ödüller silinir.
-
             RollbackActiveAttempt();
 
             Time.timeScale = 1f;
 
-            SceneManager.LoadScene(
-                mainMenuSceneName);
+            if (LoadingScreenService.Instance != null)
+            {
+                LoadingScreenService.Instance.LoadScene(
+                    mainMenuSceneName);
+            }
+            else
+            {
+                SceneManager.LoadScene(
+                    mainMenuSceneName);
+            }
         }
 
         // =========================================================

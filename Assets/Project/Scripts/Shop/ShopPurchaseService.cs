@@ -79,10 +79,7 @@ namespace ZenMatch.Runtime.Shop
                     ShopPurchaseFailReason.LifeLimitReached);
             }
 
-            if (walletService.Coins < item.CoinPrice)
-                return Fail(
-                    item,
-                    ShopPurchaseFailReason.NotEnoughCoins);
+            
 
             if (walletService.Coins < item.CoinPrice)
                 return Fail(

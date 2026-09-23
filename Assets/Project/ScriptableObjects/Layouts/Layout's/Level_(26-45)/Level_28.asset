@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layoutId: Normal_1
   category: 0
+  useSpecialTraySettings: 0
+  startingActiveTrayCapacity: 7
   groups:
   - groupId: Group_01
     role: 0
@@ -26,6 +28,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 4
       maxStackHeight: 4
@@ -40,10 +45,12 @@ MonoBehaviour:
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L28-N1-Point_1_1
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 4
       maxStackHeight: 4
       isSpecialTile: 0
@@ -59,6 +66,9 @@ MonoBehaviour:
       stackOpenDirection: 1
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 4
       maxStackHeight: 4
@@ -73,10 +83,12 @@ MonoBehaviour:
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 2
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L28-N1-Point_1_3
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 4
       maxStackHeight: 4
       isSpecialTile: 0
@@ -92,6 +104,9 @@ MonoBehaviour:
       stackOpenDirection: 3
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 4
       maxStackHeight: 4
@@ -106,10 +121,12 @@ MonoBehaviour:
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 3
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L28-N1-Point_1_5
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 4
       maxStackHeight: 4
       isSpecialTile: 0
@@ -125,6 +142,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 4
       maxStackHeight: 4
@@ -139,10 +159,12 @@ MonoBehaviour:
       stackLayoutMode: 1
       visibilityMode: 0
       stackOpenDirection: 0
-      startsLocked: 1
+      startsLocked: 0
       unlocksTraySlotOnComplete: 0
-      requiredCompletedPointIds:
-      - L28-N1-Point_1_7
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
+      requiredCompletedPointIds: []
       minStackHeight: 4
       maxStackHeight: 4
       isSpecialTile: 0
@@ -158,6 +180,9 @@ MonoBehaviour:
       stackOpenDirection: 1
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 4
       maxStackHeight: 4
@@ -174,6 +199,9 @@ MonoBehaviour:
       stackOpenDirection: 2
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L28-N1-Point_1_9
       minStackHeight: 4
@@ -191,6 +219,9 @@ MonoBehaviour:
       stackOpenDirection: 1
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 4
       maxStackHeight: 4
@@ -207,6 +238,9 @@ MonoBehaviour:
       stackOpenDirection: 4
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L28-N1-Point_1_11
       minStackHeight: 4
@@ -224,6 +258,9 @@ MonoBehaviour:
       stackOpenDirection: 4
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 4
       maxStackHeight: 4
@@ -240,6 +277,9 @@ MonoBehaviour:
       stackOpenDirection: 1
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L28-N1-Point_1_13
       minStackHeight: 4
@@ -257,6 +297,9 @@ MonoBehaviour:
       stackOpenDirection: 4
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 4
       maxStackHeight: 4
@@ -273,6 +316,9 @@ MonoBehaviour:
       stackOpenDirection: 1
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L28-N1-Point_1_15
       minStackHeight: 4
@@ -290,6 +336,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 5
       maxStackHeight: 5

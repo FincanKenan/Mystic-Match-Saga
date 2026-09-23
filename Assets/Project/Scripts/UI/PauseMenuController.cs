@@ -172,8 +172,16 @@ namespace ZenMatch.Runtime.UI
             }
             else
             {
-                SceneManager.LoadScene(
-                    mainMenuSceneName);
+                if (LoadingScreenService.Instance != null)
+                {
+                    LoadingScreenService.Instance.LoadScene(
+                        mainMenuSceneName);
+                }
+                else
+                {
+                    SceneManager.LoadScene(
+                        mainMenuSceneName);
+                }
             }
         }
 

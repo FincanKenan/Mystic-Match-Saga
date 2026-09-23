@@ -8,29 +8,93 @@ namespace ZenMatch.Runtime.Audio
     {
         public static GameAudioService Instance { get; private set; }
 
+        // Eski ayarlar.
+        // Yeni sisteme ilk geçiþte fallback olarak kullanýlýr.
         private const string MasterVolumeKey =
             "ZenMatch_MasterVolume";
 
         private const string MutedKey =
             "ZenMatch_AudioMuted";
 
+        // Yeni baðýmsýz ayarlar.
+        private const string SfxVolumeKey =
+            "ZenMatch_SfxVolume";
+
+        private const string MusicVolumeKey =
+            "ZenMatch_MusicVolume";
+
+        private const string SfxMutedKey =
+            "ZenMatch_SfxMuted";
+
+        private const string MusicMutedKey =
+            "ZenMatch_MusicMuted";
+
+        // =========================================================
+        // REFERENCES
+        // =========================================================
+
         [Header("Database")]
-        [SerializeField] private GameSoundDatabaseSO soundDatabase;
+        [SerializeField]
+        private GameSoundDatabaseSO soundDatabase;
 
         [Header("Audio Sources")]
-        [SerializeField] private AudioSource musicSource;
-        [SerializeField] private AudioSource sfxSource;
+        [SerializeField]
+        private AudioSource musicSource;
+
+        [SerializeField]
+        private AudioSource sfxSource;
+
         private AudioSource restartableSfxSource;
-        private Coroutine _restartableSfxDelayRoutine;
+
+        private Coroutine
+            _restartableSfxDelayRoutine;
+
+        // =========================================================
+        // SETTINGS
+        // =========================================================
 
         [Header("Settings")]
-        [SerializeField] private bool dontDestroyOnLoad = true;
+        [SerializeField]
+        private bool dontDestroyOnLoad = true;
+
+        [Header("Background Music")]
+        [SerializeField]
+        private bool playBackgroundMusicOnStart = true;
+
+        [SerializeField]
+        private GameSoundEvent backgroundMusicEvent =
+            GameSoundEvent.None;
+
+        [Range(0f, 1f)]
+        [SerializeField]
+        private float musicBaseVolume = 0.22f;
 
         [Header("Debug")]
-        [SerializeField] private bool logMissingSounds = true;
+        [SerializeField]
+        private bool logMissingSounds = true;
 
-        public float MasterVolume { get; private set; } = 1f;
-        public bool IsMuted { get; private set; }
+        // =========================================================
+        // RUNTIME SETTINGS
+        // =========================================================
+
+        public float SfxVolume { get; private set; } = 1f;
+
+        public float MusicVolume { get; private set; } = 1f;
+
+        public bool IsSfxMuted { get; private set; }
+
+        public bool IsMusicMuted { get; private set; }
+
+        // Eski UI kodlarý compile olmaya devam etsin.
+        public float MasterVolume => SfxVolume;
+
+        public bool IsMuted => IsSfxMuted;
+
+        private float _currentMusicEntryVolume = 1f;
+
+        // =========================================================
+        // UNITY
+        // =========================================================
 
         private void Awake()
         {
@@ -44,11 +108,31 @@ namespace ZenMatch.Runtime.Audio
             Instance = this;
 
             if (dontDestroyOnLoad)
-                DontDestroyOnLoad(gameObject);
+            {
+                DontDestroyOnLoad(
+                    gameObject);
+            }
 
             ConfigureSources();
+
             LoadAudioSettings();
-            ApplyMasterVolume();
+
+            ApplyAudioSettings();
+        }
+
+        private void Start()
+        {
+            if (!playBackgroundMusicOnStart)
+                return;
+
+            if (backgroundMusicEvent ==
+                GameSoundEvent.None)
+            {
+                return;
+            }
+
+            PlayMusic(
+                backgroundMusicEvent);
         }
 
         private void ConfigureSources()
@@ -57,68 +141,206 @@ namespace ZenMatch.Runtime.Audio
             {
                 musicSource.playOnAwake = false;
                 musicSource.loop = true;
+                musicSource.spatialBlend = 0f;
             }
 
             if (sfxSource != null)
             {
                 sfxSource.playOnAwake = false;
                 sfxSource.loop = false;
+                sfxSource.spatialBlend = 0f;
             }
         }
 
         // =========================================================
-        // MASTER AUDIO SETTINGS
+        // AUDIO SETTINGS
         // =========================================================
 
         private void LoadAudioSettings()
         {
-            MasterVolume =
-                PlayerPrefs.GetFloat(
-                    MasterVolumeKey,
-                    1f);
+            float legacyVolume =
+                Mathf.Clamp01(
+                    PlayerPrefs.GetFloat(
+                        MasterVolumeKey,
+                        1f));
 
-            IsMuted =
+            bool legacyMuted =
                 PlayerPrefs.GetInt(
                     MutedKey,
                     0) == 1;
 
-            MasterVolume =
-                Mathf.Clamp01(MasterVolume);
+            SfxVolume =
+                Mathf.Clamp01(
+                    PlayerPrefs.GetFloat(
+                        SfxVolumeKey,
+                        legacyVolume));
+
+            MusicVolume =
+                Mathf.Clamp01(
+                    PlayerPrefs.GetFloat(
+                        MusicVolumeKey,
+                        legacyVolume));
+
+            IsSfxMuted =
+                PlayerPrefs.GetInt(
+                    SfxMutedKey,
+                    legacyMuted ? 1 : 0) == 1;
+
+            IsMusicMuted =
+                PlayerPrefs.GetInt(
+                    MusicMutedKey,
+                    legacyMuted ? 1 : 0) == 1;
+
+            SaveAudioSettings();
         }
 
-        public void SetMasterVolume(float volume)
+        private void SaveAudioSettings()
         {
-            MasterVolume =
-                Mathf.Clamp01(volume);
+            PlayerPrefs.SetFloat(
+                SfxVolumeKey,
+                SfxVolume);
 
             PlayerPrefs.SetFloat(
-                MasterVolumeKey,
-                MasterVolume);
-
-            PlayerPrefs.Save();
-
-            ApplyMasterVolume();
-        }
-
-        public void SetMuted(bool muted)
-        {
-            IsMuted = muted;
+                MusicVolumeKey,
+                MusicVolume);
 
             PlayerPrefs.SetInt(
-                MutedKey,
-                IsMuted ? 1 : 0);
+                SfxMutedKey,
+                IsSfxMuted ? 1 : 0);
+
+            PlayerPrefs.SetInt(
+                MusicMutedKey,
+                IsMusicMuted ? 1 : 0);
 
             PlayerPrefs.Save();
-
-            ApplyMasterVolume();
         }
 
-        private void ApplyMasterVolume()
+        private void ApplyAudioSettings()
         {
-            AudioListener.volume =
-                IsMuted
+            // Artýk global ses seviyesi kullanmýyoruz.
+            AudioListener.volume = 1f;
+
+            ApplySfxSettings();
+            ApplyMusicSettings();
+        }
+
+        private void ApplySfxSettings()
+        {
+            if (sfxSource != null)
+            {
+                sfxSource.volume =
+                    IsSfxMuted
+                        ? 0f
+                        : SfxVolume;
+            }
+
+            if (restartableSfxSource != null &&
+                IsSfxMuted)
+            {
+                restartableSfxSource.volume = 0f;
+            }
+        }
+
+        private void ApplyMusicSettings()
+        {
+            if (musicSource == null)
+                return;
+
+            float finalVolume =
+                musicBaseVolume *
+                MusicVolume *
+                _currentMusicEntryVolume;
+
+            musicSource.volume =
+                IsMusicMuted
                     ? 0f
-                    : MasterVolume;
+                    : Mathf.Clamp01(
+                        finalVolume);
+        }
+
+        // =========================================================
+        // SFX SETTINGS
+        // =========================================================
+
+        public void SetSfxVolume(
+            float volume)
+        {
+            SfxVolume =
+                Mathf.Clamp01(volume);
+
+            SaveAudioSettings();
+
+            ApplySfxSettings();
+        }
+
+        public void SetSfxMuted(
+            bool muted)
+        {
+            IsSfxMuted = muted;
+
+            SaveAudioSettings();
+
+            if (IsSfxMuted)
+            {
+                StopActiveSfx();
+            }
+
+            ApplySfxSettings();
+        }
+
+        public void ToggleSfxMuted()
+        {
+            SetSfxMuted(
+                !IsSfxMuted);
+        }
+
+        // =========================================================
+        // MUSIC SETTINGS
+        // =========================================================
+
+        public void SetMusicVolume(
+            float volume)
+        {
+            MusicVolume =
+                Mathf.Clamp01(volume);
+
+            SaveAudioSettings();
+
+            ApplyMusicSettings();
+        }
+
+        public void SetMusicMuted(
+            bool muted)
+        {
+            IsMusicMuted = muted;
+
+            SaveAudioSettings();
+
+            ApplyMusicSettings();
+        }
+
+        public void ToggleMusicMuted()
+        {
+            SetMusicMuted(
+                !IsMusicMuted);
+        }
+
+        // =========================================================
+        // LEGACY SETTINGS
+        // =========================================================
+
+        // Eski Settings UI geçici olarak
+        // efekt sesini kontrol etmeye devam eder.
+        public void SetMasterVolume(
+            float volume)
+        {
+            SetSfxVolume(volume);
+        }
+
+        public void SetMuted(
+            bool muted)
+        {
+            SetSfxMuted(muted);
         }
 
         // =========================================================
@@ -128,10 +350,14 @@ namespace ZenMatch.Runtime.Audio
         public void PlaySfx(
             GameSoundEvent soundEvent)
         {
+            if (IsSfxMuted)
+                return;
+
             if (soundDatabase == null)
             {
                 Debug.LogWarning(
-                    "[GameAudioService] SoundDatabase atanmadý.",
+                    "[GameAudioService] " +
+                    "SoundDatabase atanmadý.",
                     this);
 
                 return;
@@ -144,7 +370,8 @@ namespace ZenMatch.Runtime.Audio
                 if (logMissingSounds)
                 {
                     Debug.LogWarning(
-                        $"[GameAudioService] Database içinde " +
+                        "[GameAudioService] " +
+                        "Database içinde " +
                         $"{soundEvent} bulunamadý.",
                         this);
                 }
@@ -161,31 +388,42 @@ namespace ZenMatch.Runtime.Audio
             if (sound.Delay > 0f)
             {
                 StartCoroutine(
-                    PlaySfxDelayedRoutine(sound));
+                    PlaySfxDelayedRoutine(
+                        sound));
             }
             else
             {
-                PlaySfxNow(sound);
+                PlaySfxNow(
+                    sound);
             }
         }
 
-        private IEnumerator PlaySfxDelayedRoutine(
-            GameSoundEntry sound)
+        private IEnumerator
+            PlaySfxDelayedRoutine(
+                GameSoundEntry sound)
         {
             yield return
                 new WaitForSecondsRealtime(
                     sound.Delay);
 
-            PlaySfxNow(sound);
+            if (IsSfxMuted)
+                yield break;
+
+            PlaySfxNow(
+                sound);
         }
 
         private void PlaySfxNow(
             GameSoundEntry sound)
         {
+            if (IsSfxMuted)
+                return;
+
             if (sfxSource == null)
             {
                 Debug.LogWarning(
-                    "[GameAudioService] SFX AudioSource atanmadý.",
+                    "[GameAudioService] " +
+                    "SFX AudioSource atanmadý.",
                     this);
 
                 return;
@@ -215,21 +453,19 @@ namespace ZenMatch.Runtime.Audio
         // VARIABLE SFX
         // =========================================================
 
-        /// <summary>
-        /// Ayný SFX'in ses yüksekliði ve pitch'i
-        /// runtime sýrasýnda deðiþtirilebilir.
-        ///
-        /// Fast Match Combo sistemi bunu kullanýr.
-        /// </summary>
         public void PlaySfx(
             GameSoundEvent soundEvent,
             float volumeMultiplier,
             float pitchMultiplier)
         {
+            if (IsSfxMuted)
+                return;
+
             if (soundDatabase == null)
             {
                 Debug.LogWarning(
-                    "[GameAudioService] SoundDatabase atanmadý.",
+                    "[GameAudioService] " +
+                    "SoundDatabase atanmadý.",
                     this);
 
                 return;
@@ -242,7 +478,8 @@ namespace ZenMatch.Runtime.Audio
                 if (logMissingSounds)
                 {
                     Debug.LogWarning(
-                        $"[GameAudioService] Database içinde " +
+                        "[GameAudioService] " +
+                        "Database içinde " +
                         $"{soundEvent} bulunamadý.",
                         this);
                 }
@@ -284,14 +521,18 @@ namespace ZenMatch.Runtime.Audio
             }
         }
 
-        private IEnumerator PlayVariableSfxDelayedRoutine(
-            GameSoundEntry sound,
-            float volumeMultiplier,
-            float pitchMultiplier)
+        private IEnumerator
+            PlayVariableSfxDelayedRoutine(
+                GameSoundEntry sound,
+                float volumeMultiplier,
+                float pitchMultiplier)
         {
             yield return
                 new WaitForSecondsRealtime(
                     sound.Delay);
+
+            if (IsSfxMuted)
+                yield break;
 
             PlayVariableSfxNow(
                 sound,
@@ -304,6 +545,9 @@ namespace ZenMatch.Runtime.Audio
             float volumeMultiplier,
             float pitchMultiplier)
         {
+            if (IsSfxMuted)
+                return;
+
             if (sound == null ||
                 sound.Clip == null)
             {
@@ -319,7 +563,8 @@ namespace ZenMatch.Runtime.Audio
                 false);
 
             AudioSource source =
-                oneShotObject.AddComponent<AudioSource>();
+                oneShotObject
+                    .AddComponent<AudioSource>();
 
             source.playOnAwake = false;
             source.loop = false;
@@ -328,14 +573,20 @@ namespace ZenMatch.Runtime.Audio
             if (sfxSource != null)
             {
                 source.outputAudioMixerGroup =
-                    sfxSource.outputAudioMixerGroup;
+                    sfxSource
+                        .outputAudioMixerGroup;
 
                 source.volume =
-                    sfxSource.volume;
+                    IsSfxMuted
+                        ? 0f
+                        : SfxVolume;
             }
             else
             {
-                source.volume = 1f;
+                source.volume =
+                    IsSfxMuted
+                        ? 0f
+                        : SfxVolume;
             }
 
             source.clip =
@@ -361,7 +612,8 @@ namespace ZenMatch.Runtime.Audio
                 sound.Clip.length /
                 Mathf.Max(
                     0.1f,
-                    Mathf.Abs(source.pitch));
+                    Mathf.Abs(
+                        source.pitch));
 
             Destroy(
                 oneShotObject,
@@ -369,86 +621,17 @@ namespace ZenMatch.Runtime.Audio
         }
 
         // =========================================================
-        // MUSIC
+        // RESTARTABLE SFX
         // =========================================================
-
-        public void PlayMusic(
-            GameSoundEvent soundEvent)
-        {
-            if (soundDatabase == null ||
-                musicSource == null)
-            {
-                return;
-            }
-
-            if (!soundDatabase.TryGetSound(
-                    soundEvent,
-                    out GameSoundEntry sound))
-            {
-                return;
-            }
-
-            if (sound == null ||
-                sound.Clip == null)
-            {
-                return;
-            }
-
-            if (musicSource.clip == sound.Clip &&
-                musicSource.isPlaying)
-            {
-                return;
-            }
-
-            musicSource.Stop();
-
-            musicSource.clip =
-                sound.Clip;
-
-            musicSource.volume =
-                sound.Volume;
-
-            musicSource.pitch =
-                sound.Pitch;
-
-            musicSource.loop = true;
-
-            musicSource.Play();
-        }
-
-        public void StopMusic()
-        {
-            if (musicSource != null)
-                musicSource.Stop();
-        }
-
-        // =========================================================
-        // INDIVIDUAL SOURCE VOLUME
-        // =========================================================
-
-        public void SetSfxVolume(float volume)
-        {
-            if (sfxSource != null)
-            {
-                sfxSource.volume =
-                    Mathf.Clamp01(volume);
-            }
-        }
-
-        public void SetMusicVolume(float volume)
-        {
-            if (musicSource != null)
-            {
-                musicSource.volume =
-                    Mathf.Clamp01(volume);
-            }
-        }
 
         public void PlayRestartableSfx(
-    GameSoundEvent soundEvent,
-    float volumeMultiplier,
-    float pitchMultiplier)
+            GameSoundEvent soundEvent,
+            float volumeMultiplier,
+            float pitchMultiplier)
         {
+            if (IsSfxMuted)
+                return;
+
             if (soundDatabase == null)
                 return;
 
@@ -459,7 +642,8 @@ namespace ZenMatch.Runtime.Audio
                 if (logMissingSounds)
                 {
                     Debug.LogWarning(
-                        $"[GameAudioService] Database içinde " +
+                        "[GameAudioService] " +
+                        "Database içinde " +
                         $"{soundEvent} bulunamadý.",
                         this);
                 }
@@ -478,15 +662,16 @@ namespace ZenMatch.Runtime.Audio
             if (restartableSfxSource == null)
                 return;
 
-            if (_restartableSfxDelayRoutine != null)
+            if (_restartableSfxDelayRoutine !=
+                null)
             {
                 StopCoroutine(
                     _restartableSfxDelayRoutine);
 
-                _restartableSfxDelayRoutine = null;
+                _restartableSfxDelayRoutine =
+                    null;
             }
 
-            // Önceki ayný kanal sesini hemen kes.
             restartableSfxSource.Stop();
 
             volumeMultiplier =
@@ -528,7 +713,11 @@ namespace ZenMatch.Runtime.Audio
                 new WaitForSecondsRealtime(
                     sound.Delay);
 
-            _restartableSfxDelayRoutine = null;
+            _restartableSfxDelayRoutine =
+                null;
+
+            if (IsSfxMuted)
+                yield break;
 
             PlayRestartableSfxNow(
                 sound,
@@ -541,6 +730,9 @@ namespace ZenMatch.Runtime.Audio
             float volumeMultiplier,
             float pitchMultiplier)
         {
+            if (IsSfxMuted)
+                return;
+
             EnsureRestartableSfxSource();
 
             if (restartableSfxSource == null ||
@@ -556,9 +748,9 @@ namespace ZenMatch.Runtime.Audio
                 sound.Clip;
 
             float baseVolume =
-                sfxSource != null
-                    ? sfxSource.volume
-                    : 1f;
+                IsSfxMuted
+                    ? 0f
+                    : SfxVolume;
 
             restartableSfxSource.volume =
                 baseVolume *
@@ -578,7 +770,8 @@ namespace ZenMatch.Runtime.Audio
             restartableSfxSource.Play();
         }
 
-        private void EnsureRestartableSfxSource()
+        private void
+            EnsureRestartableSfxSource()
         {
             if (restartableSfxSource != null)
                 return;
@@ -610,6 +803,139 @@ namespace ZenMatch.Runtime.Audio
                         sfxSource
                             .outputAudioMixerGroup;
             }
+        }
+
+        // =========================================================
+        // STOP SFX
+        // =========================================================
+
+        private void StopActiveSfx()
+        {
+            if (_restartableSfxDelayRoutine !=
+                null)
+            {
+                StopCoroutine(
+                    _restartableSfxDelayRoutine);
+
+                _restartableSfxDelayRoutine =
+                    null;
+            }
+
+            if (sfxSource != null)
+            {
+                sfxSource.Stop();
+            }
+
+            if (restartableSfxSource != null)
+            {
+                restartableSfxSource.Stop();
+            }
+
+            AudioSource[] sources =
+                GetComponentsInChildren<
+                    AudioSource>(true);
+
+            for (int i = 0;
+                 i < sources.Length;
+                 i++)
+            {
+                AudioSource source =
+                    sources[i];
+
+                if (source == null)
+                    continue;
+
+                if (source == musicSource)
+                    continue;
+
+                source.Stop();
+            }
+        }
+
+        // =========================================================
+        // MUSIC
+        // =========================================================
+
+        public void PlayMusic(
+            GameSoundEvent soundEvent)
+        {
+            if (soundDatabase == null ||
+                musicSource == null)
+            {
+                return;
+            }
+
+            if (!soundDatabase.TryGetSound(
+                    soundEvent,
+                    out GameSoundEntry sound))
+            {
+                if (logMissingSounds)
+                {
+                    Debug.LogWarning(
+                        "[GameAudioService] " +
+                        "Müzik event'i database " +
+                        $"içinde bulunamadý: {soundEvent}",
+                        this);
+                }
+
+                return;
+            }
+
+            if (sound == null ||
+                sound.Clip == null)
+            {
+                return;
+            }
+
+            _currentMusicEntryVolume =
+                Mathf.Clamp01(
+                    sound.Volume);
+
+            if (musicSource.clip ==
+                    sound.Clip &&
+                musicSource.isPlaying)
+            {
+                ApplyMusicSettings();
+                return;
+            }
+
+            musicSource.Stop();
+
+            musicSource.clip =
+                sound.Clip;
+
+            musicSource.pitch =
+                sound.Pitch;
+
+            musicSource.loop = true;
+
+            ApplyMusicSettings();
+
+            musicSource.Play();
+        }
+
+        public void StopMusic()
+        {
+            if (musicSource != null)
+            {
+                musicSource.Stop();
+            }
+        }
+
+        public void ResumeMusic()
+        {
+            if (musicSource == null)
+                return;
+
+            if (musicSource.clip == null)
+                return;
+
+            if (!musicSource.isPlaying)
+            {
+                musicSource.Play();
+            }
+
+            ApplyMusicSettings();
         }
     }
 }

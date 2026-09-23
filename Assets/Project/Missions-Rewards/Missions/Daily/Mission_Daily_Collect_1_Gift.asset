@@ -20,8 +20,9 @@ MonoBehaviour:
   requirements:
   - requirementId: collect_any_gift
     sourceType: 20
+    requiredSourceId: 
     requiredTag: 
     requiredCount: 1
     displayName: Hediye Kutusu
-  rewardOnClaim: {fileID: 11400000, guid: fbb6441726a1b9242b5e12ec9d90ec4c, type: 2}
-  icon: {fileID: 0}
+  rewardOnClaim: {fileID: 11400000, guid: 8cbca57f605751647b05815557f8287a, type: 2}
+  icon: {fileID: 21300000, guid: 76f3f7f567ff9894d849775dde880508, type: 3}
