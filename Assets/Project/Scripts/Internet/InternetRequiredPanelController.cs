@@ -13,12 +13,31 @@ namespace ZenMatch.UI
         // =========================================================
 
         [Header("References")]
-        [SerializeField] private InternetConnectionService connectionService;
+        [SerializeField]
+        private InternetConnectionService connectionService;
 
         [Header("UI")]
-        [SerializeField] private GameObject panelRoot;
-        [SerializeField] private TMP_Text statusText;
-        [SerializeField] private Button retryButton;
+        [SerializeField]
+        private GameObject panelRoot;
+
+        [SerializeField]
+        private CanvasGroup panelCanvasGroup;
+
+        [SerializeField]
+        private TMP_Text statusText;
+
+        [SerializeField]
+        private Button retryButton;
+
+        // =========================================================
+        // BLOCKING
+        // =========================================================
+
+        [Header("Blocking")]
+        [Tooltip(
+            "Ýnternet yokken Time.timeScale 0 yapýlarak oyun durdurulur.")]
+        [SerializeField]
+        private bool pauseGameWhileBlocked = true;
 
         // =========================================================
         // TEXT
@@ -37,8 +56,25 @@ namespace ZenMatch.UI
             "Baðlantýnýzý kontrol edip tekrar deneyin.";
 
         // =========================================================
+        // RUNTIME
+        // =========================================================
+
+        private bool _ownsTimeScaleLock;
+        private float _previousTimeScale = 1f;
+
+        // =========================================================
         // UNITY
         // =========================================================
+
+        private void Awake()
+        {
+            if (panelCanvasGroup == null &&
+                panelRoot != null)
+            {
+                panelCanvasGroup =
+                    panelRoot.GetComponent<CanvasGroup>();
+            }
+        }
 
         private void OnEnable()
         {
@@ -64,6 +100,8 @@ namespace ZenMatch.UI
             }
 
             Unsubscribe();
+
+            ReleaseGameLock();
         }
 
         // =========================================================
@@ -128,8 +166,7 @@ namespace ZenMatch.UI
                 return;
             }
 
-            if (!connectionService.HasCompletedInitialCheck ||
-                connectionService.IsChecking)
+            if (!connectionService.HasCompletedInitialCheck)
             {
                 ShowChecking();
 
@@ -202,10 +239,7 @@ namespace ZenMatch.UI
 
         private void ShowChecking()
         {
-            if (panelRoot != null)
-            {
-                panelRoot.SetActive(true);
-            }
+            ShowPanel();
 
             if (statusText != null)
             {
@@ -221,10 +255,7 @@ namespace ZenMatch.UI
 
         private void ShowOffline()
         {
-            if (panelRoot != null)
-            {
-                panelRoot.SetActive(true);
-            }
+            ShowPanel();
 
             if (statusText != null)
             {
@@ -238,12 +269,71 @@ namespace ZenMatch.UI
             }
         }
 
+        private void ShowPanel()
+        {
+            if (panelRoot != null)
+            {
+                panelRoot.SetActive(true);
+
+                // Ayný Canvas içindeki diðer UI'larýn üstüne getir.
+                panelRoot.transform.SetAsLastSibling();
+            }
+
+            if (panelCanvasGroup != null)
+            {
+                panelCanvasGroup.alpha = 1f;
+                panelCanvasGroup.interactable = true;
+                panelCanvasGroup.blocksRaycasts = true;
+            }
+
+            AcquireGameLock();
+        }
+
         private void HidePanel()
         {
+            if (panelCanvasGroup != null)
+            {
+                panelCanvasGroup.interactable = false;
+                panelCanvasGroup.blocksRaycasts = false;
+            }
+
             if (panelRoot != null)
             {
                 panelRoot.SetActive(false);
             }
+
+            ReleaseGameLock();
+        }
+
+        // =========================================================
+        // GAME LOCK
+        // =========================================================
+
+        private void AcquireGameLock()
+        {
+            if (!pauseGameWhileBlocked)
+                return;
+
+            if (_ownsTimeScaleLock)
+                return;
+
+            _previousTimeScale =
+                Time.timeScale;
+
+            Time.timeScale = 0f;
+
+            _ownsTimeScaleLock = true;
+        }
+
+        private void ReleaseGameLock()
+        {
+            if (!_ownsTimeScaleLock)
+                return;
+
+            Time.timeScale =
+                _previousTimeScale;
+
+            _ownsTimeScaleLock = false;
         }
     }
 }

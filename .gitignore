@@ -11,4 +11,6 @@ UserSettings/
 *.suo
 *.user
 *.userprefs
+.vs/.tmp/
+.tmp/
 .vs/

@@ -345,6 +345,7 @@ GameObject:
   - component: {fileID: 6545811417726717520}
   - component: {fileID: 402778353010530871}
   - component: {fileID: 5726364563260476170}
+  - component: {fileID: 690956857193845420}
   m_Layer: 5
   m_Name: InternetRequiredPanel
   m_TagString: Untagged
@@ -412,6 +413,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &690956857193845420
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4518070917477966633}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &4944519625788354404
 GameObject:
   m_ObjectHideFlags: 0
@@ -463,8 +476,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   connectionService: {fileID: 0}
   panelRoot: {fileID: 4518070917477966633}
+  panelCanvasGroup: {fileID: 690956857193845420}
   statusText: {fileID: 8851534138549479917}
   retryButton: {fileID: 5157865007667890670}
+  pauseGameWhileBlocked: 1
   checkingText: "\u0130nternet ba\u011Flant\u0131s\u0131 kontrol ediliyor..."
   offlineText: "Oyunu oynamak i\xE7in internet ba\u011Flant\u0131s\u0131 gereklidir.\nBa\u011Flant\u0131n\u0131z\u0131
     kontrol edip tekrar deneyin."

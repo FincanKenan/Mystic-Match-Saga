@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using ZenMatch.Runtime;
+using ZenMatch.Runtime.Networking;
 
 namespace ZenMatch.Gameplay
 {
@@ -18,6 +19,11 @@ namespace ZenMatch.Gameplay
 
         private void Update()
         {
+            // Ýnternet baðlantýsý kontrol edilmediyse
+            // veya baðlantý yoksa board inputunu tamamen engelle.
+            if (IsInternetInputBlocked())
+                return;
+
             // Android / dokunmatik ekran
             if (Touchscreen.current != null &&
                 Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
@@ -33,7 +39,8 @@ namespace ZenMatch.Gameplay
             if (Mouse.current != null &&
                 Mouse.current.leftButton.wasPressedThisFrame)
             {
-                Vector2 mousePosition = Mouse.current.position.ReadValue();
+                Vector2 mousePosition =
+                    Mouse.current.position.ReadValue();
 
                 HandlePointerDown(mousePosition);
             }
@@ -41,6 +48,12 @@ namespace ZenMatch.Gameplay
 
         private void HandlePointerDown(Vector2 screenPosition)
         {
+            // Ek güvenlik:
+            // Update ile HandlePointerDown arasýnda baðlantý durumu deðiþirse
+            // seçim yine engellensin.
+            if (IsInternetInputBlocked())
+                return;
+
             if (levelController == null || targetCamera == null)
                 return;
 
@@ -108,6 +121,17 @@ namespace ZenMatch.Gameplay
                 bestTile.PointId,
                 bestTile.TileIndex,
                 bestWorldPosition);
+        }
+
+        private static bool IsInternetInputBlocked()
+        {
+            InternetConnectionService service =
+                InternetConnectionService.Instance;
+
+            if (service == null)
+                return false;
+
+            return service.IsInteractionBlocked;
         }
     }
 }

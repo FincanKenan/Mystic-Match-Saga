@@ -22,17 +22,23 @@ namespace ZenMatch.Runtime.Ads
 
         [Header("Test")]
         [SerializeField]
-        private bool useTestAds = true;
+        private bool useTestAds = false;
+
+        [Header("Genel")]
+        [SerializeField]
+        private bool adsEnabled = false;
+
+        public bool AdsEnabled => adsEnabled;
 
 
         [Header("Android - Gerçek Reklam Kimlikleri")]
         [SerializeField]
         private string androidRewardedLifeId =
-            "ca-app-pub-8852032082574858/9010284419";
+            "ca-app-pub-4185569926581248/4350758176";
 
         [SerializeField]
         private string androidInterstitialLevelCompleteId =
-            "ca-app-pub-8852032082574858/3459358654";
+            "ca-app-pub-4185569926581248/2758474909";
 
 
         [Header("iOS - Daha Sonra")]

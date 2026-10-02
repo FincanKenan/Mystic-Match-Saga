@@ -65,6 +65,10 @@ namespace ZenMatch.Runtime.Networking
 
         public bool HasCompletedInitialCheck { get; private set; }
 
+        public bool IsInteractionBlocked =>
+            !HasCompletedInitialCheck ||
+            !IsOnline;
+
         public event Action<bool> ConnectionStateChanged;
         public event Action<bool> ConnectionCheckCompleted;
 
@@ -103,6 +107,22 @@ namespace ZenMatch.Runtime.Networking
             if (monitorWhileRunning)
             {
                 StartMonitoring();
+            }
+        }
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (hasFocus)
+            {
+                CheckNow();
+            }
+        }
+
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            if (!pauseStatus)
+            {
+                CheckNow();
             }
         }
 

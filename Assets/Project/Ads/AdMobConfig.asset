@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e5ce6f44d4911d40b01067132ca98b3, type: 3}
   m_Name: AdMobConfig
   m_EditorClassIdentifier: 
-  useTestAds: 1
-  androidRewardedLifeId: ca-app-pub-8852032082574858/9010284419
-  androidInterstitialLevelCompleteId: ca-app-pub-8852032082574858/3459358654
+  useTestAds: 0
+  androidRewardedLifeId: ca-app-pub-4185569926581248/4350758176
+  androidInterstitialLevelCompleteId: ca-app-pub-4185569926581248/2758474909
   iosRewardedLifeId: 
   iosInterstitialLevelCompleteId: 
   noInterstitialThroughLevel: 5

@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using ZenMatch.Runtime.Networking;
 using ZenMatch.Runtime.PlayerProgress;
 
 namespace ZenMatch.UI
@@ -293,6 +294,17 @@ namespace ZenMatch.UI
 
         public void StartLevel()
         {
+            if (InternetConnectionService.Instance == null ||
+        InternetConnectionService.Instance.IsInteractionBlocked)
+            {
+                return;
+            }
+
+            ResolveServices();
+
+            if (IsBlockedByPanel())
+                return;
+
             ResolveServices();
 
             if (IsBlockedByPanel())

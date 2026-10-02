@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace ZenMatch.Runtime.Audio
 {
@@ -57,13 +58,25 @@ namespace ZenMatch.Runtime.Audio
         [SerializeField]
         private bool dontDestroyOnLoad = true;
 
-        [Header("Background Music")]
+       
+        
+
+        [Header("Scene Music")]
         [SerializeField]
-        private bool playBackgroundMusicOnStart = true;
+        private string mainMenuSceneName = "SampleScene";
 
         [SerializeField]
-        private GameSoundEvent backgroundMusicEvent =
-            GameSoundEvent.None;
+        private string gameSceneName = "GameScene";
+
+        [SerializeField]
+        private GameSoundEvent mainMenuMusicEvent =
+            GameSoundEvent.MainMenuMusic;
+
+        [SerializeField]
+        private GameSoundEvent gameMusicEvent =
+            GameSoundEvent.GameMusic;
+
+      
 
         [Range(0f, 1f)]
         [SerializeField]
@@ -122,17 +135,39 @@ namespace ZenMatch.Runtime.Audio
 
         private void Start()
         {
-            if (!playBackgroundMusicOnStart)
-                return;
+            SceneManager.sceneLoaded +=
+                HandleSceneLoaded;
 
-            if (backgroundMusicEvent ==
-                GameSoundEvent.None)
+            PlayMusicForScene(
+                SceneManager.GetActiveScene());
+        }
+
+        private void OnDestroy()
+        {
+            SceneManager.sceneLoaded -=
+                HandleSceneLoaded;
+        }
+
+        private void HandleSceneLoaded(
+    Scene scene,
+    LoadSceneMode mode)
+        {
+            PlayMusicForScene(scene);
+        }
+
+        private void PlayMusicForScene(
+            Scene scene)
+        {
+            if (scene.name == mainMenuSceneName)
             {
+                PlayMusic(mainMenuMusicEvent);
                 return;
             }
 
-            PlayMusic(
-                backgroundMusicEvent);
+            if (scene.name == gameSceneName)
+            {
+                PlayMusic(gameMusicEvent);
+            }
         }
 
         private void ConfigureSources()
@@ -912,6 +947,17 @@ namespace ZenMatch.Runtime.Audio
             ApplyMusicSettings();
 
             musicSource.Play();
+
+            Debug.Log(
+    $"[MUSIC DEBUG] Event={soundEvent} | " +
+    $"Clip={sound.Clip.name} | " +
+    $"Muted={IsMusicMuted} | " +
+    $"MusicVolume={MusicVolume} | " +
+    $"EntryVolume={sound.Volume} | " +
+    $"BaseVolume={musicBaseVolume} | " +
+    $"FinalSourceVolume={musicSource.volume} | " +
+    $"IsPlaying={musicSource.isPlaying}",
+    this);
         }
 
         public void StopMusic()

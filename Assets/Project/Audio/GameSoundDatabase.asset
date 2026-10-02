@@ -83,3 +83,8 @@ MonoBehaviour:
     volume: 1
     pitch: 1.5
     delay: 0.2
+  - soundEvent: 100
+    clip: {fileID: 8300000, guid: f78b7246634a00f428f3c5dc1e7728f1, type: 3}
+    volume: 1
+    pitch: 1.5
+    delay: 0.2

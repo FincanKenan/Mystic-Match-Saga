@@ -96,6 +96,16 @@ namespace ZenMatch.Runtime.Ads
 
         private void HandleAdsInitialized()
         {
+            if (config == null || !config.AdsEnabled)
+            {
+                Debug.Log(
+                    "[Ads] Reklam sistemi devre dýþý. " +
+                    "Reklam yüklenmeyecek.");
+
+                SetRewardedAvailability(false);
+                return;
+            }
+
             LoadRewardedLifeAd();
             LoadInterstitialAd();
         }
@@ -107,8 +117,15 @@ namespace ZenMatch.Runtime.Ads
 
         public void LoadRewardedLifeAd()
         {
+            if (config == null || !config.AdsEnabled)
+            {
+                SetRewardedAvailability(false);
+                return;
+            }
+
             if (_rewardedLoading)
                 return;
+
 
             if (_consentService == null ||
                 !_consentService.IsMobileAdsInitialized)
@@ -168,6 +185,16 @@ namespace ZenMatch.Runtime.Ads
             Action onRewardEarned,
             Action onUnavailable = null)
         {
+            if (config == null || !config.AdsEnabled)
+            {
+                ExecuteOnMainThread(() =>
+                {
+                    onUnavailable?.Invoke();
+                });
+
+                return;
+            }
+
             if (!IsRewardedLifeReady)
             {
                 LoadRewardedLifeAd();
@@ -295,6 +322,10 @@ namespace ZenMatch.Runtime.Ads
 
         public void LoadInterstitialAd()
         {
+            if (config == null || !config.AdsEnabled)
+                return;
+
+
             if (_interstitialLoading)
                 return;
 
@@ -353,7 +384,15 @@ namespace ZenMatch.Runtime.Ads
             int completedLevelNumber,
             Action onFinished)
         {
-            if (!ShouldShowInterstitial(
+            
+                if (config == null || !config.AdsEnabled)
+                {
+                    onFinished?.Invoke();
+                    return;
+                }
+
+
+                if (!ShouldShowInterstitial(
                     completedLevelNumber))
             {
                 onFinished?.Invoke();

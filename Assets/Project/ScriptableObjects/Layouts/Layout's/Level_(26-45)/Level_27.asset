@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layoutId: Normal_1
   category: 0
+  useSpecialTraySettings: 0
+  startingActiveTrayCapacity: 7
   groups:
   - groupId: Group_01
     role: 0
@@ -26,6 +28,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 3
       maxStackHeight: 3
@@ -42,6 +47,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L27-N1-Point_1_1
       minStackHeight: 3
@@ -53,12 +61,15 @@ MonoBehaviour:
       specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_3
-      stackDirection: 1
-      stackLayoutMode: 1
+      stackDirection: 4
+      stackLayoutMode: 0
       visibilityMode: 0
       stackOpenDirection: 1
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L27-N1-Point_1_2
       minStackHeight: 3
@@ -76,6 +87,9 @@ MonoBehaviour:
       stackOpenDirection: 2
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 3
       maxStackHeight: 3
@@ -89,9 +103,12 @@ MonoBehaviour:
       stackDirection: 7
       stackLayoutMode: 1
       visibilityMode: 0
-      stackOpenDirection: 4
+      stackOpenDirection: 3
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L27-N1-Point_1_4
       minStackHeight: 3
@@ -103,12 +120,15 @@ MonoBehaviour:
       specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_6
-      stackDirection: 1
-      stackLayoutMode: 1
+      stackDirection: 4
+      stackLayoutMode: 0
       visibilityMode: 0
-      stackOpenDirection: 4
+      stackOpenDirection: 3
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L27-N1-Point_1_5
       minStackHeight: 3
@@ -126,6 +146,9 @@ MonoBehaviour:
       stackOpenDirection: 0
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 3
       maxStackHeight: 3
@@ -137,11 +160,14 @@ MonoBehaviour:
       note: 
     - pointId: L27-N1-Point_1_8
       stackDirection: 6
-      stackLayoutMode: 1
+      stackLayoutMode: 0
       visibilityMode: 0
-      stackOpenDirection: 0
+      stackOpenDirection: 4
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L27-N1-Point_1_7
       minStackHeight: 3
@@ -153,12 +179,15 @@ MonoBehaviour:
       specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_9
-      stackDirection: 1
-      stackLayoutMode: 1
+      stackDirection: 0
+      stackLayoutMode: 0
       visibilityMode: 0
       stackOpenDirection: 1
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L27-N1-Point_1_8
       minStackHeight: 3
@@ -176,6 +205,9 @@ MonoBehaviour:
       stackOpenDirection: 2
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 3
       maxStackHeight: 3
@@ -187,11 +219,14 @@ MonoBehaviour:
       note: 
     - pointId: L27-N1-Point_1_11
       stackDirection: 7
-      stackLayoutMode: 1
+      stackLayoutMode: 0
       visibilityMode: 0
       stackOpenDirection: 4
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L27-N1-Point_1_10
       minStackHeight: 3
@@ -203,12 +238,15 @@ MonoBehaviour:
       specialRewardTurnLimit: 0
       note: 
     - pointId: L27-N1-Point_1_12
-      stackDirection: 1
-      stackLayoutMode: 1
+      stackDirection: 0
+      stackLayoutMode: 0
       visibilityMode: 0
-      stackOpenDirection: 4
+      stackOpenDirection: 3
       startsLocked: 1
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds:
       - L27-N1-Point_1_11
       minStackHeight: 3
@@ -226,6 +264,9 @@ MonoBehaviour:
       stackOpenDirection: 4
       startsLocked: 0
       unlocksTraySlotOnComplete: 0
+      protectsTraySlot: 0
+      trayProtectionSafeSelectionCount: 0
+      trayProtectionFadeSelectionCount: 1
       requiredCompletedPointIds: []
       minStackHeight: 6
       maxStackHeight: 6
